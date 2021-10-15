@@ -1,20 +1,21 @@
 package CastleWars.data;
 
-import static CastleWars.Bundle.findLocale;
-import static CastleWars.Bundle.format;
-
 import CastleWars.Main;
 import CastleWars.logic.Room;
 import CastleWars.logic.TurretRoom;
 import arc.Events;
 import arc.math.Mathf;
 import arc.struct.IntMap;
+import arc.struct.Seq;
 import arc.util.Interval;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
 import mindustry.game.EventType;
 import mindustry.gen.*;
+
+import static CastleWars.Bundle.findLocale;
+import static CastleWars.Bundle.format;
 
 public class PlayerData {
 
@@ -33,7 +34,8 @@ public class PlayerData {
     }
 
     public void update() {
-        if (interval.get(0, MoneyInterval)) money += income;
+        if (interval.get(0, MoneyInterval))
+            money += income * (Groups.player.copy(new Seq<>()).select(p -> p.team().equals(this.player.team())).size / (Groups.player.size() - Groups.player.copy(new Seq<Player>()).select(p -> p.team().equals(this.player.team())).size));
         updateLabels();
 
         if (player.shooting && player.unit() != null) {
