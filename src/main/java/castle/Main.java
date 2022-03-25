@@ -27,7 +27,7 @@ import mindustry.world.blocks.storage.CoreBlock;
 import static mindustry.Vars.*;
 
 public class Main extends Plugin {
-
+//Hello darkdustry. 
     @Override
     public void init() {
         UnitTypes.flare.defaultController = GroundAI::new;
