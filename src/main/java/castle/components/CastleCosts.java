@@ -19,79 +19,79 @@ public class CastleCosts {
 
     public static void load() {
         units = OrderedMap.of(
-                UnitTypes.dagger,   new Moneys(60,    0,  10),
-                UnitTypes.mace,     new Moneys(150,   1,  50),
-                UnitTypes.fortress, new Moneys(500,   4,  150),
-                UnitTypes.scepter,  new Moneys(3000,  20, 750),
-                UnitTypes.reign,    new Moneys(10000, 45, 1500),
+                UnitTypes.dagger,   new Moneys(70,    0,  20),
+                UnitTypes.mace,     new Moneys(180,   1,  50),
+                UnitTypes.fortress, new Moneys(650,   4,  200),
+                UnitTypes.scepter,  new Moneys(3000,  20, 850),
+                UnitTypes.reign,    new Moneys(10000, 60, 1500),
 
-                UnitTypes.crawler,  new Moneys(75,    0,  10),
-                UnitTypes.atrax,    new Moneys(160,   1,  60),
-                UnitTypes.spiroct,  new Moneys(500,   4,  150),
-                UnitTypes.arkyid,   new Moneys(4600,  24, 750),
-                UnitTypes.toxopid,  new Moneys(12500, 50, 1750),
+                UnitTypes.crawler,  new Moneys(50,    0,  15),
+                UnitTypes.atrax,    new Moneys(200,   1,  60),
+                UnitTypes.spiroct,  new Moneys(700,   4,  250),
+                UnitTypes.arkyid,   new Moneys(3850,  20, 750),
+                UnitTypes.toxopid,  new Moneys(14000, 50, 1750),
 
-                UnitTypes.nova,     new Moneys(75,    0,  15),
-                UnitTypes.pulsar,   new Moneys(160,   1,  50),
-                UnitTypes.quasar,   new Moneys(500,   4,  175),
-                UnitTypes.vela,     new Moneys(3750,  25, 750),
-                UnitTypes.corvus,   new Moneys(15000, 55, 1500),
+                UnitTypes.nova,     new Moneys(85,    0,  15),
+                UnitTypes.pulsar,   new Moneys(150,   1,  50),
+                UnitTypes.quasar,   new Moneys(750,   4,  300),
+                UnitTypes.vela,     new Moneys(4000,  22, 750),
+                UnitTypes.corvus,   new Moneys(15000, 70, 1500),
 
-                UnitTypes.risso,    new Moneys(150,   0,  25),
-                UnitTypes.minke,    new Moneys(350,   2,  75),
-                UnitTypes.bryde,    new Moneys(1200  ,6,  200),
-                UnitTypes.sei,      new Moneys(3750,  22, 800),
-                UnitTypes.omura,    new Moneys(15000, 50, 1750),
+                UnitTypes.risso,    new Moneys(200,   0,  50),
+                UnitTypes.minke,    new Moneys(250,   1,  75),
+                UnitTypes.bryde,    new Moneys(1000  ,5,  200),
+                UnitTypes.sei,      new Moneys(4250,  24, 900),
+                UnitTypes.omura,    new Moneys(15000, 60, 2000),
 
-                UnitTypes.retusa,   new Moneys(160,   0,  25),
-                UnitTypes.oxynoe,   new Moneys(650,   3,  80),
-                UnitTypes.cyerce,   new Moneys(1300,  6,  200),
-                UnitTypes.aegires,  new Moneys(4800,  24, 800),
-                UnitTypes.navanax,  new Moneys(11000, 70, 2000)
+                UnitTypes.retusa,   new Moneys(150,   0,  50),
+                UnitTypes.oxynoe,   new Moneys(700,   4,  80),
+                UnitTypes.cyerce,   new Moneys(1650,  6,  200),
+                UnitTypes.aegires,  new Moneys(5250,  26, 1000),
+                UnitTypes.navanax,  new Moneys(13500, 70, 2000)
         );
 
         turrets = OrderedMap.of(
-                Blocks.duo,        100,
-                Blocks.scatter,    250,
+                Blocks.duo,        50,
+                Blocks.scatter,    150,
                 Blocks.scorch,     200,
-                Blocks.hail,       450,
-                Blocks.wave,       300,
-                Blocks.lancer,     350,
-                Blocks.arc,        150,
-                Blocks.swarmer,    1250,
-                Blocks.salvo,      500,
-                Blocks.tsunami,    850,
-                Blocks.fuse,       1500,
-                Blocks.ripple,     1500,
-                Blocks.cyclone,    1750,
-                Blocks.foreshadow, 4000,
-                Blocks.spectre,    3000,
-                Blocks.meltdown,   3000
+                Blocks.hail,       250,
+                Blocks.wave,       250,
+                Blocks.lancer,     300,
+                Blocks.arc,        100,
+                Blocks.swarmer,    1650,
+                Blocks.salvo,      750,
+                Blocks.tsunami,    800,
+                Blocks.fuse,       1350,
+                Blocks.ripple,     1400,
+                Blocks.cyclone,    2000,
+                Blocks.foreshadow, 6000,
+                Blocks.spectre,    4000,
+                Blocks.meltdown,   3500
         );
 
         items = OrderedMap.of(
-                Items.copper,        500,
-                Items.lead,          500,
-                Items.metaglass,     750,
-                Items.graphite,      750,
-                Items.sand,          750,
-                Items.coal,          750,
-                Items.titanium,      800,
-                Items.thorium,       1000,
-                Items.scrap,         500,
-                Items.silicon,       750,
-                Items.plastanium,    1250,
-                Items.phaseFabric,   2000,
-                Items.surgeAlloy,    2500,
+                Items.copper,        250,
+                Items.lead,          300,
+                Items.metaglass,     550,
+                Items.graphite,      400,
+                Items.sand,          50,
+                Items.coal,          50,
+                Items.titanium,      850,
+                Items.thorium,       1150,
+                Items.scrap,         50,
+                Items.silicon,       500,
+                Items.plastanium,    1300,
+                Items.phaseFabric,   1250,
+                Items.surgeAlloy,    1850,
                 Items.sporePod,      500,
-                Items.blastCompound, 750,
-                Items.pyratite,      750
+                Items.blastCompound, 100,
+                Items.pyratite,      100
         );
 
         effects = OrderedMap.of(
-                StatusEffects.overclock, 7500,
-                StatusEffects.overdrive, 15000,
-                StatusEffects.boss,      25000
+                StatusEffects.overclock, 4000,
+                StatusEffects.overdrive, 12500,
+                StatusEffects.boss,      20000
         );
     }
 
