@@ -8,13 +8,8 @@ repositories {
     maven { url 'https://www.jitpack.io' }
 }
 
-sourceSets.main {
-    java.srcDirs = ['src/main/java']
-    resources.srcDirs = ['src/main/resources']
-}
-
 ext {
-    mindustryVersion = 'v137'
+    mindustryVersion = 'v139'
 }
 
 dependencies {

@@ -1,7 +1,10 @@
 {
   "name": "castle-wars",
-  "author": "Xusk",
+  "minGameVersion": "139",
+  "displayName": "Castle Wars",
+  "author": "Darkness6030",
+  "description": "Defend your side!",
+  "version": "1.0",
   "main": "castle.Main",
-  "description": "Defende your side!",
-  "version": 1.1
+  "repo": "Darkdustry-Coders/CastleWars"
 }
