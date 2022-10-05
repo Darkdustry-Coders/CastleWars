@@ -4,22 +4,30 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.util.Interval;
-import castle.components.*;
+import castle.CastleRooms.Room;
+import castle.components.Bundle;
+import castle.components.CastleCosts;
+import castle.components.CastleIcons;
+import castle.components.PlayerData;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
-import mindustry.gen.*;
+import mindustry.gen.Call;
+import mindustry.gen.Groups;
+import mindustry.gen.Player;
 import mindustry.mod.Plugin;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.production.Drill;
 import mindustry.world.blocks.storage.CoreBlock;
+import mindustry.world.meta.BuildVisibility;
 
 import java.util.Locale;
 
-import static castle.CastleRooms.*;
-import static castle.CastleUtils.*;
-import static castle.components.Bundle.*;
+import static castle.CastleRooms.rooms;
+import static castle.CastleRooms.spawns;
+import static castle.CastleUtils.isBreak;
+import static castle.CastleUtils.timer;
 import static castle.components.PlayerData.datas;
 import static mindustry.Vars.*;
 
@@ -30,16 +38,13 @@ public class Main extends Plugin {
     public static final Interval interval = new Interval();
 
     public static Locale findLocale(Player player) {
-        var locale = supportedLocales.find(l -> l.toString().equals(player.locale) || player.locale.startsWith(l.toString()));
-        return locale != null ? locale : defaultLocale;
+        Locale locale = Bundle.supportedLocales.find(l -> l.toString().equals(player.locale) || player.locale.startsWith(l.toString()));
+        return locale != null ? locale : Bundle.defaultLocale;
     }
 
     @Override
     public void init() {
-        content.units().each(unit -> unit.playerControllable, unit -> {
-            unit.payloadCapacity = 0f;
-            unit.controller = u -> new CastleCommandAI();
-        });
+        content.units().each(unit -> unit.playerControllable, unit -> unit.controller = u -> new CastleCommandAI());
 
         Bundle.load();
         CastleCosts.load();
@@ -54,7 +59,7 @@ public class Main extends Plugin {
                 for (var tile : entry.value)
                     if (tile.dst(action.tile) <= state.rules.dropZoneRadius) return false;
 
-            return !(action.tile.block() instanceof Turret) && !(action.tile.block() instanceof Drill) && action.tile.block() != Blocks.itemSource && action.tile.block() != Blocks.liquidSource;
+            return !(action.tile.block() instanceof Turret) && !(action.tile.block() instanceof Drill) && action.tile.block().buildVisibility != BuildVisibility.sandboxOnly;
         });
 
         Events.on(PlayerJoin.class, event -> {
