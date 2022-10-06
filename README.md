@@ -1,1 +1,1 @@
-# castle
+# CastleWars plugin.
