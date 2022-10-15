@@ -3,8 +3,10 @@ package castle;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.ai.types.CommandAI;
+import mindustry.gen.Teamc;
 
 import static castle.CastleUtils.onEnemySide;
+import static mindustry.entities.Units.closestTarget;
 
 public class CastleCommandAI extends CommandAI {
 
@@ -24,5 +26,15 @@ public class CastleCommandAI extends CommandAI {
                 lastCommandTime = Time.millis();
             }
         }
+    }
+
+    @Override
+    public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
+        return nearAttackTarget(x, y, range) ? attackTarget : target(x, y, range, air, ground);
+    }
+
+    @Override
+    public Teamc target(float x, float y, float range, boolean air, boolean ground) {
+         return closestTarget(unit.team, x, y, range, unit -> unit.checkTarget(air, ground), building -> ground && building.health < 999999999f);
     }
 }
