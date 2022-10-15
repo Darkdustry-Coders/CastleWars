@@ -20,7 +20,7 @@ public class CastleUtils {
     public static int timer = roundTime;
 
     public static void checkPlanet(Map map) {
-        Rules rules = map.applyRules(Gamemode.pvp);
+        var rules = map.applyRules(Gamemode.pvp);
         planet = content.planets().find(planet -> planet.accessible && (planet.defaultEnv == rules.env || planet.hiddenItems.asSet().equals(rules.hiddenBuildItems)));
     }
 
@@ -44,6 +44,8 @@ public class CastleUtils {
 
         rules.teams.get(Team.sharded).cheat = true;
         rules.teams.get(Team.blue).cheat = true;
+
+        rules.weather.clear();
 
         rules.bannedBlocks.addAll(content.blocks().select(block -> block instanceof CoreBlock || block instanceof UnitFactory || block.group == BlockGroup.turrets || block.group == BlockGroup.drills || block.group == BlockGroup.logic));
     }
