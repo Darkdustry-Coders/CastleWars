@@ -31,6 +31,7 @@ public class CastleUtils {
         rules.unitCapVariable = false;
 
         rules.canGameOver = false;
+        rules.reactorExplosions = true;
 
         rules.dropZoneRadius = 60f;
         rules.showSpawns = true;
