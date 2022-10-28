@@ -25,7 +25,7 @@ public class CastleUtils {
     }
 
     public static void applyRules(Rules rules) {
-        //rules.pvp = true;
+        rules.pvp = true;
 
         rules.unitCap = 500;
         rules.unitCapVariable = false;
