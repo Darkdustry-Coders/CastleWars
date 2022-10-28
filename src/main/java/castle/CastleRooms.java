@@ -15,9 +15,9 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.storage.CoreBlock;
+import useful.Bundle;
 
 import static castle.CastleUtils.countUnits;
-import static castle.components.Bundle.*;
 import static mindustry.Vars.*;
 
 public class CastleRooms {
@@ -125,7 +125,7 @@ public class CastleRooms {
             tile.setNet(block, team, 0);
             if (!(block instanceof CoreBlock)) tile.build.health(Float.MAX_VALUE);
 
-            Groups.player.each(player -> Call.label(player.con, format("events.buy", findLocale(player), data.player.coloredName()), 1f, getX(), getY()));
+            Groups.player.each(player -> Call.label(player.con, Bundle.format("events.buy", player, data.player.coloredName()), 1f, getX(), getY()));
         }
 
         @Override
@@ -238,7 +238,7 @@ public class CastleRooms {
             if (!super.canBuy(data)) return false;
 
             if (countUnits(data.player.team()) >= Units.getCap(data.player.team())) {
-                Call.announce(data.player.con, get("rooms.unit.limit", data.locale));
+                Bundle.announce(data.player, "rooms.unit.limit");
                 return false;
             }
 
