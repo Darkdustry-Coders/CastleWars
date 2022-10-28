@@ -1,36 +1,23 @@
 package castle;
 
-import arc.math.Mathf;
 import arc.math.geom.Position;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
-import arc.util.Interval;
-import arc.util.Strings;
-import arc.util.Timer;
-import arc.util.Tmp;
-import castle.components.CastleCosts;
-import castle.components.CastleIcons;
-import castle.components.PlayerData;
+import arc.util.*;
+import castle.components.*;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.entities.Units;
 import mindustry.game.Team;
-import mindustry.gen.Call;
-import mindustry.gen.Groups;
-import mindustry.gen.Iconc;
-import mindustry.gen.WorldLabel;
-import mindustry.type.Item;
-import mindustry.type.StatusEffect;
-import mindustry.type.UnitType;
+import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import static castle.CastleUtils.countUnits;
-import static castle.Main.findLocale;
-import static castle.components.Bundle.format;
-import static castle.components.Bundle.get;
+import static castle.components.Bundle.*;
 import static mindustry.Vars.*;
 
 public class CastleRooms {
@@ -112,8 +99,8 @@ public class CastleRooms {
     }
 
     public static class BlockRoom extends Room {
-        public Block block;
-        public Team team;
+        public final Block block;
+        public final Team team;
 
         public boolean bought;
 
@@ -122,7 +109,7 @@ public class CastleRooms {
 
             this.block = block;
             this.team = team;
-            this.label.text(CastleIcons.get(block.name) + " :[white] " + cost);
+            this.label.text(CastleIcons.get(block) + " :[white] " + cost);
         }
 
         public BlockRoom(Block block, Team team, int x, int y, int cost) {
@@ -138,7 +125,7 @@ public class CastleRooms {
             tile.setNet(block, team, 0);
             if (!(block instanceof CoreBlock)) tile.build.health(Float.MAX_VALUE);
 
-            Groups.player.each(p -> Call.label(p.con, format("events.buy", findLocale(p), data.player.coloredName()), 1f, getX(), getY()));
+            Groups.player.each(player -> Call.label(player.con, format("events.buy", findLocale(player), data.player.coloredName()), 1f, getX(), getY()));
         }
 
         @Override
@@ -159,7 +146,7 @@ public class CastleRooms {
             var source = world.tile(startx, y);
             int timeOffset = 0;
 
-            var item = content.items().find(i -> block.consumesItem(i));
+            var item = content.items().find(block::consumesItem);
             if (item != null) {
                 Timer.schedule(() -> {
                     source.setNet(Blocks.itemSource, team, 0);
@@ -168,7 +155,7 @@ public class CastleRooms {
                 }, timeOffset++);
             }
 
-            var liquid = content.liquids().find(l -> block.consumesLiquid(l));
+            var liquid = content.liquids().find(block::consumesLiquid);
             if (liquid != null) {
                 Timer.schedule(() -> {
                     source.setNet(Blocks.liquidSource, team, 0);
@@ -187,9 +174,10 @@ public class CastleRooms {
     }
 
     public static class MinerRoom extends BlockRoom {
-        public Item item;
-        public int amount;
-        public Interval interval = new Interval();
+        public final Interval interval = new Interval();
+
+        public final Item item;
+        public final int amount;
 
         public MinerRoom(Block drill, Item item, Team team, int x, int y) {
             super(drill, team, x, y, CastleCosts.items.get(item));
@@ -197,23 +185,22 @@ public class CastleRooms {
             this.item = item;
             this.amount = (int) (300f - item.cost * 150f);
 
-            this.label.text("[" + CastleIcons.get(item.name) + "] : " + cost);
+            this.label.text("[" + CastleIcons.get(item) + "] : " + cost);
         }
 
         @Override
         public void update() {
             if (bought && interval.get(300f)) {
-                float randX = getX() + Mathf.range(12f), randY = getY() + Mathf.range(12f);
-                Call.effect(Fx.mineHuge, randX, randY, 0f, team.color);
-                Call.transferItemTo(null, item, amount, randX, randY, team.core());
+                Call.effect(Fx.mineHuge, getX(), getY(), 0f, team.color);
+                Call.transferItemTo(null, item, amount, getX(), getY(), team.core());
             }
         }
     }
 
     public static class UnitRoom extends Room {
-        public UnitType type;
-        public UnitRoomType roomType;
-        public int income;
+        public final UnitType type;
+        public final UnitRoomType roomType;
+        public final int income;
 
         public UnitRoom(UnitType type, UnitRoomType roomType, int income, int x, int y, int cost) {
             super(x, y, cost, 4);
@@ -225,7 +212,7 @@ public class CastleRooms {
             this.label.set(getX(), getY() + 12f);
             this.label.fontSize(2.25f);
             this.label.text(" ".repeat((String.valueOf(cost).length() + String.valueOf(income).length() + 2) / 2) +
-                    CastleIcons.get(type.name) + " " + roomType.icon +
+                    CastleIcons.get(type) + " " + roomType.icon +
                     "\n[gray]" + cost +
                     "\n[white]" + Iconc.blockPlastaniumCompressor + " : " + (income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[crimson]") + income);
         }
@@ -261,7 +248,7 @@ public class CastleRooms {
         public enum UnitRoomType {
             attack("[accent]" + Iconc.modeAttack), defend("[scarlet]" + Iconc.defense);
 
-            public String icon;
+            public final String icon;
 
             UnitRoomType(String icon) {
                 this.icon = icon;
@@ -280,7 +267,7 @@ public class CastleRooms {
 
             this.label.set(getX(), getY() + 12f);
             this.label.fontSize(2.25f);
-            this.label.text("[accent]" + Strings.capitalize(effect.name) + "\n" + "effect" + "\n[white]" + CastleIcons.get(effect.name) + " : [gray]" + cost);
+            this.label.text("[accent]" + Strings.capitalize(effect.name) + "\n" + "effect" + "\n[white]" + CastleIcons.get(effect) + " : [gray]" + cost);
         }
 
         @Override

@@ -7,15 +7,13 @@ import mindustry.content.Blocks;
 import mindustry.content.Planets;
 import mindustry.game.Team;
 import mindustry.type.unit.ErekirUnitType;
-import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.distribution.Sorter.SorterBuild;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import static castle.CastleRooms.*;
-import static castle.CastleUtils.isErekir;
-import static castle.CastleUtils.isSerpulo;
+import static castle.CastleUtils.*;
 import static mindustry.Vars.world;
 
 public class CastleGenerator {
@@ -55,10 +53,9 @@ public class CastleGenerator {
                     tiles.getc(x, y2).setNet(CastleUtils.planet.defaultCore, Team.blue, 0);
 
                     var core = isSerpulo() ? Blocks.coreNucleus : Blocks.coreAcropolis;
-                    y2 = tiles.height - y - 2 + core.size % 2;
 
                     new BlockRoom(core, Team.sharded, x, y, 5000);
-                    new BlockRoom(core, Team.blue, x, y2, 5000);
+                    new BlockRoom(core, Team.blue, x, tiles.height - y - 2 + core.size % 2, 5000);
                 }
 
                 if (tile.block() instanceof Turret turret) {
@@ -75,11 +72,10 @@ public class CastleGenerator {
                     var item = sorter.config();
                     if (!CastleCosts.items.containsKey(item)) continue;
 
-                    Block drill = isSerpulo() ? Blocks.laserDrill : Blocks.impactDrill;
-                    y2 = tiles.height - y - 2 + drill.size % 2;
+                    var drill = isSerpulo() ? Blocks.laserDrill : Blocks.impactDrill;
 
                     new MinerRoom(drill, item, Team.sharded, x, y);
-                    new MinerRoom(drill, item, Team.blue, x, y2);
+                    new MinerRoom(drill, item, Team.blue, x, tiles.height - y - 2 + drill.size % 2);
                 }
 
                 if (tile.overlay() == Blocks.spawn) {

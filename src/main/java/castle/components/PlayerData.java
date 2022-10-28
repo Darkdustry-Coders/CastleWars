@@ -8,9 +8,8 @@ import mindustry.gen.Player;
 
 import java.util.Locale;
 
-import static castle.CastleUtils.countUnits;
-import static castle.CastleUtils.timer;
-import static castle.Main.findLocale;
+import static castle.CastleUtils.*;
+import static castle.components.Bundle.findLocale;
 
 public class PlayerData {
 

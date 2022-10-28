@@ -22,9 +22,8 @@ public class CastleCommandAI extends CommandAI {
             targetPos = Tmp.v1.set(core);
         } else {
             super.updateUnit();
-            if (hasCommand()) {
+            if (hasCommand())
                 lastCommandTime = Time.millis();
-            }
         }
     }
 

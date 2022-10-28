@@ -2,26 +2,22 @@ package castle.components;
 
 import arc.struct.StringMap;
 import arc.util.Http;
+import mindustry.ctype.MappableContent;
 
 public class CastleIcons {
 
     private static final StringMap icons = new StringMap();
 
     public static void load() {
-        Http.get("https://raw.githubusercontent.com/Anuken/Mindustry/v136/core/assets/icons/icons.properties").submit(response -> {
-            var lines = response.getResultAsString().split("\n");
-            for (var line : lines) {
+        Http.get("https://raw.githubusercontent.com/Anuken/Mindustry/master/core/assets/icons/icons.properties", response -> {
+            for (var line : response.getResultAsString().split("\n")) {
                 var values = line.split("\\|")[0].split("=");
-
-                var name = values[1];
-                var icon = String.valueOf((char) Integer.parseInt(values[0]));
-
-                icons.put(name, icon);
+                icons.put(values[1], String.valueOf((char) Integer.parseInt(values[0])));
             }
         });
     }
 
-    public static String get(String key) {
-        return icons.get(key);
+    public static String get(MappableContent content) {
+        return icons.get(content.name, content.name);
     }
 }

@@ -2,11 +2,10 @@ package castle.components;
 
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import mindustry.gen.Player;
 
 import java.text.MessageFormat;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static mindustry.Vars.mods;
 
@@ -16,34 +15,30 @@ public class Bundle {
     public static final Seq<Locale> supportedLocales = new Seq<>();
 
     private static final ObjectMap<Locale, ResourceBundle> bundles = new ObjectMap<>();
-    private static final ObjectMap<Locale, MessageFormat> formats = new ObjectMap<>();
 
     public static void load() {
-        var files = mods.getMod("castle-wars").root.child("bundles").seq();
+        var files = mods.getMod("castle-wars")
+                .root.child("bundles").seq()
+                .filter(fi -> fi.extEquals("properties"));
 
-        files.each(file -> {
-            var codes = file.nameWithoutExtension().split("_");
+        files.each(fi -> {
+            var codes = fi.nameWithoutExtension().split("_");
 
-            if (codes.length == 1) { // bundle.properties
-                supportedLocales.add(Locale.ROOT);
-            } else if (codes.length == 2) { // bundle_ru.properties
+            if (codes.length == 2) { // bundle_ru.properties
                 supportedLocales.add(new Locale(codes[1]));
             } else if (codes.length == 3) { // bundle_uk_UA.properties
                 supportedLocales.add(new Locale(codes[1], codes[2]));
             }
         });
 
-        supportedLocales.each(locale -> {
-            bundles.put(locale, ResourceBundle.getBundle("bundles.bundle", locale));
-            formats.put(locale, new MessageFormat("", locale));
-        });
+        supportedLocales.each(locale -> bundles.put(locale, ResourceBundle.getBundle("bundles.bundle", locale)));
     }
 
     public static String get(String key, String defaultValue, Locale locale) {
         try {
             var bundle = bundles.get(locale, bundles.get(defaultLocale));
             return bundle.getString(key);
-        } catch (MissingResourceException ignored) {
+        } catch (MissingResourceException e) {
             return defaultValue;
         }
     }
@@ -53,17 +48,14 @@ public class Bundle {
     }
 
     public static String format(String key, Locale locale, Object... values) {
-        var pattern = get(key, locale);
-        if (values.length == 0) {
-            return pattern;
-        }
+        String pattern = get(key, locale);
+        if (values.length == 0) return pattern;
 
-        var format = formats.get(locale, formats.get(defaultLocale));
-        format.applyPattern(pattern);
-        return format.format(values);
+        return MessageFormat.format(pattern, values);
     }
 
-    public static String format(String key, Object... values) {
-        return format(key, defaultLocale, values);
+    public static Locale findLocale(Player player) {
+        var locale = supportedLocales.find(l -> player.locale.equals(l.toString()) || player.locale.startsWith(l.toString()));
+        return locale != null ? locale : defaultLocale;
     }
 }

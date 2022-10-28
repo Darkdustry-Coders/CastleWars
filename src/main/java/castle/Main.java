@@ -29,11 +29,6 @@ public class Main extends Plugin {
 
     public static final Interval interval = new Interval();
 
-    public static Locale findLocale(Player player) {
-        var locale = supportedLocales.find(l -> l.toString().equals(player.locale) || player.locale.startsWith(l.toString()));
-        return locale != null ? locale : defaultLocale;
-    }
-
     @Override
     public void init() {
         content.units().each(unit -> unit.playerControllable, unit -> {
