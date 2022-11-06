@@ -15,6 +15,7 @@ import mindustry.mod.Plugin;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.production.Drill;
 import mindustry.world.blocks.storage.CoreBlock;
+import useful.Bundle;
 
 import static castle.CastleRooms.*;
 import static castle.CastleUtils.*;
@@ -34,7 +35,7 @@ public class Main extends Plugin {
             unit.controller = u -> new CastleCommandAI();
         });
 
-        Bundle.load();
+        Bundle.load(Main.class);
         CastleCosts.load();
         CastleIcons.load();
 
