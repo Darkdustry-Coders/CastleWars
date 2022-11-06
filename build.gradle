@@ -9,7 +9,7 @@ repositories {
 }
 
 ext {
-    mindustryVersion = 'v139'
+    mindustryVersion = 'v140.1'
 }
 
 dependencies {
@@ -19,7 +19,7 @@ dependencies {
 
 jar {
     from {
-        configurations.runtimeClasspath.collect {it.isDirectory() ? it : zipTree(it)}
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 

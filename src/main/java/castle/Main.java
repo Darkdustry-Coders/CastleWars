@@ -9,17 +9,15 @@ import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
-import mindustry.gen.*;
+import mindustry.gen.Call;
+import mindustry.gen.Groups;
 import mindustry.mod.Plugin;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.production.Drill;
 import mindustry.world.blocks.storage.CoreBlock;
 
-import java.util.Locale;
-
 import static castle.CastleRooms.*;
 import static castle.CastleUtils.*;
-import static castle.components.Bundle.*;
 import static castle.components.PlayerData.datas;
 import static mindustry.Vars.*;
 
@@ -87,7 +85,7 @@ public class Main extends Plugin {
         Events.on(WorldLoadEvent.class, event -> CastleUtils.timer = roundTime);
 
         Events.run(Trigger.update, () -> {
-            if (isBreak() || state.serverPaused) return;
+            if (isBreak() || state.isPaused()) return;
 
             Groups.unit.each(unit -> unit.isFlying() && !unit.spawnedByCore && (unit.floorOn() == null || unit.floorOn() == Blocks.space), unit -> {
                 Call.effect(Fx.unitEnvKill, unit.x, unit.y, 0f, Color.scarlet);
