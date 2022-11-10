@@ -26,15 +26,15 @@ public class CastleGenerator {
 
         for (int x = 0; x < tiles.width; x++)
             for (int y = saved.height; y < tiles.height - saved.height; y++)
-                tiles.set(x, y, new Tile(x, y, Blocks.space, Blocks.air, Blocks.air));
+                tiles.set(x, y, new Tile(x, y, Blocks.space.id, 0, 0));
 
         for (int x = 0; x < saved.width; x++) {
             for (int y = 0; y < saved.height; y++) {
-                Tile tile = saved.getc(x, y);
+                var tile = saved.getc(x, y);
 
-                var floor = tile.floor();
-                var overlay = tile.overlay().needsSurface ? tile.overlay() : Blocks.air;
-                var wall = !tile.block().hasBuilding() && tile.isCenter() ? tile.block() : Blocks.air;
+                short floor = tile.floorID();
+                short overlay = tile.overlay().needsSurface ? tile.overlayID() : 0;
+                short wall = !tile.block().hasBuilding() && tile.isCenter() ? tile.blockID() : 0;
 
                 tiles.set(x, y, new Tile(x, y, floor, overlay, wall));
                 tiles.set(x, tiles.height - y - 1, new Tile(x, tiles.height - y - 1, floor, overlay, wall));

@@ -34,6 +34,6 @@ public class CastleCommandAI extends CommandAI {
 
     @Override
     public Teamc target(float x, float y, float range, boolean air, boolean ground) {
-         return closestTarget(unit.team, x, y, range, unit -> unit.checkTarget(air, ground), building -> ground && building.health < 999999999f);
+        return closestTarget(unit.team, x, y, range, unit -> unit.checkTarget(air, ground), building -> ground && building.health < 999999999f);
     }
 }

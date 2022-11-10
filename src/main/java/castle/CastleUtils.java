@@ -29,16 +29,12 @@ public class CastleUtils {
 
         rules.unitCap = 500;
         rules.unitCapVariable = false;
-
         rules.canGameOver = false;
-        rules.reactorExplosions = true;
-
         rules.dropZoneRadius = 60f;
         rules.showSpawns = true;
 
         rules.polygonCoreProtection = true;
         rules.buildSpeedMultiplier = 0.5f;
-
         rules.waves = false;
         rules.waveTimer = false;
         rules.modeName = "Castle Wars";
