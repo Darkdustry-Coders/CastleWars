@@ -5,18 +5,17 @@ import castle.CastleRooms;
 import mindustry.entities.Units;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
-import useful.Bundle;
 
 import java.util.Locale;
 
 import static castle.CastleUtils.*;
+import static castle.components.Bundle.findLocale;
 
 public class PlayerData {
 
     public static final Seq<PlayerData> datas = new Seq<>();
 
     public Player player;
-    public Locale locale;
 
     public int money = 0;
     public int income = 15;
@@ -46,7 +45,7 @@ public class PlayerData {
 
     public void handlePlayerJoin(Player player) {
         this.player = player;
-        this.locale = Bundle.locale(player);
+        this.locale = findLocale(player);
     }
 
     public void reset() {

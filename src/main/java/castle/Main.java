@@ -15,10 +15,11 @@ import mindustry.mod.Plugin;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.production.Drill;
 import mindustry.world.blocks.storage.CoreBlock;
-import useful.Bundle;
+import java.util.Locale;
 
 import static castle.CastleRooms.*;
 import static castle.CastleUtils.*;
+import static castle.components.Bundle.*;
 import static castle.components.PlayerData.datas;
 import static mindustry.Vars.*;
 
@@ -35,7 +36,7 @@ public class Main extends Plugin {
             unit.controller = u -> new CastleCommandAI();
         });
 
-        Bundle.load(Main.class);
+        Bundle.load();
         CastleCosts.load();
         CastleIcons.load();
 
