@@ -88,7 +88,7 @@ public class Main extends Plugin {
         Events.run(Trigger.update, () -> {
             if (isBreak() || state.isPaused()) return;
 
-            Groups.unit.each(unit -> unit.isFlying() && !unit.spawnedByCore && (unit.floorOn() == null || unit.floorOn() == Blocks.space), unit -> {
+            Groups.unit.each(unit -> !unit.spawnedByCore && (unit.isFlying() || unit.elevation > 0f) && (unit.floorOn() == null || unit.floorOn() == Blocks.space), unit -> {
                 Call.effect(Fx.unitEnvKill, unit.x, unit.y, 0f, Color.scarlet);
                 Call.unitDespawn(unit);
             });
