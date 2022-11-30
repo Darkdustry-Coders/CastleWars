@@ -1,28 +1,28 @@
 package castle;
 
 import arc.struct.Seq;
-import arc.util.Structs;
 import castle.components.CastleCosts;
 import mindustry.content.Blocks;
-import mindustry.content.Planets;
 import mindustry.game.Team;
 import mindustry.type.unit.ErekirUnitType;
 import mindustry.world.Tile;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.distribution.Sorter.SorterBuild;
+import mindustry.world.blocks.environment.SpawnBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import static castle.CastleRooms.*;
-import static castle.CastleUtils.*;
-import static mindustry.Vars.world;
+import static castle.CastleUtils.isSerpulo;
+import static mindustry.Vars.*;
 
 public class CastleGenerator {
 
+    public static final int unitOffsetX = 5, unitOffsetY = 3, effectOffsetX = 3, effectOffsetY = 6;
     public static int offsetX, offsetY;
 
     public static void generate() {
         var saved = world.tiles;
-        var tiles = world.resize(world.width(), world.height() * 2 + size * 13 / 2);
+        var tiles = world.resize(world.width(), world.height() * 2 + 65);
 
         for (int x = 0; x < saved.width; x++)
             for (int y = saved.height; y < tiles.height - saved.height; y++)
@@ -46,40 +46,36 @@ public class CastleGenerator {
                 var tile = saved.getc(x, y);
                 if (!tile.isCenter()) continue;
 
-                int y2 = tiles.height - y - 2 + tile.block().size % 2;
+                int y2 = tiles.height - y - 2;
 
-                if (tile.block() instanceof CoreBlock) {
-                    tiles.getc(x, y).setNet(CastleUtils.planet.defaultCore, Team.sharded, 0);
-                    tiles.getc(x, y2).setNet(CastleUtils.planet.defaultCore, Team.blue, 0);
+                if (tile.block() instanceof CoreBlock core) {
+                    tiles.getc(x, y).setNet(core, Team.sharded, 0);
+                    tiles.getc(x, y2 + core.size % 2).setNet(core, Team.blue, 0);
 
-                    var core = isSerpulo() ? Blocks.coreNucleus : Blocks.coreAcropolis;
+                    var newCore = isSerpulo() ? Blocks.coreNucleus : Blocks.coreAcropolis;
 
-                    new BlockRoom(core, Team.sharded, x, y, 5000);
-                    new BlockRoom(core, Team.blue, x, tiles.height - y - 2 + core.size % 2, 5000);
+                    new BlockRoom(newCore, Team.sharded, x, y, 5000);
+                    new BlockRoom(newCore, Team.blue, x, y2 + newCore.size % 2, 5000);
                 }
 
                 if (tile.block() instanceof Turret turret) {
-                    boolean isErekirTurret = Structs.contains(turret.requirements, stack -> Planets.serpulo.hiddenItems.contains(stack.item));
-                    if (isErekir() && !isErekirTurret || isSerpulo() && isErekirTurret) continue;
-
-                    if (!CastleCosts.turrets.containsKey(turret)) continue;
+                    if (!turret.environmentBuildable() || !CastleCosts.turrets.containsKey(turret)) continue;
 
                     new TurretRoom(turret, Team.sharded, x, y);
-                    new TurretRoom(turret, Team.blue, x, y2);
+                    new TurretRoom(turret, Team.blue, x, y2 + turret.size % 2);
                 }
 
                 if (tile.build instanceof SorterBuild sorter) {
-                    var item = sorter.config();
-                    if (!CastleCosts.items.containsKey(item)) continue;
+                    if (!CastleCosts.items.containsKey(sorter.config())) continue;
 
                     var drill = isSerpulo() ? Blocks.laserDrill : Blocks.impactDrill;
 
-                    new MinerRoom(drill, item, Team.sharded, x, y);
-                    new MinerRoom(drill, item, Team.blue, x, tiles.height - y - 2 + drill.size % 2);
+                    new MinerRoom(drill, sorter.config(), Team.sharded, x, y);
+                    new MinerRoom(drill, sorter.config(), Team.blue, x, y2 + drill.size % 2);
                 }
 
-                if (tile.overlay() == Blocks.spawn) {
-                    spawns.get(Team.sharded, Seq::new).add(tiles.getc(x, y2));
+                if (tile.overlay() instanceof SpawnBlock spawn) {
+                    spawns.get(Team.sharded, Seq::new).add(tiles.getc(x, y2 + spawn.size % 2));
                     spawns.get(Team.blue, Seq::new).add(tiles.getc(x, y));
                 }
             }
@@ -89,26 +85,28 @@ public class CastleGenerator {
     }
 
     public static void generateShop(int shopX, int shopY) {
-        offsetX = offsetY = 0; // Сбрасываем offset, оставшийся от генерации старой карты
+        offsetX = offsetY = 0;
 
-        CastleCosts.units.each((type, money) -> {
-            boolean isErekirUnit = type instanceof ErekirUnitType;
-            if (isErekir() && !isErekirUnit || isSerpulo() && isErekirUnit) return;
+        CastleCosts.units.each((type, data) -> {
+            boolean isErekir = type instanceof ErekirUnitType;
+            if ((isErekir && isSerpulo()) || (!isErekir && !isSerpulo())) return;
 
-            new UnitRoom(type, UnitRoom.UnitRoomType.attack, money.income(), shopX + offsetX * size, shopY + offsetY * size * 2, money.cost());
-            new UnitRoom(type, UnitRoom.UnitRoomType.defend, -money.income(), shopX + offsetX * size, shopY + offsetY * size * 2 + size, money.cost());
+            new UnitRoom(type, data.income(), true, shopX + offsetX * size, shopY + offsetY * size * 2, data.cost());
+            new UnitRoom(type, -data.income(), false, shopX + offsetX * size, shopY + offsetY * size * 2 + size, data.cost());
 
-            if (++offsetX % 5 != 0) return;
-            if (++offsetY % 3 != 0) offsetX -= 5;
-            else offsetY -= 3;
+            if (++offsetX % unitOffsetX != 0) return;
+            if (++offsetY % unitOffsetY != 0) offsetX -= unitOffsetX;
+            else offsetY -= unitOffsetY;
         });
 
-        CastleCosts.effects.each((effect, cost) -> {
-            new EffectRoom(effect, shopX + offsetX * size, shopY + offsetY * size * 2, cost);
+        offsetY = 0;
 
-            if (++offsetX % 5 != 0) return;
-            if (++offsetY % 3 != 0) offsetX -= 5;
-            else offsetY -= 3;
+        CastleCosts.effects.each((effect, data) -> {
+            new EffectRoom(effect, data.duration(), data.ally(), shopX + offsetX * size, shopY + offsetY * size, data.cost());
+
+            if ((++offsetX % unitOffsetX) % effectOffsetX != 0) return;
+            if (++offsetY % effectOffsetY != 0) offsetX -= effectOffsetX;
+            else offsetY -= effectOffsetY;
         });
     }
 }

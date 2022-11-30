@@ -12,66 +12,76 @@ import mindustry.world.blocks.defense.turrets.Turret;
 
 public class CastleCosts {
 
-    public static OrderedMap<UnitType, Moneys> units;
+    public static OrderedMap<UnitType, UnitData> units;
+    public static OrderedMap<StatusEffect, EffectData> effects;
+
     public static OrderedMap<Turret, Integer> turrets;
     public static OrderedMap<Item, Integer> items;
-    public static OrderedMap<StatusEffect, Integer> effects;
 
     public static void load() {
         units = OrderedMap.of(
-                UnitTypes.dagger, new Moneys(60, 0, 15),
-                UnitTypes.mace, new Moneys(170, 1, 50),
-                UnitTypes.fortress, new Moneys(550, 4, 200),
-                UnitTypes.scepter, new Moneys(3000, 20, 750),
-                UnitTypes.reign, new Moneys(10000, 60, 1500),
+                UnitTypes.dagger, new UnitData(60, 0, 15),
+                UnitTypes.mace, new UnitData(170, 1, 50),
+                UnitTypes.fortress, new UnitData(550, 4, 200),
+                UnitTypes.scepter, new UnitData(3000, 20, 750),
+                UnitTypes.reign, new UnitData(10000, 60, 1500),
 
-                UnitTypes.crawler, new Moneys(50, 0, 10),
-                UnitTypes.atrax, new Moneys(180, 1, 60),
-                UnitTypes.spiroct, new Moneys(600, 4, 200),
-                UnitTypes.arkyid, new Moneys(4300, 20, 1000),
-                UnitTypes.toxopid, new Moneys(13000, 50, 1750),
+                UnitTypes.crawler, new UnitData(50, 0, 10),
+                UnitTypes.atrax, new UnitData(180, 1, 60),
+                UnitTypes.spiroct, new UnitData(600, 4, 200),
+                UnitTypes.arkyid, new UnitData(4300, 20, 1000),
+                UnitTypes.toxopid, new UnitData(13000, 50, 1750),
 
-                UnitTypes.nova, new Moneys(75, 0, 15),
-                UnitTypes.pulsar, new Moneys(180, 1, 50),
-                UnitTypes.quasar, new Moneys(600, 4, 200),
-                UnitTypes.vela, new Moneys(3800, 22, 750),
-                UnitTypes.corvus, new Moneys(15000, 70, 1500),
+                UnitTypes.nova, new UnitData(75, 0, 15),
+                UnitTypes.pulsar, new UnitData(180, 1, 50),
+                UnitTypes.quasar, new UnitData(600, 4, 200),
+                UnitTypes.vela, new UnitData(3800, 22, 750),
+                UnitTypes.corvus, new UnitData(15000, 70, 1500),
 
-                UnitTypes.risso, new Moneys(175, 1, 24),
-                UnitTypes.minke, new Moneys(250, 1, 70),
-                UnitTypes.bryde, new Moneys(1000, 5, 200),
-                UnitTypes.sei, new Moneys(5500, 24, 900),
-                UnitTypes.omura, new Moneys(15000, 65, 2000),
+                UnitTypes.risso, new UnitData(175, 1, 24),
+                UnitTypes.minke, new UnitData(250, 1, 70),
+                UnitTypes.bryde, new UnitData(1000, 5, 200),
+                UnitTypes.sei, new UnitData(5500, 24, 900),
+                UnitTypes.omura, new UnitData(15000, 65, 2000),
 
-                UnitTypes.retusa, new Moneys(130, 0, 50),
-                UnitTypes.oxynoe, new Moneys(625, 3, 150),
-                UnitTypes.cyerce, new Moneys(1400, 6, 200),
-                UnitTypes.aegires, new Moneys(7000, 16, 3000),
-                UnitTypes.navanax, new Moneys(13500, 70, 1350),
+                UnitTypes.retusa, new UnitData(130, 0, 50),
+                UnitTypes.oxynoe, new UnitData(625, 3, 150),
+                UnitTypes.cyerce, new UnitData(1400, 6, 200),
+                UnitTypes.aegires, new UnitData(7000, 16, 3000),
+                UnitTypes.navanax, new UnitData(13500, 70, 1350),
 
-                UnitTypes.flare, new Moneys(80, 0, 20),
-                UnitTypes.horizon, new Moneys(200, 1, 70),
-                UnitTypes.zenith, new Moneys(700, 4, 150),
-                UnitTypes.antumbra, new Moneys(4100, 23, 850),
-                UnitTypes.eclipse, new Moneys(12000, 60, 1250),
+                UnitTypes.flare, new UnitData(80, 0, 20),
+                UnitTypes.horizon, new UnitData(200, 1, 70),
+                UnitTypes.zenith, new UnitData(700, 4, 150),
+                UnitTypes.antumbra, new UnitData(4100, 23, 850),
+                UnitTypes.eclipse, new UnitData(12000, 60, 1250),
 
-                UnitTypes.stell, new Moneys(260, 2, 100),
-                UnitTypes.locus, new Moneys(800, 4, 250),
-                UnitTypes.precept, new Moneys(2000, 14, 600),
-                UnitTypes.vanquish, new Moneys(5500, 27, 1000),
-                UnitTypes.conquer, new Moneys(10000, 60, 1700),
+                UnitTypes.stell, new UnitData(260, 2, 100),
+                UnitTypes.locus, new UnitData(800, 4, 250),
+                UnitTypes.precept, new UnitData(2000, 14, 600),
+                UnitTypes.vanquish, new UnitData(5500, 27, 1000),
+                UnitTypes.conquer, new UnitData(10000, 60, 1700),
 
-                UnitTypes.merui, new Moneys(280, 2, 100),
-                UnitTypes.cleroi, new Moneys(900, 4, 400),
-                UnitTypes.anthicus, new Moneys(2450, 14, 750),
-                UnitTypes.tecta, new Moneys(5500, 26, 1100),
-                UnitTypes.collaris, new Moneys(11000, 55, 1900),
+                UnitTypes.merui, new UnitData(280, 2, 100),
+                UnitTypes.cleroi, new UnitData(900, 4, 400),
+                UnitTypes.anthicus, new UnitData(2450, 14, 750),
+                UnitTypes.tecta, new UnitData(5500, 26, 1100),
+                UnitTypes.collaris, new UnitData(11000, 55, 1900),
 
-                UnitTypes.elude, new Moneys(300, 2, 110),
-                UnitTypes.avert, new Moneys(900, 4, 300),
-                UnitTypes.obviate, new Moneys(2200, 12, 750),
-                UnitTypes.quell, new Moneys(4750, 25, 1500),
-                UnitTypes.disrupt, new Moneys(11500, 45, 2300)
+                UnitTypes.elude, new UnitData(300, 2, 110),
+                UnitTypes.avert, new UnitData(900, 4, 300),
+                UnitTypes.obviate, new UnitData(2200, 12, 750),
+                UnitTypes.quell, new UnitData(4750, 25, 1500),
+                UnitTypes.disrupt, new UnitData(11500, 45, 2300)
+        );
+
+        effects = OrderedMap.of(
+                StatusEffects.overclock, new EffectData(4000, 20, true),
+                StatusEffects.overdrive, new EffectData(12000, 20, true),
+                StatusEffects.boss, new EffectData(32000, 20, true),
+                StatusEffects.sporeSlowed, new EffectData(4000, 20, false),
+                StatusEffects.sapped, new EffectData(12000, 20, false),
+                StatusEffects.unmoving, new EffectData(32000, 5, false)
         );
 
         turrets = OrderedMap.of(
@@ -124,17 +134,9 @@ public class CastleCosts {
                 Items.oxide, 1500,
                 Items.carbide, 1800
         );
-
-        effects = OrderedMap.of(
-                StatusEffects.overclock, 4250,
-                StatusEffects.overdrive, 11500,
-                StatusEffects.boss, 20000
-        );
     }
 
-    public static int drop(UnitType type) {
-        return units.containsKey(type) ? units.get(type).drop : -1;
-    }
+    public record UnitData(int cost, int income, int drop) {}
 
-    public record Moneys(int cost, int income, int drop) {}
+    public record EffectData(int cost, int duration, boolean ally) {}
 }

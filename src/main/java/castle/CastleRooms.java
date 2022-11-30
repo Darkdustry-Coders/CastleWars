@@ -59,7 +59,6 @@ public class CastleRooms {
 
             this.label.set(getX(), getY());
             this.label.fontSize(1.75f);
-            this.label.flags(WorldLabel.flagBackground);
             this.label.flags(WorldLabel.flagOutline);
             this.label.add();
 
@@ -102,14 +101,12 @@ public class CastleRooms {
         public final Block block;
         public final Team team;
 
-        public boolean bought;
-
         public BlockRoom(Block block, Team team, int x, int y, int cost, int size) {
             super(x, y, cost, size);
 
             this.block = block;
             this.team = team;
-            this.label.text(CastleIcons.get(block) + " :[white] " + cost);
+            this.label.text(CastleUtils.getIcon(block) + " :[white] " + cost);
         }
 
         public BlockRoom(Block block, Team team, int x, int y, int cost) {
@@ -120,7 +117,6 @@ public class CastleRooms {
         public void buy(PlayerData data) {
             super.buy(data);
             label.hide();
-            bought = true;
 
             tile.setNet(block, team, 0);
             if (!(block instanceof CoreBlock)) tile.build.health(Float.MAX_VALUE);
@@ -130,7 +126,7 @@ public class CastleRooms {
 
         @Override
         public boolean canBuy(PlayerData data) {
-            return super.canBuy(data) && data.player.team() == team && !bought;
+            return super.canBuy(data) && data.player.team() == team && label.isAdded();
         }
     }
 
@@ -185,12 +181,12 @@ public class CastleRooms {
             this.item = item;
             this.amount = (int) (300f - item.cost * 150f);
 
-            this.label.text("[" + CastleIcons.get(item) + "] : " + cost);
+            this.label.text("[" + CastleUtils.getIcon(item) + "] : " + cost);
         }
 
         @Override
         public void update() {
-            if (bought && interval.get(300f)) {
+            if (!label.isAdded() && interval.get(300f)) {
                 Call.effect(Fx.mineHuge, getX(), getY(), 0f, team.color);
                 Call.transferItemTo(null, item, amount, getX(), getY(), team.core());
             }
@@ -199,22 +195,20 @@ public class CastleRooms {
 
     public static class UnitRoom extends Room {
         public final UnitType type;
-        public final UnitRoomType roomType;
         public final int income;
+        public final boolean attack;
 
-        public UnitRoom(UnitType type, UnitRoomType roomType, int income, int x, int y, int cost) {
+        public UnitRoom(UnitType type, int income, boolean attack, int x, int y, int cost) {
             super(x, y, cost, 4);
 
             this.type = type;
-            this.roomType = roomType;
             this.income = income;
+            this.attack = attack;
 
             this.label.set(getX(), getY() + 12f);
             this.label.fontSize(2.25f);
-            this.label.text(" ".repeat((String.valueOf(cost).length() + String.valueOf(income).length() + 2) / 2) +
-                    CastleIcons.get(type) + " " + roomType.icon +
-                    "\n[gray]" + cost +
-                    "\n[white]" + Iconc.blockPlastaniumCompressor + " : " + (income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[crimson]") + income);
+
+            this.label.text(CastleUtils.getIcon(type) + " " + (attack ? "[accent]" + Iconc.modeAttack : "[scarlet]" + Iconc.defense) + "\n[gray]" + cost + "\n[white]" + Iconc.blockPlastaniumCompressor + " : " + (income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[crimson]") + income);
         }
 
         @Override
@@ -224,7 +218,7 @@ public class CastleRooms {
 
             Tmp.v1.rnd(Math.min(type.hitSize, 48f));
 
-            if (roomType == UnitRoomType.attack) {
+            if (attack) {
                 var spawn = spawns.get(data.player.team()).random();
                 type.spawn(data.player.team(), spawn.worldx() + Tmp.v1.x, spawn.worldy() + Tmp.v1.y);
             } else if (data.player.core() != null) {
@@ -244,41 +238,30 @@ public class CastleRooms {
 
             return true;
         }
-
-        public enum UnitRoomType {
-            attack("[accent]" + Iconc.modeAttack), defend("[scarlet]" + Iconc.defense);
-
-            public final String icon;
-
-            UnitRoomType(String icon) {
-                this.icon = icon;
-            }
-        }
     }
 
     public static class EffectRoom extends Room {
-        public StatusEffect effect;
-        public Interval interval = new Interval();
+        public final StatusEffect effect;
+        public final int duration;
+        public final boolean ally;
 
-        public EffectRoom(StatusEffect effect, int x, int y, int cost) {
+        public EffectRoom(StatusEffect effect, int duration, boolean ally, int x, int y, int cost) {
             super(x, y, cost, 4);
 
             this.effect = effect;
+            this.duration = duration;
+            this.ally = ally;
 
             this.label.set(getX(), getY() + 12f);
             this.label.fontSize(2.25f);
-            this.label.text("[accent]" + Strings.capitalize(effect.name) + "\n" + "effect" + "\n[white]" + CastleIcons.get(effect) + " : [gray]" + cost);
+
+            this.label.text(CastleUtils.getIcon(effect) + "\n[gray]" + cost);
         }
 
         @Override
         public void buy(PlayerData data) {
             super.buy(data);
-            data.player.team().data().units.each(unit -> unit.apply(effect, Float.POSITIVE_INFINITY));
-        }
-
-        @Override
-        public boolean canBuy(PlayerData data) {
-            return super.canBuy(data) && interval.get(60f);
+            Groups.unit.each(unit -> !unit.spawnedByCore && ((ally && unit.team == data.player.team()) || (!ally && unit.team != data.player.team())), unit -> unit.apply(effect, duration));
         }
     }
 }

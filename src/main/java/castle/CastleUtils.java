@@ -1,11 +1,13 @@
 package castle;
 
+import arc.util.Reflect;
+import arc.util.Strings;
 import mindustry.content.Planets;
-import mindustry.game.Gamemode;
+import mindustry.ctype.MappableContent;
 import mindustry.game.Rules;
 import mindustry.game.Team;
+import mindustry.gen.Iconc;
 import mindustry.gen.Teamc;
-import mindustry.maps.Map;
 import mindustry.type.Planet;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitFactory;
@@ -19,36 +21,41 @@ public class CastleUtils {
     public static Planet planet;
     public static int timer = roundTime;
 
-    public static void checkPlanet(Map map) {
-        var rules = map.applyRules(Gamemode.pvp);
-        planet = content.planets().find(planet -> planet.accessible && (planet.defaultEnv == rules.env || planet.hiddenItems.asSet().equals(rules.hiddenBuildItems)));
+    public static void checkPlanet() {
+        planet = content.planets().find(planet -> planet.accessible && (planet.defaultEnv == state.rules.env || planet.hiddenItems.asSet().equals(state.rules.hiddenBuildItems)));
     }
 
     public static void applyRules(Rules rules) {
-        rules.pvp = true;
+        rules.waveTimer = rules.waves = rules.waveSending = false;
+        rules.pvp = false;
 
         rules.unitCap = 500;
         rules.unitCapVariable = false;
-        rules.canGameOver = false;
         rules.dropZoneRadius = 60f;
         rules.showSpawns = true;
 
         rules.polygonCoreProtection = true;
         rules.buildSpeedMultiplier = 0.5f;
-        rules.waves = false;
-        rules.waveTimer = false;
+
         rules.modeName = "Castle Wars";
 
         rules.teams.get(Team.sharded).cheat = true;
         rules.teams.get(Team.blue).cheat = true;
 
         rules.weather.clear();
-
         rules.bannedBlocks.addAll(content.blocks().select(block -> block instanceof CoreBlock || block instanceof UnitFactory || block.group == BlockGroup.turrets || block.group == BlockGroup.drills || block.group == BlockGroup.logic));
     }
 
     public static int countUnits(Team team) {
         return team.data().units.count(unit -> unit.type.useUnitCap);
+    }
+
+    public static char getIcon(MappableContent content) {
+        try {
+            return Reflect.get(Iconc.class, Strings.kebabToCamel(content.getContentType().name() + "-" + content.name));
+        } catch (Exception e) {
+            return '?';
+        }
     }
 
     public static boolean onEnemySide(Teamc teamc) {
@@ -65,9 +72,5 @@ public class CastleUtils {
 
     public static boolean isSerpulo() {
         return planet == Planets.serpulo;
-    }
-
-    public static boolean isErekir() {
-        return planet == Planets.erekir;
     }
 }

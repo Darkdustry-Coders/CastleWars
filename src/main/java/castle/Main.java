@@ -4,7 +4,8 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.util.Interval;
-import castle.components.*;
+import castle.components.CastleCosts;
+import castle.components.PlayerData;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.game.EventType.*;
@@ -14,11 +15,11 @@ import mindustry.gen.Groups;
 import mindustry.mod.Plugin;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.production.Drill;
-import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
 import static castle.CastleRooms.*;
 import static castle.CastleUtils.*;
+import static castle.components.CastleCosts.units;
 import static castle.components.PlayerData.datas;
 import static mindustry.Vars.*;
 
@@ -35,11 +36,10 @@ public class Main extends Plugin {
             unit.controller = u -> new CastleCommandAI();
         });
 
+        content.statusEffects().each(statusEffect -> statusEffect.permanent = false);
+
         Bundle.load(Main.class);
         CastleCosts.load();
-        CastleIcons.load();
-
-        world = new CastleWorld();
 
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null) return true;
@@ -57,20 +57,13 @@ public class Main extends Plugin {
             else datas.add(new PlayerData(event.player));
         });
 
-        Events.on(BlockDestroyEvent.class, event -> {
-            if (event.tile.block() instanceof CoreBlock && event.tile.team().cores().size <= 1) {
-                Events.fire(new GameOverEvent(event.tile.team() == Team.sharded ? Team.blue : Team.sharded));
-            }
-        });
-
         Events.on(UnitDestroyEvent.class, event -> {
-            int income = CastleCosts.drop(event.unit.type);
-            if (income <= 0 || event.unit.spawnedByCore) return;
-            datas.each(data -> {
-                if (data.player.team() != event.unit.team) {
-                    data.money += income;
-                    Call.label(data.player.con, "[lime]+[accent] " + income, 2f, event.unit.x, event.unit.y);
-                }
+            if (!units.containsKey(event.unit.type) || event.unit.spawnedByCore) return;
+
+            int income = units.get(event.unit.type).drop();
+            datas.each(data -> data.player.team() != event.unit.team, data -> {
+                data.money += income;
+                Call.label(data.player.con, "[lime]+[accent] " + income, 2f, event.unit.x, event.unit.y);
             });
         });
 
@@ -84,11 +77,15 @@ public class Main extends Plugin {
         Events.on(PlayEvent.class, event -> CastleUtils.applyRules(state.rules));
 
         Events.on(WorldLoadEvent.class, event -> CastleUtils.timer = roundTime);
+        Events.on(WorldLoadEndEvent.class, event -> {
+            CastleUtils.checkPlanet();
+            CastleGenerator.generate();
+        });
 
         Events.run(Trigger.update, () -> {
             if (isBreak() || state.isPaused()) return;
 
-            Groups.unit.each(unit -> !unit.spawnedByCore && (unit.isFlying() || unit.elevation > 0f) && (unit.floorOn() == null || unit.floorOn() == Blocks.space), unit -> {
+            Groups.unit.each(unit -> !unit.spawnedByCore && (unit.floorOn() == null || unit.floorOn().solid), unit -> {
                 Call.effect(Fx.unitEnvKill, unit.x, unit.y, 0f, Color.scarlet);
                 Call.unitDespawn(unit);
             });
@@ -99,11 +96,8 @@ public class Main extends Plugin {
             if (interval.get(60f)) {
                 datas.each(PlayerData::updateMoney);
                 spawns.each((team, spawns) -> spawns.each(spawn -> {
-                    for (int deg = 0; deg < 36; deg++) {
-                        float x = spawn.worldx() + Mathf.cosDeg(deg * 10) * state.rules.dropZoneRadius;
-                        float y = spawn.worldy() + Mathf.sinDeg(deg * 10) * state.rules.dropZoneRadius;
-                        Call.effect(Fx.mineBig, x, y, 0f, team.color);
-                    }
+                    for (int deg = 0; deg < 36; deg++)
+                        Call.effect(Fx.mineBig, spawn.worldx() + Mathf.cosDeg(deg * 10) * state.rules.dropZoneRadius, spawn.worldy() + Mathf.sinDeg(deg * 10) * state.rules.dropZoneRadius, 0f, team.color);
                 }));
 
                 if (--timer <= 0) Events.fire(new GameOverEvent(Team.derelict));
