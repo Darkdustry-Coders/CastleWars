@@ -4,6 +4,7 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.util.Interval;
+import castle.Rooms.Room;
 import castle.components.CastleCosts;
 import castle.components.PlayerData;
 import mindustry.content.Blocks;
@@ -17,7 +18,6 @@ import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.production.Drill;
 import useful.Bundle;
 
-import static castle.CastleRooms.*;
 import static castle.CastleUtils.*;
 import static castle.Rooms.rooms;
 import static castle.components.CastleCosts.units;
@@ -27,7 +27,6 @@ import static mindustry.Vars.*;
 public class Main extends Plugin {
 
     public static final int roundTime = 45 * 60;
-
     public static final Interval interval = new Interval();
 
     @Override
@@ -37,7 +36,7 @@ public class Main extends Plugin {
             unit.controller = u -> new CastleCommandAI();
         });
 
-        content.statusEffects().each(statusEffect -> statusEffect.permanent = false);
+        content.statusEffects().each(effect -> effect.permanent = false);
 
         Bundle.load(Main.class);
         CastleCosts.load();
@@ -45,7 +44,7 @@ public class Main extends Plugin {
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null) return true;
 
-            return !(action.tile.block() instanceof Turret) && !(action.tile.block() instanceof Drill) && action.tile.block() != Blocks.itemSource && action.tile.block() != Blocks.liquidSource;
+            return action.tile.build == null || action.tile.build.health != Float.POSITIVE_INFINITY;
         });
 
         Events.on(PlayerJoin.class, event -> {
@@ -84,7 +83,7 @@ public class Main extends Plugin {
 
             Groups.unit.each(unit -> !unit.spawnedByCore && (unit.floorOn() == null || unit.floorOn().solid), unit -> {
                 Call.effect(Fx.unitEnvKill, unit.x, unit.y, 0f, Color.scarlet);
-                Call.unitDespawn(unit);
+                Call.unitDespawn(unit); // TODO Call.unitEnvDeath instead of this to?
             });
 
             datas.each(PlayerData::update);
