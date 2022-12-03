@@ -1,21 +1,15 @@
 package castle;
 
 import arc.Events;
-import arc.graphics.Color;
-import arc.math.Mathf;
 import arc.util.Interval;
 import castle.Rooms.Room;
 import castle.components.CastleCosts;
 import castle.components.PlayerData;
-import mindustry.content.Blocks;
-import mindustry.content.Fx;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.mod.Plugin;
-import mindustry.world.blocks.defense.turrets.Turret;
-import mindustry.world.blocks.production.Drill;
 import useful.Bundle;
 
 import static castle.CastleUtils.*;
@@ -81,10 +75,7 @@ public class Main extends Plugin {
         Events.run(Trigger.update, () -> {
             if (isBreak() || state.isPaused()) return;
 
-            Groups.unit.each(unit -> !unit.spawnedByCore && (unit.floorOn() == null || unit.floorOn().solid), unit -> {
-                Call.effect(Fx.unitEnvKill, unit.x, unit.y, 0f, Color.scarlet);
-                Call.unitDespawn(unit); // TODO Call.unitEnvDeath instead of this to?
-            });
+            Groups.unit.each(unit -> !unit.spawnedByCore && (unit.floorOn() == null || unit.floorOn().solid), Call::unitEnvDeath);
 
             datas.each(PlayerData::update);
             rooms.each(Room::update);

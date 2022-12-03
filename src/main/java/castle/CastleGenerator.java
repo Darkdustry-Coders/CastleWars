@@ -1,7 +1,6 @@
 package castle;
 
 import arc.func.*;
-import arc.struct.Seq;
 import castle.components.CastleCosts;
 import mindustry.content.Blocks;
 import mindustry.game.Team;
@@ -46,8 +45,6 @@ public class CastleGenerator {
             for (int y = 0; y < saved.height; y++) {
                 var tile = saved.getc(x, y);
                 if (!tile.isCenter()) continue;
-
-                int y2 = tiles.height - y - 2;
 
                 if (tile.block() instanceof CoreBlock core) {
                     var upgrade = isSerpulo() ? Blocks.coreNucleus : Blocks.coreAcropolis;
@@ -99,7 +96,7 @@ public class CastleGenerator {
         CastleCosts.effects.each((effect, data) -> {
             new EffectRoom(effect, data.duration(), data.ally(), shopX + offsetX * size, shopY + offsetY * size, data.cost());
 
-            if ((++offsetX % unitOffsetX) % effectOffsetX != 0) return;
+            if (++offsetX % unitOffsetX % effectOffsetX != 0) return;
             if (++offsetY % effectOffsetY != 0) offsetX -= effectOffsetX;
             else offsetY -= effectOffsetY;
         });
@@ -107,13 +104,11 @@ public class CastleGenerator {
 
     public static void addRoom(int x, int y, int size, Prov<Room> create) {
         var first = create.get();
-        first.set(x, y, size);
-        first.team = Team.sharded;
+        first.set(x, y, size, Team.sharded);
         first.spawn();
 
         var second = create.get();
-        second.set(x, world.tiles.height - y - 2 + size % 2, size);
-        second.team = Team.blue;
+        second.set(x, world.tiles.height - y - 2 + size % 2, size, Team.blue);
         second.spawn();
     }
 }

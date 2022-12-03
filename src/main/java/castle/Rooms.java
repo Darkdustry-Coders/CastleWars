@@ -2,46 +2,54 @@ package castle;
 
 import arc.struct.Seq;
 import arc.util.Interval;
+import arc.util.Structs;
 import arc.util.Tmp;
 import castle.components.CastleCosts;
 import castle.components.PlayerData;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
+import mindustry.core.World;
 import mindustry.entities.Units;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.Block;
+import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
 import static castle.CastleUtils.countUnits;
 import static mindustry.Vars.*;
-import static mindustry.world.blocks.ConstructBlock.get;
 
 public class Rooms {
 
     public static final Seq<Room> rooms = new Seq<>();
 
     public static class Room {
-        public int x;
-        public int y;
 
-        public int size;
-        public int cost;
+        public int x, y;
+        public int size, cost;
 
         public Team team;
-        public WorldLabel label;
+        public WorldLabel label = WorldLabel.create();
 
-        public Room() {
-            rooms.add(this);
-        }
-
-        public void set(int x, int y, int size) {
+        public void set(int x, int y, int size, Team team) {
             this.x = x;
             this.y = y;
 
             this.size = size;
+            this.team = team;
+        }
+
+        public void spawn() {
+            world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size), tile -> tile.setFloor(Blocks.metalFloor.asFloor()));
+
+            label.set(x * tilesize, y * tilesize);
+            label.fontSize(1.75f);
+            label.flags(WorldLabel.flagOutline);
+            label.add();
+
+            rooms.add(this);
         }
 
         public void buy(PlayerData data) {
@@ -52,11 +60,11 @@ public class Rooms {
             return data.money >= cost;
         }
 
-        public void update() {}
-
-        public void spawn() {
-            world.tile(x, y).getLinkedTilesAs(get(size), tile -> tile.setFloor(Blocks.metalFloor.asFloor()));
+        public boolean check(float x, float y) {
+            return Structs.inBounds(World.toTile(x) - this.x, World.toTile(y) - this.y, size, size);
         }
+
+        public void update() {}
     }
 
     public static class BlockRoom extends Room {
