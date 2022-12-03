@@ -61,7 +61,8 @@ public class Rooms {
         }
 
         public boolean check(float x, float y) {
-            return Structs.inBounds(World.toTile(x) - this.x, World.toTile(y) - this.y, size, size);
+            final int offset = size / 2 - (1 - size % 2);
+            return Structs.inBounds(World.toTile(x) - this.x + offset, World.toTile(y) - this.y + offset, size, size);
         }
 
         public void update() {}
