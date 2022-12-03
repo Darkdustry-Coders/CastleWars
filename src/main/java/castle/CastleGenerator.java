@@ -1,5 +1,6 @@
 package castle;
 
+import arc.func.*;
 import arc.struct.Seq;
 import castle.components.CastleCosts;
 import mindustry.content.Blocks;
@@ -11,7 +12,7 @@ import mindustry.world.blocks.distribution.Sorter.SorterBuild;
 import mindustry.world.blocks.environment.SpawnBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 
-import static castle.CastleRooms.*;
+import static castle.Rooms.*;
 import static castle.CastleUtils.isSerpulo;
 import static mindustry.Vars.*;
 
@@ -24,22 +25,22 @@ public class CastleGenerator {
         var saved = world.tiles;
         var tiles = world.resize(world.width(), world.height() * 2 + 65);
 
-        for (int x = 0; x < saved.width; x++)
-            for (int y = saved.height; y < tiles.height - saved.height; y++)
-                tiles.set(x, y, new Tile(x, y, Blocks.space, Blocks.air, Blocks.air));
-
         for (int x = 0; x < saved.width; x++) {
             for (int y = 0; y < saved.height; y++) {
                 var tile = saved.getc(x, y);
 
                 var floor = tile.floor();
                 var overlay = tile.overlay().needsSurface ? tile.overlay() : Blocks.air;
-                var wall = !tile.block().hasBuilding() && tile.isCenter() ? tile.block() : Blocks.air;
+                var block = !tile.block().hasBuilding() && tile.isCenter() ? tile.block() : Blocks.air;
 
-                tiles.set(x, y, new Tile(x, y, floor, overlay, wall));
-                tiles.set(x, tiles.height - y - 1, new Tile(x, tiles.height - y - 1, floor, overlay, wall));
+                tiles.set(x, y, new Tile(x, y, floor, overlay, block));
+                tiles.set(x, tiles.height - y - 1, new Tile(x, tiles.height - y - 1, floor, overlay, block));
             }
         }
+
+        for (int x = 0; x < saved.width; x++)
+            for (int y = saved.height; y < tiles.height - saved.height; y++)
+                tiles.set(x, y, new Tile(x, y, Blocks.space, Blocks.air, Blocks.air));
 
         for (int x = 0; x < saved.width; x++) {
             for (int y = 0; y < saved.height; y++) {
@@ -49,20 +50,15 @@ public class CastleGenerator {
                 int y2 = tiles.height - y - 2;
 
                 if (tile.block() instanceof CoreBlock core) {
-                    tiles.getc(x, y).setNet(core, Team.sharded, 0);
-                    tiles.getc(x, y2 + core.size % 2).setNet(core, Team.blue, 0);
+                    var upgrade = isSerpulo() ? Blocks.coreNucleus : Blocks.coreAcropolis;
 
-                    var newCore = isSerpulo() ? Blocks.coreNucleus : Blocks.coreAcropolis;
-
-                    new BlockRoom(newCore, Team.sharded, x, y, 5000);
-                    new BlockRoom(newCore, Team.blue, x, y2 + newCore.size % 2, 5000);
+                    addRoom(x, y, upgrade.size, () -> new CoreRoom(core, upgrade, 5000));
                 }
 
                 if (tile.block() instanceof Turret turret) {
                     if (!turret.environmentBuildable() || !CastleCosts.turrets.containsKey(turret)) continue;
 
-                    new TurretRoom(turret, Team.sharded, x, y);
-                    new TurretRoom(turret, Team.blue, x, y2 + turret.size % 2);
+                    addRoom(x, y, turret.size, () -> new BlockRoom(turret, 0));
                 }
 
                 if (tile.build instanceof SorterBuild sorter) {
@@ -70,13 +66,12 @@ public class CastleGenerator {
 
                     var drill = isSerpulo() ? Blocks.laserDrill : Blocks.impactDrill;
 
-                    new MinerRoom(drill, sorter.config(), Team.sharded, x, y);
-                    new MinerRoom(drill, sorter.config(), Team.blue, x, y2 + drill.size % 2);
+                    addRoom(x, y, drill.size, () -> new MinerRoom(drill, sorter.config()));
                 }
 
-                if (tile.overlay() instanceof SpawnBlock spawn) {
-                    spawns.get(Team.sharded, Seq::new).add(tiles.getc(x, y2 + spawn.size % 2));
-                    spawns.get(Team.blue, Seq::new).add(tiles.getc(x, y));
+                if (tile.overlay() instanceof SpawnBlock) {
+                    //spawns.get(Team.sharded, Seq::new).add(tiles.getc(x, y2 + spawn.size % 2));
+                    //spawns.get(Team.blue, Seq::new).add(tiles.getc(x, y));
                 }
             }
         }
@@ -108,5 +103,17 @@ public class CastleGenerator {
             if (++offsetY % effectOffsetY != 0) offsetX -= effectOffsetX;
             else offsetY -= effectOffsetY;
         });
+    }
+
+    public static void addRoom(int x, int y, int size, Prov<Room> create) {
+        var first = create.get();
+        first.set(x, y, size);
+        first.team = Team.sharded;
+        first.spawn();
+
+        var second = create.get();
+        second.set(x, world.tiles.height - y - 2 + size % 2, size);
+        second.team = Team.blue;
+        second.spawn();
     }
 }

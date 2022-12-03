@@ -19,6 +19,7 @@ import useful.Bundle;
 
 import static castle.CastleRooms.*;
 import static castle.CastleUtils.*;
+import static castle.Rooms.rooms;
 import static castle.components.CastleCosts.units;
 import static castle.components.PlayerData.datas;
 import static mindustry.Vars.*;
@@ -43,10 +44,6 @@ public class Main extends Plugin {
 
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null) return true;
-
-            for (var entry : spawns)
-                for (var tile : entry.value)
-                    if (tile.dst(action.tile) <= state.rules.dropZoneRadius) return false;
 
             return !(action.tile.block() instanceof Turret) && !(action.tile.block() instanceof Drill) && action.tile.block() != Blocks.itemSource && action.tile.block() != Blocks.liquidSource;
         });
