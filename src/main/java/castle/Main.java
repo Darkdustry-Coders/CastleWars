@@ -66,10 +66,11 @@ public class Main extends Plugin {
 
         Events.on(PlayEvent.class, event -> CastleUtils.applyRules(state.rules));
 
-        Events.on(WorldLoadEvent.class, event -> CastleUtils.timer = roundTime);
         Events.on(WorldLoadEndEvent.class, event -> {
             CastleUtils.checkPlanet();
             CastleGenerator.generate();
+
+            CastleUtils.timer = roundTime;
         });
 
         Events.run(Trigger.update, () -> {

@@ -45,6 +45,7 @@ public class Rooms {
             world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size), tile -> tile.setFloor(Blocks.metalFloor.asFloor()));
 
             label.set(x * tilesize, y * tilesize);
+            label.text(toString());
             label.fontSize(1.75f);
             label.flags(WorldLabel.flagOutline);
             label.add();
@@ -75,8 +76,6 @@ public class Rooms {
         public BlockRoom(Block block, int cost) {
             this.block = block;
             this.cost = cost;
-
-            this.label.text(CastleUtils.getIcon(block) + " : " + cost);
         }
 
         @Override
@@ -96,6 +95,11 @@ public class Rooms {
         @Override
         public boolean canBuy(PlayerData data) {
             return super.canBuy(data) && data.player.team() == team && label.isAdded();
+        }
+
+        @Override
+        public String toString() {
+            return CastleUtils.getIcon(block) + " : " + cost;
         }
     }
 
@@ -127,8 +131,6 @@ public class Rooms {
 
             this.item = item;
             this.amount = (int) (300f - item.cost * 150f);
-
-            this.label.text("[" + CastleUtils.getIcon(item) + "] : " + cost);
         }
 
         @Override
@@ -137,6 +139,11 @@ public class Rooms {
 
             Call.effect(Fx.mineHuge, x * tilesize, y * tilesize, 0f, team.color);
             Call.transferItemTo(null, item, amount, x * tilesize, y * tilesize, team.core());
+        }
+
+        @Override
+        public String toString() {
+            return "[" + CastleUtils.getIcon(item) + "] : " + cost;
         }
     }
 
@@ -155,8 +162,6 @@ public class Rooms {
 
             this.label.set(x * tilesize, y * tilesize + 12f);
             this.label.fontSize(2.25f);
-
-            this.label.text(CastleUtils.getIcon(type) + " " + (attack ? "[accent]" + Iconc.modeAttack : "[scarlet]" + Iconc.defense) + "\n[gray]" + cost + "\n[white]" + Iconc.blockPlastaniumCompressor + " : " + (income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[crimson]") + income);
         }
 
         @Override
@@ -186,6 +191,15 @@ public class Rooms {
 
             return true;
         }
+
+        @Override
+        public String toString() {
+            return new StringBuilder()
+                    .append(CastleUtils.getIcon(type) + " ").append(attack ? "[accent]" + Iconc.modeAttack : "[scarlet]" + Iconc.defense)
+                    .append("\n[gray]" + cost + "\n[white]")
+                    .append(Iconc.blockPlastaniumCompressor + " : ").append(income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[crimson]").append(income)
+                    .toString();
+        }
     }
 
     public static class EffectRoom extends Room {
@@ -203,14 +217,17 @@ public class Rooms {
 
             this.label.set(x, y + 12f);
             this.label.fontSize(2.25f);
-
-            this.label.text(CastleUtils.getIcon(effect) + "\n[gray]" + cost);
         }
 
         @Override
         public void buy(PlayerData data) {
             super.buy(data);
             Groups.unit.each(unit -> !unit.spawnedByCore && ((ally && unit.team == data.player.team()) || (!ally && unit.team != data.player.team())), unit -> unit.apply(effect, duration));
+        }
+
+        @Override
+        public String toString() {
+            return CastleUtils.getIcon(effect) + "\n[gray]" + cost;
         }
     }
 }
