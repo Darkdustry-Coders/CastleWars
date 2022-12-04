@@ -80,15 +80,15 @@ public class Main extends Plugin {
             datas.each(PlayerData::update);
             rooms.each(Room::update);
 
-            if (interval.get(60f)) {
-                datas.each(PlayerData::updateMoney);
-                spawns.each((team, spawns) -> spawns.each(spawn -> {
-                    for (int deg = 0; deg < 36; deg++)
-                        Call.effect(Fx.mineBig, spawn.worldx() + Mathf.cosDeg(deg * 10) * state.rules.dropZoneRadius, spawn.worldy() + Mathf.sinDeg(deg * 10) * state.rules.dropZoneRadius, 0f, team.color);
-                }));
+            if (!interval.get(60f)) return;
 
-                if (--timer <= 0) Events.fire(new GameOverEvent(Team.derelict));
-            }
+            datas.each(PlayerData::updateMoney);
+            spawns.each((team, spawns) -> spawns.each(spawn -> {
+                for (int deg = 0; deg < 36; deg++)
+                    Call.effect(Fx.mineBig, spawn.worldx() + Mathf.cosDeg(deg * 10) * state.rules.dropZoneRadius, spawn.worldy() + Mathf.sinDeg(deg * 10) * state.rules.dropZoneRadius, 0f, team.color);
+            }));
+
+            if (--timer <= 0) Events.fire(new GameOverEvent(Team.derelict));
         });
     }
 }

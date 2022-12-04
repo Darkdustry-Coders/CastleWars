@@ -69,13 +69,14 @@ public class Rooms {
     }
 
     public static class BlockRoom extends Room {
+
         public final Block block;
 
         public BlockRoom(Block block, int cost) {
             this.block = block;
             this.cost = cost;
 
-            this.label.text(CastleUtils.getIcon(block) + " :[white] " + cost);
+            this.label.text(CastleUtils.getIcon(block) + " : " + cost);
         }
 
         @Override
@@ -86,8 +87,9 @@ public class Rooms {
             var tile = world.tile(x, y);
 
             tile.setNet(block, team, 0);
-            if (!(block instanceof CoreBlock)) tile.build.health(Float.MAX_VALUE);
+            if (block instanceof CoreBlock == false) tile.build.health(Float.MAX_VALUE);
 
+            // TODO add label to bundle
             Groups.player.each(player -> Call.label(player.con, Bundle.format("events.buy", player, data.player.coloredName()), 1f, x * tilesize, y * tilesize));
         }
 
@@ -98,11 +100,11 @@ public class Rooms {
     }
 
     public static class CoreRoom extends BlockRoom {
-        public Block core;
+
+        public final Block core;
 
         public CoreRoom(Block core, Block upgrade, int cost) {
             super(upgrade, cost);
-
             this.core = core;
         }
 
@@ -114,6 +116,7 @@ public class Rooms {
     }
 
     public static class MinerRoom extends BlockRoom {
+
         public final Interval interval = new Interval();
 
         public final Item item;
@@ -130,14 +133,15 @@ public class Rooms {
 
         @Override
         public void update() {
-            if (!label.isAdded() && interval.get(300f)) {
-                Call.effect(Fx.mineHuge, x * tilesize, y * tilesize, 0f, team.color);
-                Call.transferItemTo(null, item, amount, x * tilesize, y * tilesize, team.core());
-            }
+            if (label.isAdded() || !interval.get(300f)) return;
+
+            Call.effect(Fx.mineHuge, x * tilesize, y * tilesize, 0f, team.color);
+            Call.transferItemTo(null, item, amount, x * tilesize, y * tilesize, team.core());
         }
     }
 
     public static class UnitRoom extends Room {
+
         public final UnitType type;
         public final int income;
         public final boolean attack;
@@ -185,6 +189,7 @@ public class Rooms {
     }
 
     public static class EffectRoom extends Room {
+
         public final StatusEffect effect;
         public final int duration;
         public final boolean ally;
