@@ -153,15 +153,12 @@ public class Rooms {
         public final int income;
         public final boolean attack;
 
-        public UnitRoom(UnitType type, int income, boolean attack, int x, int y, int cost) {
+        public UnitRoom(UnitType type, int income, boolean attack, int cost) {
             this.cost = cost;
 
             this.type = type;
             this.income = income;
             this.attack = attack;
-
-            this.label.set(x * tilesize, y * tilesize + 12f);
-            this.label.fontSize(2.25f);
         }
 
         @Override
@@ -208,15 +205,12 @@ public class Rooms {
         public final int duration;
         public final boolean ally;
 
-        public EffectRoom(StatusEffect effect, int duration, boolean ally, int x, int y, int cost) {
+        public EffectRoom(StatusEffect effect, int duration, boolean ally, int cost) {
             this.cost = cost;
 
             this.effect = effect;
             this.duration = duration;
             this.ally = ally;
-
-            this.label.set(x, y + 12f);
-            this.label.fontSize(2.25f);
         }
 
         @Override

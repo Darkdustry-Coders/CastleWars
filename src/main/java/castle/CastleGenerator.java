@@ -81,8 +81,8 @@ public class CastleGenerator {
             boolean isErekir = type instanceof ErekirUnitType;
             if (isErekir == CastleUtils.isSerpulo()) return;
 
-            new UnitRoom(type, data.income(), true, shopX + offsetX * 9, shopY + offsetY * 18, data.cost());
-            new UnitRoom(type, -data.income(), false, shopX + offsetX * 9, shopY + offsetY * 18 + 9, data.cost());
+            addRoom(shopX + offsetX * 9, shopY + offsetY * 18,     new UnitRoom(type, data.income(), true, data.cost()));
+            addRoom(shopX + offsetX * 9, shopY + offsetY * 18 + 9, new UnitRoom(type, -data.income(), false, data.cost()));
 
             if (++offsetX % unitOffsetX != 0) return;
             if (++offsetY % unitOffsetY != 0) offsetX -= unitOffsetX;
@@ -92,7 +92,7 @@ public class CastleGenerator {
         offsetY = 0;
 
         CastleCosts.effects.each((effect, data) -> {
-            new EffectRoom(effect, data.duration(), data.ally(), shopX + offsetX * 9, shopY + offsetY * 9, data.cost());
+            addRoom(shopX + offsetX * 9, shopY + offsetY * 9, new EffectRoom(effect, data.duration(), data.ally(), data.cost()));
 
             if (++offsetX % unitOffsetX % effectOffsetX != 0) return;
             if (++offsetY % effectOffsetY != 0) offsetX -= effectOffsetX;
@@ -112,5 +112,13 @@ public class CastleGenerator {
         var second = create.get();
         second.set(x, world.tiles.height - y - 2 + size % 2, size, Team.blue);
         second.spawn();
+    }
+
+    private static void addRoom(int x, int y, Room room) {
+        room.set(x, y, 5, Team.derelict); // TODO replace 5 with 3 and fix room.spawn
+        room.spawn();
+
+        room.label.y += 12f;
+        room.label.fontSize(2.25f);
     }
 }
