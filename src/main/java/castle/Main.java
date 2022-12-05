@@ -1,8 +1,10 @@
 package castle;
 
 import arc.Events;
+import arc.struct.Seq;
 import arc.util.Interval;
 import castle.CastleRooms.Room;
+import castle.CastleGenerator.Spawns;
 import castle.components.CastleCosts;
 import castle.components.PlayerData;
 import mindustry.game.EventType.*;
@@ -13,21 +15,24 @@ import mindustry.mod.Plugin;
 import useful.Bundle;
 
 import static castle.CastleUtils.*;
-import static castle.CastleRooms.rooms;
 import static castle.components.CastleCosts.units;
 import static castle.components.PlayerData.datas;
 import static mindustry.Vars.*;
 
 public class Main extends Plugin {
 
-    public static final int roundTime = 45 * 60;
     public static final Interval interval = new Interval();
+
+    public static final Seq<Room> rooms = new Seq<>();
+    public static final Spawns spawns = new Spawns();
+
+    public static int timer = 0;
 
     @Override
     public void init() {
-        content.units().each(unit -> unit.playerControllable, unit -> {
-            unit.payloadCapacity = 0f;
-            unit.controller = u -> new CastleCommandAI();
+        content.units().each(unit -> unit.playerControllable, type -> {
+            type.payloadCapacity = 0f;
+            type.controller = unit -> new CastleCommandAI();
         });
 
         content.statusEffects().each(effect -> effect.permanent = false);
@@ -37,7 +42,7 @@ public class Main extends Plugin {
 
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null) return true;
-            if (CastleGenerator.spawns.within(action.tile)) return false;
+            if (spawns.within(action.tile)) return false;
 
             return action.tile.build == null || action.tile.build.health != Float.POSITIVE_INFINITY;
         });
@@ -70,7 +75,7 @@ public class Main extends Plugin {
             CastleUtils.checkPlanet();
             CastleGenerator.generate();
 
-            CastleUtils.timer = roundTime;
+            timer = 45 * 60;
         });
 
         Events.run(Trigger.update, () -> {
@@ -84,7 +89,7 @@ public class Main extends Plugin {
             if (!interval.get(60f)) return;
 
             datas.each(PlayerData::updateMoney);
-            CastleGenerator.spawns.draw();
+            spawns.draw();
 
             if (--timer <= 0) Events.fire(new GameOverEvent(Team.derelict));
         });

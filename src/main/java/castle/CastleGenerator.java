@@ -18,18 +18,17 @@ import mindustry.world.blocks.environment.SpawnBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import static castle.CastleRooms.*;
+import static castle.Main.spawns;
 import static mindustry.Vars.*;
 
 public class CastleGenerator {
-
-    public static final Spawns spawns = new Spawns();
 
     public static final int unitOffsetX = 5, unitOffsetY = 3, effectOffsetX = 3, effectOffsetY = 6;
     public static int offsetX, offsetY;
 
     public static void generate() {
         var saved = world.tiles;
-        var tiles = world.resize(world.width(), world.height() * 2 + 58);
+        world.resize(world.width(), world.height() * 2 + 58);
 
         // region tiles
 
@@ -41,11 +40,11 @@ public class CastleGenerator {
             var overlay = tile.overlay().needsSurface ? tile.overlay() : Blocks.air;
 
             addTile(x, y, floor, block, overlay);
-            addTile(x, tiles.height - y - 1, floor, block, overlay);
+            addTile(x, world.tiles.height - y - 1, floor, block, overlay);
         });
 
         for (int x = 0; x < saved.width; x++)
-            for (int y = saved.height; y < tiles.height - saved.height; y++)
+            for (int y = saved.height; y < world.tiles.height - saved.height; y++)
                 addTile(x, y, Blocks.space, Blocks.air, Blocks.air);
 
         // endregion
@@ -84,8 +83,7 @@ public class CastleGenerator {
         offsetX = offsetY = 0;
 
         CastleCosts.units.each((type, data) -> {
-            boolean isErekir = type instanceof ErekirUnitType;
-            if (isErekir == CastleUtils.isSerpulo()) return;
+            if (type instanceof ErekirUnitType == CastleUtils.isSerpulo()) return;
 
             addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18,     new UnitRoom(type, data.income(), true, data.cost()));
             addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18 + 9, new UnitRoom(type, -data.income(), false, data.cost()));

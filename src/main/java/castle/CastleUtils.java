@@ -13,15 +13,14 @@ import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockGroup;
 
-import static castle.Main.roundTime;
 import static mindustry.Vars.*;
 
 public class CastleUtils {
 
     public static Planet planet;
-    public static int timer = roundTime;
 
     public static void checkPlanet() {
+        // TODO переместить это в генератор и убрать переменную планеты
         planet = content.planets().find(planet -> planet.accessible && (planet.defaultEnv == state.rules.env || planet.hiddenItems.asSet().equals(state.rules.hiddenBuildItems)));
     }
 
@@ -59,11 +58,8 @@ public class CastleUtils {
     }
 
     public static boolean onEnemySide(Teamc teamc) {
-        return switch (teamc.team().name) {
-            case "sharded" -> teamc.y() > world.unitHeight() / 2f;
-            case "blue" -> teamc.y() < world.unitHeight() / 2f;
-            default -> false; // Если у юнита неверная команда, он не должен никого атаковать
-        };
+        return (teamc.team() == Team.sharded && teamc.y() > world.unitHeight() / 2f) ||
+                (teamc.team() == Team.blue && teamc.y() < world.unitHeight() / 2f);
     }
 
     public static boolean isBreak() {

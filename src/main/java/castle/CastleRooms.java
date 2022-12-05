@@ -1,9 +1,6 @@
 package castle;
 
-import arc.struct.Seq;
-import arc.util.Interval;
-import arc.util.Structs;
-import arc.util.Tmp;
+import arc.util.*;
 import castle.components.CastleCosts;
 import castle.components.PlayerData;
 import mindustry.content.Blocks;
@@ -19,11 +16,10 @@ import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
 import static castle.CastleUtils.countUnits;
+import static castle.Main.rooms;
 import static mindustry.Vars.*;
 
 public class CastleRooms {
-
-    public static final Seq<Room> rooms = new Seq<>();
 
     public static class Room {
 
@@ -44,7 +40,7 @@ public class CastleRooms {
 
         public void spawn() {
             world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size + 2), tile -> {
-                var floor = check(tile.x, tile.y) ? Blocks.metalFloor : Blocks.metalFloor5;
+                var floor = check(tile.worldx(), tile.worldy()) ? Blocks.metalFloor : Blocks.metalFloor5;
                 tile.setFloor(floor.asFloor());
             });
 
@@ -67,10 +63,6 @@ public class CastleRooms {
 
         public boolean check(float x, float y) {
             return Structs.inBounds(World.toTile(x) - this.x + offset, World.toTile(y) - this.y + offset, size, size);
-        }
-
-        public boolean check(int x, int y) {
-            return Structs.inBounds(x - this.x + offset, y - this.y + offset, size, size);
         }
 
         public void update() {}
@@ -174,6 +166,7 @@ public class CastleRooms {
 
             Tmp.v1.rnd(Math.min(type.hitSize, 48f));
 
+            // TODO а чо сюда засунуть
             if (attack) {
                 //var spawn = spawns.get(data.player.team()).random();
                 //type.spawn(data.player.team(), spawn.worldx() + Tmp.v1.x, spawn.worldy() + Tmp.v1.y);
