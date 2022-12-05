@@ -1,10 +1,12 @@
 package castle;
 
 import arc.Events;
+import arc.math.Mathf;
 import arc.util.Interval;
-import castle.Rooms.Room;
+import castle.CastleRooms.Room;
 import castle.components.CastleCosts;
 import castle.components.PlayerData;
+import mindustry.content.Fx;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
 import mindustry.gen.Call;
@@ -13,7 +15,7 @@ import mindustry.mod.Plugin;
 import useful.Bundle;
 
 import static castle.CastleUtils.*;
-import static castle.Rooms.rooms;
+import static castle.CastleRooms.rooms;
 import static castle.components.CastleCosts.units;
 import static castle.components.PlayerData.datas;
 import static mindustry.Vars.*;
@@ -59,7 +61,6 @@ public class Main extends Plugin {
 
         Events.on(ResetEvent.class, event -> {
             rooms.clear();
-            spawns.clear();
             datas.filter(data -> data.player.con.isConnected());
             datas.each(PlayerData::reset);
         });
@@ -84,10 +85,6 @@ public class Main extends Plugin {
             if (!interval.get(60f)) return;
 
             datas.each(PlayerData::updateMoney);
-            spawns.each((team, spawns) -> spawns.each(spawn -> {
-                for (int deg = 0; deg < 36; deg++)
-                    Call.effect(Fx.mineBig, spawn.worldx() + Mathf.cosDeg(deg * 10) * state.rules.dropZoneRadius, spawn.worldy() + Mathf.sinDeg(deg * 10) * state.rules.dropZoneRadius, 0f, team.color);
-            }));
 
             if (--timer <= 0) Events.fire(new GameOverEvent(Team.derelict));
         });

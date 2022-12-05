@@ -1,7 +1,7 @@
 package castle.components;
 
 import arc.struct.Seq;
-import castle.Rooms;
+import castle.CastleRooms;
 import mindustry.entities.Units;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
@@ -33,7 +33,7 @@ public class PlayerData {
         if (!player.con.isConnected()) return;
 
         if (player.shooting)
-            Rooms.rooms.each(room -> room.check(player.mouseX, player.mouseY) && room.canBuy(this), room -> room.buy(this));
+            CastleRooms.rooms.each(room -> room.check(player.mouseX, player.mouseY) && room.canBuy(this), room -> room.buy(this));
 
         int units = countUnits(player.team()), unitsLimit = Units.getCap(player.team());
         Call.setHudText(player.con, Bundle.format("ui.hud", locale, money >= 0 ? "[lime]" : "[scarlet]", money, income >= 0 ? "[lime]" : "[scarlet]", income, units < unitsLimit ? "[lightgray]" : "[scarlet]", units, unitsLimit, timer));

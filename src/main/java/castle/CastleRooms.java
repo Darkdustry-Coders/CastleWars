@@ -21,7 +21,7 @@ import useful.Bundle;
 import static castle.CastleUtils.countUnits;
 import static mindustry.Vars.*;
 
-public class Rooms {
+public class CastleRooms {
 
     public static final Seq<Room> rooms = new Seq<>();
 
@@ -46,7 +46,7 @@ public class Rooms {
 
             label.set(x * tilesize, y * tilesize);
             label.text(toString());
-            label.fontSize(1.75f);
+            label.fontSize(Math.min(size, 2f));
             label.flags(WorldLabel.flagOutline);
             label.add();
 
@@ -62,7 +62,7 @@ public class Rooms {
         }
 
         public boolean check(float x, float y) {
-            final int offset = size / 2 - (1 - size % 2);
+            int offset = size / 2 - (1 - size % 2);
             return Structs.inBounds(World.toTile(x) - this.x + offset, World.toTile(y) - this.y + offset, size, size);
         }
 
@@ -86,7 +86,7 @@ public class Rooms {
             var tile = world.tile(x, y);
 
             tile.setNet(block, team, 0);
-            if (block instanceof CoreBlock == false) tile.build.health(Float.MAX_VALUE);
+            if (!(block instanceof CoreBlock)) tile.build.health(Float.MAX_VALUE);
 
             // TODO add label to bundle
             Groups.player.each(player -> Call.label(player.con, Bundle.format("events.buy", player, data.player.coloredName()), 1f, x * tilesize, y * tilesize));
