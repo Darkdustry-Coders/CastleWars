@@ -1,9 +1,14 @@
 package castle;
 
 import arc.func.Prov;
+import arc.math.Mathf;
+import arc.math.geom.Point2;
+import arc.struct.Seq;
 import castle.components.CastleCosts;
 import mindustry.content.Blocks;
+import mindustry.content.Fx;
 import mindustry.game.Team;
+import mindustry.gen.Call;
 import mindustry.type.unit.ErekirUnitType;
 import mindustry.world.Block;
 import mindustry.world.Tile;
@@ -16,6 +21,8 @@ import static castle.CastleRooms.*;
 import static mindustry.Vars.*;
 
 public class CastleGenerator {
+
+    public static final Spawns spawns = new Spawns();
 
     public static final int unitOffsetX = 5, unitOffsetY = 3, effectOffsetX = 3, effectOffsetY = 6;
     public static int offsetX, offsetY;
@@ -44,6 +51,8 @@ public class CastleGenerator {
         // endregion
         // region rooms
 
+        spawns.clear();
+
         saved.each((x, y) -> {
             var tile = saved.get(x, y);
             if (!tile.isCenter()) return;
@@ -63,10 +72,7 @@ public class CastleGenerator {
                 addRoom(x, y, drill.size, () -> new MinerRoom(drill, sorter.config()));
             }
 
-            if (tile.overlay() instanceof SpawnBlock) {
-                // spawns.get(Team.sharded, Seq::new).add(tiles.getc(x, y2 + spawn.size % 2));
-                // spawns.get(Team.blue, Seq::new).add(tiles.getc(x, y));
-            }
+            if (tile.overlay() instanceof SpawnBlock) spawns.add(x, y);
         });
 
         // endregion
@@ -120,5 +126,43 @@ public class CastleGenerator {
 
         room.label.y += 12f;
         room.label.fontSize(2.25f);
+    }
+
+    public static class Spawns {
+
+        public Seq<Point2> sharded = new Seq<>();
+        public Seq<Point2> blue = new Seq<>();
+
+        public void add(int x, int y) {
+            sharded.add(new Point2(x, world.height() - y - 2));
+            blue.add(new Point2(x, y));
+        }
+
+        public void clear() {
+            sharded.clear();
+            blue.clear();
+        }
+
+        public boolean within(Tile tile) {
+            for (Point2 spawn : sharded) if (within(tile, spawn)) return true;
+            for (Point2 spawn : blue) if (within(tile, spawn)) return true;
+
+            return false;
+        }
+
+        public boolean within(Tile tile, Point2 point) {
+            return tile.within(point.x * tilesize, point.y * tilesize, state.rules.dropZoneRadius);
+        }
+
+        public void draw() {
+            sharded.each(spawn -> draw(spawn, Team.sharded));
+            blue.each(spawn -> draw(spawn, Team.blue));
+        }
+
+        public void draw(Point2 spawn, Team team) {
+            for (int deg = 0; deg < 360; deg += 10) Call.effect(Fx.mineBig,
+                    spawn.x * tilesize + Mathf.cosDeg(deg) * state.rules.dropZoneRadius,
+                    spawn.y * tilesize + Mathf.sinDeg(deg) * state.rules.dropZoneRadius, 0f, team.color);
+        }
     }
 }

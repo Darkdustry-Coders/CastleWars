@@ -37,6 +37,7 @@ public class Main extends Plugin {
 
         netServer.admins.addActionFilter(action -> {
             if (action.tile == null) return true;
+            if (CastleGenerator.spawns.within(action.tile)) return false;
 
             return action.tile.build == null || action.tile.build.health != Float.POSITIVE_INFINITY;
         });
@@ -83,6 +84,7 @@ public class Main extends Plugin {
             if (!interval.get(60f)) return;
 
             datas.each(PlayerData::updateMoney);
+            CastleGenerator.spawns.draw();
 
             if (--timer <= 0) Events.fire(new GameOverEvent(Team.derelict));
         });
