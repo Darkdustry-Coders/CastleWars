@@ -1,12 +1,10 @@
 package castle;
 
 import arc.Events;
-import arc.math.Mathf;
 import arc.util.Interval;
 import castle.CastleRooms.Room;
 import castle.components.CastleCosts;
 import castle.components.PlayerData;
-import mindustry.content.Fx;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
 import mindustry.gen.Call;

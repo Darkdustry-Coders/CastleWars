@@ -86,10 +86,9 @@ public class CastleRooms {
             var tile = world.tile(x, y);
 
             tile.setNet(block, team, 0);
-            if (!(block instanceof CoreBlock)) tile.build.health(Float.MAX_VALUE);
+            if (block instanceof CoreBlock == false) tile.build.health(Float.MAX_VALUE);
 
-            // TODO add label to bundle
-            Groups.player.each(player -> Call.label(player.con, Bundle.format("events.buy", player, data.player.coloredName()), 1f, x * tilesize, y * tilesize));
+            Bundle.label(1f, x * tilesize, y * tilesize, "events.buy", data.player.coloredName());
         }
 
         @Override

@@ -3,7 +3,6 @@ package castle.components;
 import arc.struct.Seq;
 import castle.CastleRooms;
 import mindustry.entities.Units;
-import mindustry.gen.Call;
 import mindustry.gen.Player;
 import useful.Bundle;
 
@@ -36,7 +35,10 @@ public class PlayerData {
             CastleRooms.rooms.each(room -> room.check(player.mouseX, player.mouseY) && room.canBuy(this), room -> room.buy(this));
 
         int units = countUnits(player.team()), unitsLimit = Units.getCap(player.team());
-        Call.setHudText(player.con, Bundle.format("ui.hud", locale, money >= 0 ? "[lime]" : "[scarlet]", money, income >= 0 ? "[lime]" : "[scarlet]", income, units < unitsLimit ? "[lightgray]" : "[scarlet]", units, unitsLimit, timer));
+        Bundle.setHud(player, "ui.hud",
+                money >= 0 ? "lime" : "scarlet", money,
+                income >= 0 ? "lime" : "scarlet", income,
+                units < unitsLimit ? "lightgray" : "scarlet", units, unitsLimit, timer);
     }
 
     public void updateMoney() {
