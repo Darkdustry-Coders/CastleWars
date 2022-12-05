@@ -28,7 +28,7 @@ public class CastleRooms {
     public static class Room {
 
         public int x, y;
-        public int size, cost;
+        public int size, cost, offset;
 
         public Team team;
         public WorldLabel label = WorldLabel.create();
@@ -39,10 +39,14 @@ public class CastleRooms {
 
             this.size = size;
             this.team = team;
+            this.offset = size / 2 - (1 - size % 2);
         }
 
         public void spawn() {
-            world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size), tile -> tile.setFloor(Blocks.metalFloor.asFloor()));
+            world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size + 2), tile -> {
+                var floor = check(tile.x, tile.y) ? Blocks.metalFloor : Blocks.metalFloor5;
+                tile.setFloor(floor.asFloor());
+            });
 
             label.set(x * tilesize, y * tilesize);
             label.text(toString());
@@ -62,8 +66,11 @@ public class CastleRooms {
         }
 
         public boolean check(float x, float y) {
-            int offset = size / 2 - (1 - size % 2);
             return Structs.inBounds(World.toTile(x) - this.x + offset, World.toTile(y) - this.y + offset, size, size);
+        }
+
+        public boolean check(int x, int y) {
+            return Structs.inBounds(x - this.x + offset, y - this.y + offset, size, size);
         }
 
         public void update() {}

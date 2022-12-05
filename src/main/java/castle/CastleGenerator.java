@@ -115,7 +115,7 @@ public class CastleGenerator {
     }
 
     private static void addShopRoom(int x, int y, Room room) {
-        room.set(x, y, 5, Team.derelict); // TODO replace 5 with 3 and fix room.spawn
+        room.set(x, y, 3, Team.derelict);
         room.spawn();
 
         room.label.y += 12f;
