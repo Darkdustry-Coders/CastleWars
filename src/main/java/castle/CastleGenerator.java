@@ -9,6 +9,7 @@ import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.game.Team;
 import mindustry.gen.Call;
+import mindustry.type.UnitType;
 import mindustry.type.unit.ErekirUnitType;
 import mindustry.world.Block;
 import mindustry.world.Tile;
@@ -131,6 +132,10 @@ public class CastleGenerator {
         public Seq<Point2> sharded = new Seq<>();
         public Seq<Point2> blue = new Seq<>();
 
+        public Point2 get(Team team) {
+            return team == Team.sharded ? sharded.random() : blue.random();
+        }
+
         public void add(int x, int y) {
             sharded.add(new Point2(x, world.height() - y - 2));
             blue.add(new Point2(x, y));
@@ -139,6 +144,11 @@ public class CastleGenerator {
         public void clear() {
             sharded.clear();
             blue.clear();
+        }
+
+        public void spawn(Team team, UnitType type) {
+            var spawn = spawns.get(team).cpy().add(Mathf.random(6), Mathf.random(6));
+            type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
         }
 
         public boolean within(Tile tile) {

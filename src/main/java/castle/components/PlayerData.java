@@ -1,7 +1,6 @@
 package castle.components;
 
 import arc.struct.Seq;
-import castle.CastleRooms;
 import mindustry.entities.Units;
 import mindustry.gen.Player;
 import useful.Bundle;
@@ -9,6 +8,7 @@ import useful.Bundle;
 import java.util.Locale;
 
 import static castle.CastleUtils.*;
+import static castle.Main.*;
 
 public class PlayerData {
 
@@ -32,7 +32,7 @@ public class PlayerData {
         if (!player.con.isConnected()) return;
 
         if (player.shooting)
-            CastleRooms.rooms.each(room -> room.check(player.mouseX, player.mouseY) && room.canBuy(this), room -> room.buy(this));
+            rooms.each(room -> room.check(player.mouseX, player.mouseY) && room.canBuy(this), room -> room.buy(this));
 
         int units = countUnits(player.team()), unitsLimit = Units.getCap(player.team());
         Bundle.setHud(player, "ui.hud",

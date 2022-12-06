@@ -16,7 +16,7 @@ import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
 import static castle.CastleUtils.countUnits;
-import static castle.Main.rooms;
+import static castle.Main.*;
 import static mindustry.Vars.*;
 
 public class CastleRooms {
@@ -166,11 +166,8 @@ public class CastleRooms {
 
             Tmp.v1.rnd(Math.min(type.hitSize, 48f));
 
-            // TODO а чо сюда засунуть
-            if (attack) {
-                //var spawn = spawns.get(data.player.team()).random();
-                //type.spawn(data.player.team(), spawn.worldx() + Tmp.v1.x, spawn.worldy() + Tmp.v1.y);
-            } else if (data.player.core() != null) {
+            if (attack) spawns.spawn(data.player.team(), type);
+            else if (data.player.core() != null) {
                 var core = data.player.core();
                 type.spawn(data.player.team(), core.x + 48f, core.y + Tmp.v1.y);
             }
