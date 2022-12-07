@@ -17,7 +17,7 @@ public class PlayerData {
     public Player player;
     public Locale locale;
 
-    public int money = 0;
+    public int money = 123123;
     public int income = 15;
 
     public PlayerData(Player player) {

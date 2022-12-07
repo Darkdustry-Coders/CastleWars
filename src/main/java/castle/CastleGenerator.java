@@ -27,7 +27,7 @@ public class CastleGenerator {
     public static final int unitOffsetX = 5, unitOffsetY = 3, effectOffsetX = 3, effectOffsetY = 6;
     public static int offsetX, offsetY;
 
-    public static void generate() {
+    public static void generate(boolean isSerpulo) {
         var saved = world.tiles;
         world.resize(world.width(), world.height() * 2 + 58);
 
@@ -58,18 +58,16 @@ public class CastleGenerator {
             if (!tile.isCenter()) return;
 
             if (tile.block() instanceof CoreBlock core) {
-                var upgrade = CastleUtils.isSerpulo() ? Blocks.coreNucleus : Blocks.coreAcropolis;
+                var upgrade = isSerpulo ? Blocks.coreNucleus : Blocks.coreAcropolis;
                 addRoom(x, y, upgrade.size, () -> new CoreRoom(core, upgrade, 5000));
             }
 
             if (tile.block() instanceof Turret turret && turret.environmentBuildable() && CastleCosts.turrets.containsKey(turret))
-                addRoom(x, y, turret.size, () -> new BlockRoom(turret, 0));
+                addRoom(x, y, turret.size, () -> new BlockRoom(turret, CastleCosts.turrets.get(turret)));
 
-            if (tile.build instanceof SorterBuild sorter) {
-                if (!CastleCosts.items.containsKey(sorter.config())) return;
-
-                var drill = CastleUtils.isSerpulo() ? Blocks.laserDrill : Blocks.impactDrill;
-                addRoom(x, y, drill.size, () -> new MinerRoom(drill, sorter.config()));
+            if (tile.build instanceof SorterBuild sorter && CastleCosts.items.containsKey(sorter.config())) {
+                var drill = isSerpulo ? Blocks.laserDrill : Blocks.impactDrill;
+                addRoom(x, y, drill.size, () -> new MinerRoom(drill, sorter.config(), CastleCosts.items.get(sorter.config())));
             }
 
             if (tile.overlay() instanceof SpawnBlock) spawns.add(x, y);
@@ -77,17 +75,17 @@ public class CastleGenerator {
 
         // endregion
 
-        generateShop(7, saved.height + 6);
+        generateShop(7, saved.height + 6, isSerpulo);
     }
 
-    public static void generateShop(int shopX, int shopY) {
+    public static void generateShop(int shopX, int shopY, boolean isSerpulo) {
         offsetX = offsetY = 0;
 
         CastleCosts.units.each((type, data) -> {
-            if (type instanceof ErekirUnitType == CastleUtils.isSerpulo()) return;
+            if (type instanceof ErekirUnitType == isSerpulo) return;
 
-            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18,     new UnitRoom(type, data.income(), true, data.cost()));
-            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18 + 9, new UnitRoom(type, -data.income(), false, data.cost()));
+            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18,     new UnitRoom(type, data, true));
+            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18 + 9, new UnitRoom(type, data, false));
 
             if (++offsetX % unitOffsetX != 0) return;
             if (++offsetY % unitOffsetY != 0) offsetX -= unitOffsetX;
@@ -97,7 +95,7 @@ public class CastleGenerator {
         offsetY = 0;
 
         CastleCosts.effects.each((effect, data) -> {
-            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 9, new EffectRoom(effect, data.duration(), data.ally(), data.cost()));
+            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 9, new EffectRoom(effect, data));
 
             if (++offsetX % unitOffsetX % effectOffsetX != 0) return;
             if (++offsetY % effectOffsetY != 0) offsetX -= effectOffsetX;
@@ -147,13 +145,13 @@ public class CastleGenerator {
         }
 
         public void spawn(Team team, UnitType type) {
-            var spawn = spawns.get(team).cpy().add(Mathf.random(6), Mathf.random(6));
+            var spawn = spawns.get(team).cpy().add(Mathf.range(6), Mathf.range(6));
             type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
         }
 
         public boolean within(Tile tile) {
-            for (Point2 spawn : sharded) if (within(tile, spawn)) return true;
-            for (Point2 spawn : blue) if (within(tile, spawn)) return true;
+            for (var spawn : sharded) if (within(tile, spawn)) return true;
+            for (var spawn : blue) if (within(tile, spawn)) return true;
 
             return false;
         }

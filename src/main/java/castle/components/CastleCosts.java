@@ -77,11 +77,11 @@ public class CastleCosts {
 
         effects = OrderedMap.of(
                 StatusEffects.overclock, new EffectData(4000, 20, true),
-                StatusEffects.overdrive, new EffectData(12000, 20, true),
-                StatusEffects.boss, new EffectData(32000, 20, true),
-                StatusEffects.sporeSlowed, new EffectData(4000, 20, false),
-                StatusEffects.sapped, new EffectData(12000, 20, false),
-                StatusEffects.unmoving, new EffectData(32000, 5, false)
+                StatusEffects.overdrive, new EffectData(12000, 30, true),
+                StatusEffects.boss, new EffectData(32000, 40, true),
+                StatusEffects.sporeSlowed, new EffectData(12000, 25, false),
+                StatusEffects.sapped, new EffectData(36000, 15, false),
+                StatusEffects.unmoving, new EffectData(96000, 5, false)
         );
 
         turrets = OrderedMap.of(
@@ -122,14 +122,11 @@ public class CastleCosts {
                 Items.titanium, 750,
                 Items.thorium, 1000,
                 Items.silicon, 500,
-                Items.plastanium, 1300,
-                Items.phaseFabric, 1250,
-                Items.surgeAlloy, 1850,
-                Items.sporePod, 500,
-                Items.blastCompound, 100,
-                Items.pyratite, 100,
+                Items.plastanium, 1200,
+                Items.phaseFabric, 1500,
+                Items.surgeAlloy, 1800,
 
-                Items.beryllium, 250,
+                Items.beryllium, 500,
                 Items.tungsten, 1000,
                 Items.oxide, 1500,
                 Items.carbide, 1800

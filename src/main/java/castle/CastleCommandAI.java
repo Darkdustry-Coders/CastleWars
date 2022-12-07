@@ -11,12 +11,13 @@ public class CastleCommandAI extends CommandAI {
 
     @Override
     public void updateUnit() {
-        // TODO доделать эту шизу
+        // TODO протестить... Оно вообще работает?
         if (!hasCommand() && onEnemySide(unit)) {
             target = attackTarget = unit.closestEnemyCore();
             pathfind(Pathfinder.fieldCore);
 
             updateWeapons();
+            faceTarget();
         } else {
             super.updateUnit();
         }
@@ -29,6 +30,6 @@ public class CastleCommandAI extends CommandAI {
 
     @Override
     public Teamc target(float x, float y, float range, boolean air, boolean ground) {
-        return closestTarget(unit.team, x, y, range, unit -> unit.checkTarget(air, ground), building -> ground && building.health < 999999999f);
+        return closestTarget(unit.team, x, y, range, unit -> unit.checkTarget(air, ground), building -> ground && building.health != Float.POSITIVE_INFINITY);
     }
 }

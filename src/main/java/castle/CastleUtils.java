@@ -8,7 +8,6 @@ import mindustry.game.Rules;
 import mindustry.game.Team;
 import mindustry.gen.Iconc;
 import mindustry.gen.Teamc;
-import mindustry.type.Planet;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockGroup;
@@ -17,16 +16,17 @@ import static mindustry.Vars.*;
 
 public class CastleUtils {
 
-    public static Planet planet;
+    public static boolean isSerpulo() {
+        return content.planets().find(planet -> planet.accessible && (planet.defaultEnv == state.rules.env || planet.hiddenItems.asSet().equals(state.rules.hiddenBuildItems))) == Planets.serpulo;
+    }
 
-    public static void checkPlanet() {
-        // TODO переместить это в генератор и убрать переменную планеты
-        planet = content.planets().find(planet -> planet.accessible && (planet.defaultEnv == state.rules.env || planet.hiddenItems.asSet().equals(state.rules.hiddenBuildItems)));
+    public static boolean isBreak() {
+        return world.isGenerating() || state.gameOver;
     }
 
     public static void applyRules(Rules rules) {
         rules.waveTimer = rules.waves = rules.waveSending = false;
-        rules.pvp = false;
+        rules.pvp = true;
 
         rules.unitCap = 500;
         rules.unitCapVariable = false;
@@ -60,13 +60,5 @@ public class CastleUtils {
     public static boolean onEnemySide(Teamc teamc) {
         return (teamc.team() == Team.sharded && teamc.y() > world.unitHeight() / 2f) ||
                 (teamc.team() == Team.blue && teamc.y() < world.unitHeight() / 2f);
-    }
-
-    public static boolean isBreak() {
-        return world.isGenerating() || state.gameOver;
-    }
-
-    public static boolean isSerpulo() {
-        return planet == Planets.serpulo;
     }
 }

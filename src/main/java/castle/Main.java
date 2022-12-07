@@ -30,7 +30,7 @@ public class Main extends Plugin {
 
     @Override
     public void init() {
-        content.units().each(unit -> unit.playerControllable, type -> {
+        content.units().each(type -> type.playerControllable, type -> {
             type.payloadCapacity = 0f;
             type.controller = unit -> new CastleCommandAI();
         });
@@ -59,7 +59,7 @@ public class Main extends Plugin {
             int income = units.get(event.unit.type).drop();
             datas.each(data -> data.player.team() != event.unit.team, data -> {
                 data.money += income;
-                Call.label(data.player.con, "[lime]+[accent] " + income, 2f, event.unit.x, event.unit.y);
+                Call.label(data.player.con, "[lime]+[accent] " + income, 1f, event.unit.x, event.unit.y);
             });
         });
 
@@ -72,8 +72,7 @@ public class Main extends Plugin {
         Events.on(PlayEvent.class, event -> CastleUtils.applyRules(state.rules));
 
         Events.on(WorldLoadEndEvent.class, event -> {
-            CastleUtils.checkPlanet();
-            CastleGenerator.generate();
+            CastleGenerator.generate(CastleUtils.isSerpulo());
 
             timer = 45 * 60;
         });
@@ -81,7 +80,7 @@ public class Main extends Plugin {
         Events.run(Trigger.update, () -> {
             if (isBreak() || state.isPaused()) return;
 
-            Groups.unit.each(unit -> !unit.spawnedByCore && (unit.floorOn() == null || unit.floorOn().solid), Call::unitEnvDeath);
+            Groups.unit.each(unit -> !unit.spawnedByCore && (unit.tileOn() == null || unit.floorOn().solid), Call::unitEnvDeath);
 
             datas.each(PlayerData::update);
             rooms.each(Room::update);

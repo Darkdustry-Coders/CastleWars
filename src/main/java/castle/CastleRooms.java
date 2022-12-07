@@ -1,7 +1,10 @@
 package castle;
 
-import arc.util.*;
-import castle.components.CastleCosts;
+import arc.math.Mathf;
+import arc.util.Interval;
+import arc.util.Structs;
+import castle.components.CastleCosts.EffectData;
+import castle.components.CastleCosts.UnitData;
 import castle.components.PlayerData;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
@@ -22,7 +25,6 @@ import static mindustry.Vars.*;
 public class CastleRooms {
 
     public static class Room {
-
         public int x, y;
         public int size, cost, offset;
 
@@ -44,7 +46,7 @@ public class CastleRooms {
                 tile.setFloor(floor.asFloor());
             });
 
-            label.set(x * tilesize, y * tilesize);
+            label.set(labelX(), labelY());
             label.text(toString());
             label.fontSize(Math.min(size, 2f));
             label.flags(WorldLabel.flagOutline);
@@ -65,11 +67,18 @@ public class CastleRooms {
             return Structs.inBounds(World.toTile(x) - this.x + offset, World.toTile(y) - this.y + offset, size, size);
         }
 
+        public float labelX() {
+            return (x + (1 - size % 2) / 2f) * tilesize;
+        }
+
+        public float labelY() {
+            return (y + (1 - size % 2) / 2f) * tilesize;
+        }
+
         public void update() {}
     }
 
     public static class BlockRoom extends Room {
-
         public final Block block;
 
         public BlockRoom(Block block, int cost) {
@@ -85,9 +94,11 @@ public class CastleRooms {
             var tile = world.tile(x, y);
 
             tile.setNet(block, team, 0);
-            if (block instanceof CoreBlock == false) tile.build.health(Float.MAX_VALUE);
+            if (!(block instanceof CoreBlock)) tile.build.health(Float.POSITIVE_INFINITY);
 
-            Bundle.label(1f, x * tilesize, y * tilesize, "events.buy", data.player.coloredName());
+            // TODO ади помоги
+
+            Bundle.label(1f, labelX(), labelY(), "events.buy.block", data.player.coloredName());
         }
 
         @Override
@@ -102,7 +113,6 @@ public class CastleRooms {
     }
 
     public static class CoreRoom extends BlockRoom {
-
         public final Block core;
 
         public CoreRoom(Block core, Block upgrade, int cost) {
@@ -118,14 +128,13 @@ public class CastleRooms {
     }
 
     public static class MinerRoom extends BlockRoom {
-
         public final Interval interval = new Interval();
 
         public final Item item;
         public final int amount;
 
-        public MinerRoom(Block drill, Item item) {
-            super(drill, CastleCosts.items.get(item));
+        public MinerRoom(Block drill, Item item, int cost) {
+            super(drill, cost);
 
             this.item = item;
             this.amount = (int) (300f - item.cost * 150f);
@@ -146,16 +155,16 @@ public class CastleRooms {
     }
 
     public static class UnitRoom extends Room {
-
         public final UnitType type;
+
         public final int income;
         public final boolean attack;
 
-        public UnitRoom(UnitType type, int income, boolean attack, int cost) {
-            this.cost = cost;
-
+        public UnitRoom(UnitType type, UnitData data, boolean attack) {
             this.type = type;
-            this.income = income;
+
+            this.cost = data.cost();
+            this.income = attack ? data.income() : -data.income();
             this.attack = attack;
         }
 
@@ -164,12 +173,10 @@ public class CastleRooms {
             super.buy(data);
             data.income += income;
 
-            Tmp.v1.rnd(Math.min(type.hitSize, 48f));
-
             if (attack) spawns.spawn(data.player.team(), type);
             else if (data.player.core() != null) {
                 var core = data.player.core();
-                type.spawn(data.player.team(), core.x + 48f, core.y + Tmp.v1.y);
+                type.spawn(data.player.team(), core.x + 48f, core.y + Mathf.range(48f));
             }
         }
 
@@ -187,37 +194,46 @@ public class CastleRooms {
 
         @Override
         public String toString() {
-            return new StringBuilder()
-                    .append(CastleUtils.getIcon(type) + " ").append(attack ? "[accent]" + Iconc.modeAttack : "[scarlet]" + Iconc.defense)
-                    .append("\n[gray]" + cost + "\n[white]")
-                    .append(Iconc.blockPlastaniumCompressor + " : ").append(income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[crimson]").append(income)
-                    .toString();
+            return CastleUtils.getIcon(type) + " " + (attack ? "[accent]\uE865" : "[scarlet]\uE84D") +
+                    "\n[gray]" + cost +
+                    "\n[white]\uF8BA : " + (income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[crimson]") + income;
         }
     }
 
     public static class EffectRoom extends Room {
-
         public final StatusEffect effect;
+
         public final int duration;
         public final boolean ally;
 
-        public EffectRoom(StatusEffect effect, int duration, boolean ally, int cost) {
-            this.cost = cost;
-
+        public EffectRoom(StatusEffect effect, EffectData data) {
             this.effect = effect;
-            this.duration = duration;
-            this.ally = ally;
+
+            this.cost = data.cost();
+            this.duration = data.duration();
+            this.ally = data.ally();
         }
 
         @Override
         public void buy(PlayerData data) {
             super.buy(data);
-            Groups.unit.each(unit -> !unit.spawnedByCore && ((ally && unit.team == data.player.team()) || (!ally && unit.team != data.player.team())), unit -> unit.apply(effect, duration));
+
+            Groups.unit.each(unit -> ally == (unit.team == data.player.team()), unit -> unit.apply(effect, duration * 60f));
+
+            // TODO нормально оповещать
+            Bundle.announce(ally ? "events.buy.effect.ally" : "events.buy.effect.enemy", data.player.coloredName(), CastleUtils.getIcon(effect), duration);
+        }
+
+        @Override
+        public boolean canBuy(PlayerData data) {
+            return super.canBuy(data);
         }
 
         @Override
         public String toString() {
-            return CastleUtils.getIcon(effect) + "\n[gray]" + cost;
+            return CastleUtils.getIcon(effect) +
+                    "\n[gray]" + cost +
+                    "\n" + (ally ? "[stat]\uE804" : "[negstat]\uE805") + duration + "s";
         }
     }
 }
