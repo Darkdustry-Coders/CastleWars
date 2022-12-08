@@ -12,6 +12,7 @@ import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.mod.Plugin;
+import mindustry.world.blocks.defense.turrets.Turret;
 import useful.Bundle;
 
 import static castle.CastleUtils.*;
@@ -30,12 +31,14 @@ public class Main extends Plugin {
 
     @Override
     public void init() {
+        content.blocks().each(block -> block instanceof Turret, block -> block.sync = true);
+
+        content.statusEffects().each(effect -> effect.permanent = false);
+
         content.units().each(type -> type.playerControllable, type -> {
             type.payloadCapacity = 0f;
             type.controller = unit -> new CastleCommandAI();
         });
-
-        content.statusEffects().each(effect -> effect.permanent = false);
 
         Bundle.load(Main.class);
         CastleCosts.load();

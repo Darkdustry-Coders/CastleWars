@@ -43,7 +43,7 @@ public class CastleRooms {
         public void spawn() {
             world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size), tile -> tile.setFloor(Blocks.metalFloor.asFloor()));
 
-            label.set(labelX(), labelY());
+            label.set(drawX(), drawY());
             label.text(toString());
             label.fontSize(Math.min(size, 2f));
             label.flags(WorldLabel.flagOutline);
@@ -64,11 +64,11 @@ public class CastleRooms {
             return Structs.inBounds(tile.x - this.x + offset, tile.y - this.y + offset, size, size);
         }
 
-        public float labelX() {
+        public float drawX() {
             return (x + (1 - size % 2) / 2f) * tilesize;
         }
 
-        public float labelY() {
+        public float drawY() {
             return (y + (1 - size % 2) / 2f) * tilesize;
         }
 
@@ -89,11 +89,11 @@ public class CastleRooms {
             label.hide();
 
             var tile = world.tile(x, y);
-
             tile.setNet(block, team, 0);
+
             if (!(block instanceof CoreBlock)) tile.build.health(Float.POSITIVE_INFINITY);
 
-            Bundle.label(1f, labelX(), labelY(), "events.buy.block", data.player.coloredName());
+            Bundle.label(1f, drawX(), drawY(), "events.buy.block", data.player.coloredName());
         }
 
         @Override
@@ -136,8 +136,8 @@ public class CastleRooms {
         public void update() {
             if (label.isAdded() || !interval.get(300f)) return;
 
-            Call.effect(Fx.mineHuge, x * tilesize, y * tilesize, 0f, team.color);
-            Call.transferItemTo(null, item, 48, x * tilesize, y * tilesize, team.core());
+            Call.effect(Fx.mineHuge, drawX(), drawY(), 0f, team.color);
+            Call.transferItemTo(null, item, 48, drawX(), drawY(), team.core());
         }
 
         @Override
@@ -211,9 +211,6 @@ public class CastleRooms {
             super.buy(data);
 
             Groups.unit.each(unit -> ally == (unit.team == data.player.team()), unit -> unit.apply(effect, duration * 60f));
-
-            // TODO нормально оповещать
-            Bundle.announce(ally ? "events.buy.effect.ally" : "events.buy.effect.enemy", data.player.coloredName(), CastleUtils.getIcon(effect), duration);
         }
 
         @Override
