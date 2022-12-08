@@ -11,9 +11,8 @@ public class CastleCommandAI extends CommandAI {
 
     @Override
     public void updateUnit() {
-        // TODO протестить... Оно вообще работает?
         if (!hasCommand() && onEnemySide(unit)) {
-            target = attackTarget = unit.closestEnemyCore();
+            attackTarget = target = unit.closestEnemyCore();
             pathfind(Pathfinder.fieldCore);
 
             updateWeapons();

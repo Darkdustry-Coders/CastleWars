@@ -16,14 +16,6 @@ import static mindustry.Vars.*;
 
 public class CastleUtils {
 
-    public static boolean isSerpulo() {
-        return content.planets().find(planet -> planet.accessible && (planet.defaultEnv == state.rules.env || planet.hiddenItems.asSet().equals(state.rules.hiddenBuildItems))) == Planets.serpulo;
-    }
-
-    public static boolean isBreak() {
-        return world.isGenerating() || state.gameOver;
-    }
-
     public static void applyRules(Rules rules) {
         rules.waveTimer = rules.waves = rules.waveSending = false;
         rules.pvp = true;
@@ -55,6 +47,14 @@ public class CastleUtils {
         } catch (Exception e) {
             return '?';
         }
+    }
+
+    public static boolean isSerpulo() {
+        return state.rules.env == Planets.serpulo.defaultEnv || state.rules.hiddenBuildItems.equals(Planets.serpulo.hiddenItems.asSet());
+    }
+
+    public static boolean isBreak() {
+        return world.isGenerating() || state.gameOver;
     }
 
     public static boolean onEnemySide(Teamc teamc) {

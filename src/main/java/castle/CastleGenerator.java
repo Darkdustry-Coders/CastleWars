@@ -109,16 +109,16 @@ public class CastleGenerator {
 
     private static void addRoom(int x, int y, int size, Prov<Room> create) {
         var first = create.get();
-        first.set(x, y, size, Team.sharded);
+        first.set(x, y, size + 2, Team.sharded);
         first.spawn();
 
         var second = create.get();
-        second.set(x, world.tiles.height - y - 2 + size % 2, size, Team.blue);
+        second.set(x, world.tiles.height - y - 2 + size % 2, size + 2, Team.blue);
         second.spawn();
     }
 
     private static void addShopRoom(int x, int y, Room room) {
-        room.set(x, y, 3, Team.derelict);
+        room.set(x, y, 5, Team.derelict);
         room.spawn();
 
         room.label.y += 12f;
@@ -126,7 +126,6 @@ public class CastleGenerator {
     }
 
     public static class Spawns {
-
         public Seq<Point2> sharded = new Seq<>();
         public Seq<Point2> blue = new Seq<>();
 

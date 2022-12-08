@@ -48,9 +48,16 @@ public class Main extends Plugin {
         });
 
         Events.on(PlayerJoin.class, event -> {
-            var data = PlayerData.getData(event.player.uuid());
+            var data = PlayerData.getData(event.player);
             if (data != null) data.handlePlayerJoin(event.player);
             else datas.add(new PlayerData(event.player));
+        });
+
+        Events.on(TapEvent.class, event -> {
+            var data = PlayerData.getData(event.player);
+            if (data == null) return; // Why
+
+            rooms.each(room -> room.check(event.tile) && room.canBuy(data), room -> room.buy(data));
         });
 
         Events.on(UnitDestroyEvent.class, event -> {

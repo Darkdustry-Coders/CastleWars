@@ -17,22 +17,19 @@ public class PlayerData {
     public Player player;
     public Locale locale;
 
-    public int money = 123123;
-    public int income = 15;
+    public int money, income;
 
     public PlayerData(Player player) {
         this.handlePlayerJoin(player);
+        this.reset();
     }
 
-    public static PlayerData getData(String uuid) {
-        return datas.find(data -> data.player.uuid().equals(uuid));
+    public static PlayerData getData(Player player) {
+        return datas.find(data -> data.player.uuid().equals(player.uuid()));
     }
 
     public void update() {
         if (!player.con.isConnected()) return;
-
-        if (player.shooting)
-            rooms.each(room -> room.check(player.mouseX, player.mouseY) && room.canBuy(this), room -> room.buy(this));
 
         int units = countUnits(player.team()), unitsLimit = Units.getCap(player.team());
         Bundle.setHud(player, "ui.hud",

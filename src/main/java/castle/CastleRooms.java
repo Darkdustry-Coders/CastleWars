@@ -8,12 +8,12 @@ import castle.components.CastleCosts.UnitData;
 import castle.components.PlayerData;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
-import mindustry.core.World;
 import mindustry.entities.Units;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.Block;
+import mindustry.world.Tile;
 import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
@@ -41,10 +41,7 @@ public class CastleRooms {
         }
 
         public void spawn() {
-            world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size + 2), tile -> {
-                var floor = check(tile.worldx(), tile.worldy()) ? Blocks.metalFloor : Blocks.metalFloor5;
-                tile.setFloor(floor.asFloor());
-            });
+            world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size), tile -> tile.setFloor(Blocks.metalFloor.asFloor()));
 
             label.set(labelX(), labelY());
             label.text(toString());
@@ -63,8 +60,8 @@ public class CastleRooms {
             return data.money >= cost;
         }
 
-        public boolean check(float x, float y) {
-            return Structs.inBounds(World.toTile(x) - this.x + offset, World.toTile(y) - this.y + offset, size, size);
+        public boolean check(Tile tile) {
+            return Structs.inBounds(tile.x - this.x + offset, tile.y - this.y + offset, size, size);
         }
 
         public float labelX() {
@@ -95,8 +92,6 @@ public class CastleRooms {
 
             tile.setNet(block, team, 0);
             if (!(block instanceof CoreBlock)) tile.build.health(Float.POSITIVE_INFINITY);
-
-            // TODO ади помоги
 
             Bundle.label(1f, labelX(), labelY(), "events.buy.block", data.player.coloredName());
         }
@@ -129,15 +124,12 @@ public class CastleRooms {
 
     public static class MinerRoom extends BlockRoom {
         public final Interval interval = new Interval();
-
         public final Item item;
-        public final int amount;
 
         public MinerRoom(Block drill, Item item, int cost) {
             super(drill, cost);
 
             this.item = item;
-            this.amount = (int) (300f - item.cost * 150f);
         }
 
         @Override
@@ -145,7 +137,7 @@ public class CastleRooms {
             if (label.isAdded() || !interval.get(300f)) return;
 
             Call.effect(Fx.mineHuge, x * tilesize, y * tilesize, 0f, team.color);
-            Call.transferItemTo(null, item, amount, x * tilesize, y * tilesize, team.core());
+            Call.transferItemTo(null, item, 48, x * tilesize, y * tilesize, team.core());
         }
 
         @Override
