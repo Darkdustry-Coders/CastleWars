@@ -94,13 +94,13 @@ public class CastleRooms {
             if (!(tile.block() instanceof CoreBlock)) tile.build.health(Float.POSITIVE_INFINITY);
 
             if (block instanceof ItemTurret turret)
-                tile.build.handleStack(turret.ammoTypes.keys().next(), 100, null);
+                tile.build.handleStack(turret.ammoTypes.keys().next(), turret.itemCapacity, null);
 
             if (block instanceof LiquidTurret turret)
-                tile.build.handleLiquid(null, turret.ammoTypes.keys().next(), 100f);
+                tile.build.handleLiquid(null, turret.ammoTypes.keys().next(), turret.liquidCapacity);
 
-            if (block instanceof LaserTurret)
-                tile.build.handleLiquid(null, Liquids.water, 100f);
+            if (block instanceof LaserTurret turret)
+                tile.build.handleLiquid(null, Liquids.water, turret.liquidCapacity);
 
             Bundle.label(1f, drawX(), drawY(), "events.buy.block", data.player.coloredName());
         }
