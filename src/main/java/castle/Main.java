@@ -3,8 +3,8 @@ package castle;
 import arc.Events;
 import arc.struct.Seq;
 import arc.util.Interval;
-import castle.CastleRooms.Room;
 import castle.CastleGenerator.Spawns;
+import castle.CastleRooms.Room;
 import castle.components.CastleCosts;
 import castle.components.PlayerData;
 import mindustry.game.EventType.*;
@@ -12,10 +12,9 @@ import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.mod.Plugin;
-import mindustry.world.blocks.defense.turrets.Turret;
 import useful.Bundle;
 
-import static castle.CastleUtils.*;
+import static castle.CastleUtils.isBreak;
 import static castle.components.CastleCosts.units;
 import static castle.components.PlayerData.datas;
 import static mindustry.Vars.*;
@@ -31,8 +30,7 @@ public class Main extends Plugin {
 
     @Override
     public void init() {
-        content.blocks().each(block -> block instanceof Turret, block -> block.sync = true);
-
+        content.blocks().each(block -> block.sync = true);
         content.statusEffects().each(effect -> effect.permanent = false);
 
         content.units().each(type -> type.playerControllable, type -> {

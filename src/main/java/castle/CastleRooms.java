@@ -6,8 +6,7 @@ import arc.util.Structs;
 import castle.components.CastleCosts.EffectData;
 import castle.components.CastleCosts.UnitData;
 import castle.components.PlayerData;
-import mindustry.content.Blocks;
-import mindustry.content.Fx;
+import mindustry.content.*;
 import mindustry.entities.Units;
 import mindustry.game.Team;
 import mindustry.gen.*;
@@ -15,6 +14,7 @@ import mindustry.type.*;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.ConstructBlock;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
@@ -91,7 +91,16 @@ public class CastleRooms {
             var tile = world.tile(x, y);
             tile.setNet(block, team, 0);
 
-            if (!(block instanceof CoreBlock)) tile.build.health(Float.POSITIVE_INFINITY);
+            if (!(tile.block() instanceof CoreBlock)) tile.build.health(Float.POSITIVE_INFINITY);
+
+            if (block instanceof ItemTurret turret)
+                tile.build.handleStack(turret.ammoTypes.keys().next(), 100, null);
+
+            if (block instanceof LiquidTurret turret)
+                tile.build.handleLiquid(null, turret.ammoTypes.keys().next(), 100f);
+
+            if (block instanceof LaserTurret)
+                tile.build.handleLiquid(null, Liquids.water, 100f);
 
             Bundle.label(1f, drawX(), drawY(), "events.buy.block", data.player.coloredName());
         }
