@@ -2,15 +2,19 @@ package castle;
 
 import arc.util.Reflect;
 import arc.util.Strings;
+import arc.util.io.*;
 import mindustry.content.Planets;
 import mindustry.ctype.MappableContent;
 import mindustry.game.Rules;
 import mindustry.game.Team;
-import mindustry.gen.Iconc;
-import mindustry.gen.Teamc;
+import mindustry.gen.*;
+import mindustry.world.Tile;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockGroup;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 
 import static mindustry.Vars.*;
 
@@ -18,7 +22,7 @@ public class CastleUtils {
 
     public static void applyRules(Rules rules) {
         rules.waveTimer = rules.waves = rules.waveSending = false;
-        rules.pvp = true;
+        rules.pvp = false;
 
         rules.unitCap = 500;
         rules.unitCapVariable = false;
@@ -35,6 +39,19 @@ public class CastleUtils {
 
         rules.weather.clear();
         rules.bannedBlocks.addAll(content.blocks().select(block -> block instanceof CoreBlock || block instanceof UnitFactory || block.group == BlockGroup.turrets || block.group == BlockGroup.drills || block.group == BlockGroup.logic));
+    }
+
+    public static void syncBuild(Building build) {
+        var stream = new ByteArrayOutputStream();
+        var dataStream = new DataOutputStream(stream);
+
+        stream.write(build.pos());
+        stream.write(build.classId());
+        build.write(Writes.get(dataStream));
+
+        Streams.close(dataStream);
+
+        Call.blockSnapshot((short) 1, stream.toByteArray());
     }
 
     public static int countUnits(Team team) {

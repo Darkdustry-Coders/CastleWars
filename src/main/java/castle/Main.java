@@ -30,7 +30,6 @@ public class Main extends Plugin {
 
     @Override
     public void init() {
-        content.blocks().each(block -> block.sync = true);
         content.statusEffects().each(effect -> effect.permanent = false);
 
         content.units().each(type -> type.playerControllable, type -> {

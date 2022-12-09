@@ -1,12 +1,12 @@
 package castle;
 
 import arc.math.Mathf;
-import arc.util.Interval;
-import arc.util.Structs;
+import arc.util.*;
 import castle.components.CastleCosts.EffectData;
 import castle.components.CastleCosts.UnitData;
 import castle.components.PlayerData;
-import mindustry.content.*;
+import mindustry.content.Blocks;
+import mindustry.content.Fx;
 import mindustry.entities.Units;
 import mindustry.game.Team;
 import mindustry.gen.*;
@@ -14,7 +14,6 @@ import mindustry.type.*;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.ConstructBlock;
-import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
@@ -93,14 +92,13 @@ public class CastleRooms {
 
             if (!(tile.block() instanceof CoreBlock)) tile.build.health(Float.POSITIVE_INFINITY);
 
-            if (block instanceof ItemTurret turret)
-                Call.transferItemTo(data.player.unit(), turret.ammoTypes.keys().next(), 100, data.player.x, data.player.y, tile.build);
+            var item = content.items().find(block::consumesItem);
+            if (item != null) tile.build.handleStack(item, 100, null);
 
-            if (block instanceof LiquidTurret turret)
-                tile.build.handleLiquid(null, turret.ammoTypes.keys().next(), 100f);
+            var liquid = content.liquids().find(block::consumesLiquid);
+            if (liquid != null) tile.build.handleLiquid(null, liquid, 100f);
 
-            if (block instanceof LaserTurret)
-                tile.build.handleLiquid(null, Liquids.water, 100f);
+            CastleUtils.syncBuild(tile.build);
 
             Bundle.label(1f, drawX(), drawY(), "events.buy.block", data.player.coloredName());
         }
@@ -220,6 +218,8 @@ public class CastleRooms {
             super.buy(data);
 
             Groups.unit.each(unit -> ally == (unit.team == data.player.team()), unit -> unit.apply(effect, duration * 60f));
+
+            // TODO визуал при покупке эффекта
         }
 
         @Override
