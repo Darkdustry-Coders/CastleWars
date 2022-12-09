@@ -13,7 +13,10 @@ public class CastleCommandAI extends CommandAI {
     public void updateUnit() {
         if (!hasCommand() && onEnemySide(unit)) {
             attackTarget = target = unit.closestEnemyCore();
-            pathfind(Pathfinder.fieldCore);
+
+            if (unit.type.flying)
+                moveTo(target, unit.type.range * 0.8f);
+            else pathfind(Pathfinder.fieldCore);
 
             updateWeapons();
             faceTarget();
@@ -23,7 +26,7 @@ public class CastleCommandAI extends CommandAI {
     }
 
     @Override
-    public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
+    public Teamc findTarget(float x, float y, float range, boolean air, boolean ground) {
         return nearAttackTarget(x, y, range) ? attackTarget : target(x, y, range, air, ground);
     }
 

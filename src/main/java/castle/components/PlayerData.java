@@ -7,8 +7,8 @@ import useful.Bundle;
 
 import java.util.Locale;
 
-import static castle.CastleUtils.*;
-import static castle.Main.*;
+import static castle.CastleUtils.countUnits;
+import static castle.Main.timer;
 
 public class PlayerData {
 

@@ -1,13 +1,8 @@
 package castle.components;
 
 import arc.struct.OrderedMap;
-import mindustry.content.Blocks;
-import mindustry.content.Items;
-import mindustry.content.StatusEffects;
-import mindustry.content.UnitTypes;
-import mindustry.type.Item;
-import mindustry.type.StatusEffect;
-import mindustry.type.UnitType;
+import mindustry.content.*;
+import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.Turret;
 
 public class CastleCosts {

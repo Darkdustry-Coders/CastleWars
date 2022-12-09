@@ -84,7 +84,7 @@ public class CastleGenerator {
         CastleCosts.units.each((type, data) -> {
             if (type instanceof ErekirUnitType == isSerpulo) return;
 
-            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18,     new UnitRoom(type, data, true));
+            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18, new UnitRoom(type, data, true));
             addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18 + 9, new UnitRoom(type, data, false));
 
             if (++offsetX % unitOffsetX != 0) return;
@@ -165,9 +165,10 @@ public class CastleGenerator {
         }
 
         public void draw(Point2 spawn, Team team) {
-            for (int deg = 0; deg < 360; deg += 10) Call.effect(Fx.mineBig,
-                    spawn.x * tilesize + Mathf.cosDeg(deg) * state.rules.dropZoneRadius,
-                    spawn.y * tilesize + Mathf.sinDeg(deg) * state.rules.dropZoneRadius, 0f, team.color);
+            for (int deg = 0; deg < 360; deg += 10)
+                Call.effect(Fx.mineBig,
+                        spawn.x * tilesize + Mathf.cosDeg(deg) * state.rules.dropZoneRadius,
+                        spawn.y * tilesize + Mathf.sinDeg(deg) * state.rules.dropZoneRadius, 0f, team.color);
         }
     }
 }

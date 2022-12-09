@@ -17,6 +17,8 @@ import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static castle.CastleUtils.countUnits;
 import static castle.Main.*;
 import static mindustry.Vars.*;
@@ -90,15 +92,15 @@ public class CastleRooms {
             var tile = world.tile(x, y);
             tile.setNet(block, team, 0);
 
-            if (tile.block() instanceof CoreBlock == false) tile.build.health(Float.POSITIVE_INFINITY);
+            if (!(block instanceof CoreBlock)) tile.build.health(Float.POSITIVE_INFINITY);
 
-            var item = content.items().find(block::consumesItem);
-            if (item != null) tile.build.handleStack(item, 100, null);
+            var sourceTile = world.tile(x - offset, y);
+            var delay = new AtomicInteger();
 
-            var liquid = content.liquids().find(block::consumesLiquid);
-            if (liquid != null) tile.build.handleLiquid(null, liquid, 100f);
+            CastleUtils.runConfigure(sourceTile, Blocks.itemSource, team, content.items().find(block::consumesItem), delay);
+            CastleUtils.runConfigure(sourceTile, Blocks.liquidSource, team, content.liquids().find(block::consumesLiquid), delay);
 
-            CastleUtils.syncBuild(tile.build);
+            Timer.schedule(sourceTile::removeNet, delay.get());
 
             Bundle.label(1f, drawX(), drawY(), "events.buy.block", data.player.coloredName());
         }
