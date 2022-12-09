@@ -1,5 +1,6 @@
 package castle;
 
+import arc.util.Log;
 import arc.util.Reflect;
 import arc.util.Strings;
 import arc.util.io.*;
@@ -8,7 +9,6 @@ import mindustry.ctype.MappableContent;
 import mindustry.game.Rules;
 import mindustry.game.Team;
 import mindustry.gen.*;
-import mindustry.world.Tile;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockGroup;
@@ -45,12 +45,16 @@ public class CastleUtils {
         var stream = new ByteArrayOutputStream();
         var dataStream = new DataOutputStream(stream);
 
-        stream.write(build.pos());
-        stream.write(build.classId());
-        build.write(Writes.get(dataStream));
+        try {
+            dataStream.writeInt(build.pos());
+            dataStream.writeShort(build.block.id);
+            build.writeAll(Writes.get(dataStream));
+        } catch (Throwable ignored) {
+            Log.err("Failed to sync build", ignored);
+            return;
+        }
 
         Streams.close(dataStream);
-
         Call.blockSnapshot((short) 1, stream.toByteArray());
     }
 

@@ -90,7 +90,7 @@ public class CastleRooms {
             var tile = world.tile(x, y);
             tile.setNet(block, team, 0);
 
-            if (!(tile.block() instanceof CoreBlock)) tile.build.health(Float.POSITIVE_INFINITY);
+            if (tile.block() instanceof CoreBlock == false) tile.build.health(Float.POSITIVE_INFINITY);
 
             var item = content.items().find(block::consumesItem);
             if (item != null) tile.build.handleStack(item, 100, null);
