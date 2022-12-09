@@ -50,6 +50,6 @@ public class PlayerData {
 
     public void reset() {
         this.money = 0;
-        this.income = 1500;
+        this.income = 15;
     }
 }
