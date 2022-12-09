@@ -221,7 +221,9 @@ public class CastleRooms {
 
             Groups.unit.each(unit -> ally == (unit.team == data.player.team()), unit -> unit.apply(effect, duration * 60f));
 
-            // TODO визуал при покупке эффекта
+            // Visual thingy
+            for (int i = 0; i < 36; i++)
+                Time.run(i, () -> Call.effect(Fx.coreLandDust, data.player.x, data.player.y, Mathf.random(360f), effect.color));
         }
 
         @Override
