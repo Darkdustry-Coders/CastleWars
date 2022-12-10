@@ -73,8 +73,9 @@ public class CastleCosts {
         effects = OrderedMap.of(
                 StatusEffects.overclock, new EffectData(4000, 20, true),
                 StatusEffects.overdrive, new EffectData(12000, 30, true),
-                StatusEffects.boss, new EffectData(32000, 40, true),
+                StatusEffects.boss, new EffectData(36000, 40, true),
                 StatusEffects.sporeSlowed, new EffectData(12000, 25, false),
+                StatusEffects.electrified, new EffectData(24000, 20, false),
                 StatusEffects.sapped, new EffectData(36000, 15, false),
                 StatusEffects.unmoving, new EffectData(96000, 5, false)
         );
