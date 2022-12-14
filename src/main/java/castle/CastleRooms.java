@@ -151,7 +151,7 @@ public class CastleRooms {
 
         @Override
         public String toString() {
-            return "[" + CastleUtils.getIcon(item) + "] : " + cost;
+            return "[" + CastleUtils.getIcon(item) + "]\n" + cost;
         }
     }
 
