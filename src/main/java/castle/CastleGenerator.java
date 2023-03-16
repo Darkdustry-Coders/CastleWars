@@ -52,6 +52,7 @@ public class CastleGenerator {
         // region rooms
 
         spawns.clear();
+        state.teams.getActive().each(data -> data.cores.each(state.teams::unregisterCore));
 
         saved.each((x, y) -> {
             var tile = saved.get(x, y);
@@ -108,13 +109,13 @@ public class CastleGenerator {
     }
 
     private static void addRoom(int x, int y, int size, Prov<Room> create) {
-        var first = create.get();
-        first.set(x, y, size + 2, Team.sharded);
-        first.spawn();
+        var sharded = create.get();
+        sharded.set(x, y, size + 2, Team.sharded);
+        sharded.spawn();
 
-        var second = create.get();
-        second.set(x, world.tiles.height - y - 2 + size % 2, size + 2, Team.blue);
-        second.spawn();
+        var blue = create.get();
+        blue.set(x, world.height() - y - 2 + size % 2, size + 2, Team.blue);
+        blue.spawn();
     }
 
     private static void addShopRoom(int x, int y, Room room) {

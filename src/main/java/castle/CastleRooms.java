@@ -127,7 +127,9 @@ public class CastleRooms {
         @Override
         public void spawn() {
             super.spawn();
-            world.tile(x, y).setNet(core, team, 0);
+
+            var tile = world.tile(x, y);
+            tile.setBlock(core, team);
         }
     }
 

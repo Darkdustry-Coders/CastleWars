@@ -9,13 +9,13 @@ repositories {
 }
 
 ext {
-    mindustryVersion = 'v140.4'
+    mindustryVersion = 'v142'
 }
 
 dependencies {
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
-    implementation "com.github.xzxADIxzx.Useful-Stuffs:server-bundle:main-SNAPSHOT"
+    implementation "com.github.xzxADIxzx.Useful-Stuffs:bundle:954a8f990a"
 }
 
 jar {
