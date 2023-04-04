@@ -2,22 +2,17 @@ package castle;
 
 import arc.math.Mathf;
 import arc.util.*;
-import castle.components.CastleCosts.EffectData;
-import castle.components.CastleCosts.UnitData;
+import castle.components.CastleCosts.*;
 import castle.components.PlayerData;
-import mindustry.content.Blocks;
-import mindustry.content.Fx;
+import mindustry.content.*;
 import mindustry.entities.Units;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static castle.CastleUtils.countUnits;
 import static castle.Main.*;
@@ -93,14 +88,6 @@ public class CastleRooms {
             tile.setNet(block, team, 0);
 
             if (!(block instanceof CoreBlock)) tile.build.health(Float.POSITIVE_INFINITY);
-
-            var sourceTile = world.tile(x - offset, y);
-            var delay = new AtomicInteger();
-
-            CastleUtils.runConfigure(sourceTile, Blocks.itemSource, team, content.items().find(block::consumesItem), delay);
-            CastleUtils.runConfigure(sourceTile, Blocks.liquidSource, team, content.liquids().find(block::consumesLiquid), delay);
-
-            Timer.schedule(sourceTile::removeNet, delay.get());
 
             Bundle.label(1f, drawX(), drawY(), "events.buy.block", data.player.coloredName());
         }

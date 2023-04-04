@@ -145,7 +145,7 @@ public class CastleGenerator {
         }
 
         public void spawn(Team team, UnitType type) {
-            var spawn = spawns.get(team).cpy().add(Mathf.range(6), Mathf.range(6));
+            var spawn = spawns.get(team).cpy().add(Mathf.range(8), Mathf.range(8));
             type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
         }
 

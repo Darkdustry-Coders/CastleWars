@@ -1,19 +1,16 @@
 package castle;
 
-import arc.util.*;
+import arc.util.Reflect;
+import arc.util.Strings;
 import mindustry.content.Planets;
 import mindustry.ctype.MappableContent;
 import mindustry.game.Rules;
 import mindustry.game.Team;
 import mindustry.gen.Iconc;
 import mindustry.gen.Teamc;
-import mindustry.world.Block;
-import mindustry.world.Tile;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockGroup;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static mindustry.Vars.*;
 
@@ -63,15 +60,5 @@ public class CastleUtils {
     public static boolean onEnemySide(Teamc teamc) {
         return (teamc.team() == Team.sharded && teamc.y() > world.unitHeight() / 2f) ||
                 (teamc.team() == Team.blue && teamc.y() < world.unitHeight() / 2f);
-    }
-
-    public static void runConfigure(Tile tile, Block block, Team team, Object config, AtomicInteger delay) {
-        if (config == null) return;
-
-        Timer.schedule(() -> {
-            tile.setNet(block, team, 0);
-            tile.build.configure(config);
-            tile.build.health(Float.POSITIVE_INFINITY);
-        }, delay.getAndIncrement());
     }
 }
