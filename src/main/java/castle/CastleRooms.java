@@ -14,7 +14,7 @@ import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
-import static castle.CastleUtils.countUnits;
+import static castle.CastleUtils.*;
 import static castle.Main.*;
 import static mindustry.Vars.*;
 
@@ -87,7 +87,7 @@ public class CastleRooms {
             var tile = world.tile(x, y);
             tile.setNet(block, team, 0);
 
-            if (!(block instanceof CoreBlock)) tile.build.health(Float.POSITIVE_INFINITY);
+            if (!(block instanceof CoreBlock)) tile.build.health(Float.MAX_VALUE);
 
             Bundle.label(1f, drawX(), drawY(), "events.buy.block", data.player.coloredName());
         }

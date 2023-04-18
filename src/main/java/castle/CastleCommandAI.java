@@ -3,9 +3,11 @@ package castle;
 import mindustry.ai.Pathfinder;
 import mindustry.ai.types.CommandAI;
 import mindustry.gen.Teamc;
+import mindustry.world.blocks.defense.turrets.Turret;
+import mindustry.world.blocks.production.Drill;
 
-import static castle.CastleUtils.onEnemySide;
-import static mindustry.entities.Units.closestTarget;
+import static castle.CastleUtils.*;
+import static mindustry.entities.Units.*;
 
 public class CastleCommandAI extends CommandAI {
 
@@ -32,6 +34,6 @@ public class CastleCommandAI extends CommandAI {
 
     @Override
     public Teamc target(float x, float y, float range, boolean air, boolean ground) {
-        return closestTarget(unit.team, x, y, range, unit -> unit.checkTarget(air, ground), building -> ground && building.health != Float.POSITIVE_INFINITY);
+        return closestTarget(unit.team, x, y, range, unit -> unit.checkTarget(air, ground), build -> ground && !(build.block instanceof Turret || build.block instanceof Drill));
     }
 }

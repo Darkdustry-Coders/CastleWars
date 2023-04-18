@@ -5,21 +5,19 @@ import arc.math.Mathf;
 import arc.math.geom.Point2;
 import arc.struct.Seq;
 import castle.components.CastleCosts;
-import mindustry.content.Blocks;
-import mindustry.content.Fx;
+import mindustry.content.*;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.type.UnitType;
 import mindustry.type.unit.ErekirUnitType;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.distribution.Sorter.SorterBuild;
 import mindustry.world.blocks.environment.SpawnBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import static castle.CastleRooms.*;
-import static castle.Main.spawns;
+import static castle.Main.*;
 import static mindustry.Vars.*;
 
 public class CastleGenerator {

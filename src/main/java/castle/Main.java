@@ -5,18 +5,18 @@ import arc.struct.Seq;
 import arc.util.Interval;
 import castle.CastleGenerator.Spawns;
 import castle.CastleRooms.Room;
-import castle.components.CastleCosts;
-import castle.components.PlayerData;
+import castle.components.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
-import mindustry.gen.Call;
-import mindustry.gen.Groups;
+import mindustry.gen.*;
 import mindustry.mod.Plugin;
+import mindustry.world.blocks.defense.turrets.Turret;
+import mindustry.world.blocks.production.Drill;
 import useful.Bundle;
 
-import static castle.CastleUtils.isBreak;
-import static castle.components.CastleCosts.units;
-import static castle.components.PlayerData.datas;
+import static castle.CastleUtils.*;
+import static castle.components.CastleCosts.*;
+import static castle.components.PlayerData.*;
 import static mindustry.Vars.*;
 
 public class Main extends Plugin {
@@ -44,13 +44,17 @@ public class Main extends Plugin {
             if (action.tile == null) return true;
             if (spawns.within(action.tile)) return false;
 
-            return action.tile.build == null || action.tile.build.health != Float.POSITIVE_INFINITY;
+            return !(action.tile.block() instanceof Turret || action.tile.block() instanceof Drill);
         });
 
         Events.on(PlayerJoin.class, event -> {
             var data = PlayerData.getData(event.player);
-            if (data != null) data.handlePlayerJoin(event.player);
-            else datas.add(new PlayerData(event.player));
+            if (data == null) {
+                datas.add(new PlayerData(event.player));
+                return;
+            }
+
+            data.handlePlayerJoin(player);
         });
 
         Events.on(TapEvent.class, event -> {
@@ -72,8 +76,7 @@ public class Main extends Plugin {
 
         Events.on(ResetEvent.class, event -> {
             rooms.clear();
-            datas.filter(data -> data.player.con.isConnected());
-            datas.each(PlayerData::reset);
+            datas.filter(data -> data.player.con.isConnected()).each(PlayerData::reset);
         });
 
         Events.on(PlayEvent.class, event -> CastleUtils.applyRules(state.rules));

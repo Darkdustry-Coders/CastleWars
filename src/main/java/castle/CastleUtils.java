@@ -1,13 +1,10 @@
 package castle;
 
-import arc.util.Reflect;
-import arc.util.Strings;
+import arc.util.*;
 import mindustry.content.Planets;
 import mindustry.ctype.MappableContent;
-import mindustry.game.Rules;
-import mindustry.game.Team;
-import mindustry.gen.Iconc;
-import mindustry.gen.Teamc;
+import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockGroup;
