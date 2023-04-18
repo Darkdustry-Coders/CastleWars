@@ -126,7 +126,6 @@ public class CastleRooms {
 
         public MinerRoom(Block drill, Item item, int cost) {
             super(drill, cost);
-
             this.item = item;
         }
 

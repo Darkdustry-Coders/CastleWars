@@ -133,7 +133,7 @@ public class CastleGenerator {
         }
 
         public void add(int x, int y) {
-            sharded.add(new Point2(x, world.height() - y - 2));
+            sharded.add(new Point2(x, world.height() - y - 1));
             blue.add(new Point2(x, y));
         }
 
@@ -143,7 +143,7 @@ public class CastleGenerator {
         }
 
         public void spawn(Team team, UnitType type) {
-            var spawn = spawns.get(team).cpy().add(Mathf.range(8), Mathf.range(8));
+            var spawn = spawns.get(team).cpy().add(Mathf.range(6), Mathf.range(6));
             type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
         }
 
