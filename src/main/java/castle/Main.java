@@ -54,7 +54,7 @@ public class Main extends Plugin {
                 return;
             }
 
-            data.handlePlayerJoin(player);
+            data.handlePlayerJoin(event.player);
         });
 
         Events.on(TapEvent.class, event -> {
