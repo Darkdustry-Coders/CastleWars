@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class CastleGenerator {
 
-    public static final int unitOffsetX = 5, unitOffsetY = 3, effectOffsetX = 3, effectOffsetY = 6;
+    public static final int unitLimitX = 5, unitLimitY = 3, effectLimitX = 4, effectLimitY = 6;
     public static int offsetX, offsetY;
 
     public static void generate(boolean isSerpulo) {
@@ -86,9 +86,9 @@ public class CastleGenerator {
             addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18, new UnitRoom(type, data, true));
             addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18 + 9, new UnitRoom(type, data, false));
 
-            if (++offsetX % unitOffsetX != 0) return;
-            if (++offsetY % unitOffsetY != 0) offsetX -= unitOffsetX;
-            else offsetY -= unitOffsetY;
+            if (++offsetX % unitLimitX != 0) return;
+            if (++offsetY % unitLimitY != 0) offsetX -= unitLimitX;
+            else offsetY -= unitLimitY;
         });
 
         offsetY = 0;
@@ -96,9 +96,9 @@ public class CastleGenerator {
         CastleCosts.effects.each((effect, data) -> {
             addShopRoom(shopX + offsetX * 9, shopY + offsetY * 9, new EffectRoom(effect, data));
 
-            if (++offsetX % unitOffsetX % effectOffsetX != 0) return;
-            if (++offsetY % effectOffsetY != 0) offsetX -= effectOffsetX;
-            else offsetY -= effectOffsetY;
+            if (++offsetX % effectLimitX != 0) return;
+            if (++offsetY % effectLimitY != 0) offsetX -= effectLimitX;
+            else offsetY -= effectLimitY;
         });
     }
 

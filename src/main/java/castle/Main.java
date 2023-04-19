@@ -5,18 +5,20 @@ import arc.struct.Seq;
 import arc.util.Interval;
 import castle.CastleGenerator.Spawns;
 import castle.CastleRooms.Room;
-import castle.components.*;
+import castle.components.CastleCosts;
+import castle.components.PlayerData;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
-import mindustry.gen.*;
+import mindustry.gen.Call;
+import mindustry.gen.Groups;
 import mindustry.mod.Plugin;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.production.Drill;
 import useful.Bundle;
 
-import static castle.CastleUtils.*;
-import static castle.components.CastleCosts.*;
-import static castle.components.PlayerData.*;
+import static castle.CastleUtils.isBreak;
+import static castle.components.CastleCosts.units;
+import static castle.components.PlayerData.datas;
 import static mindustry.Vars.*;
 
 public class Main extends Plugin {
@@ -54,7 +56,7 @@ public class Main extends Plugin {
                 return;
             }
 
-            data.handlePlayerJoin(player);
+            data.handlePlayerJoin(event.player);
         });
 
         Events.on(TapEvent.class, event -> {
@@ -65,7 +67,7 @@ public class Main extends Plugin {
         });
 
         Events.on(UnitDestroyEvent.class, event -> {
-            if (!units.containsKey(event.unit.type) || event.unit.spawnedByCore) return;
+            if (!units.containsKey(event.unit.type)) return;
 
             int income = units.get(event.unit.type).drop();
             datas.each(data -> data.player.team() != event.unit.team, data -> {

@@ -1,6 +1,6 @@
 package castle.components;
 
-import arc.struct.OrderedMap;
+import arc.struct.*;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.Turret;
@@ -51,6 +51,12 @@ public class CastleCosts {
                 UnitTypes.antumbra, new UnitData(4100, 23, 850),
                 UnitTypes.eclipse, new UnitData(12000, 60, 1250),
 
+                UnitTypes.mono, new UnitData(350, 1, 90), // TODO
+                UnitTypes.poly, new UnitData(350, 1, 90),
+                UnitTypes.mega, new UnitData(900, 5, 200),
+                UnitTypes.quad, new UnitData(5250, 27, 900),
+                UnitTypes.oct, new UnitData(13000, 65, 1300),
+
                 UnitTypes.stell, new UnitData(260, 2, 100),
                 UnitTypes.locus, new UnitData(800, 4, 250),
                 UnitTypes.precept, new UnitData(2000, 14, 600),
@@ -74,6 +80,8 @@ public class CastleCosts {
                 StatusEffects.overclock, new EffectData(4000, 20, true),
                 StatusEffects.overdrive, new EffectData(12000, 30, true),
                 StatusEffects.boss, new EffectData(36000, 40, true),
+                StatusEffects.shielded, new EffectData(72000, 20, true),
+
                 StatusEffects.sporeSlowed, new EffectData(12000, 25, false),
                 StatusEffects.electrified, new EffectData(24000, 20, false),
                 StatusEffects.sapped, new EffectData(36000, 15, false),
@@ -131,7 +139,9 @@ public class CastleCosts {
         );
     }
 
-    public record UnitData(int cost, int income, int drop) {}
+    public record UnitData(int cost, int income, int drop) {
+    }
 
-    public record EffectData(int cost, int duration, boolean ally) {}
+    public record EffectData(int cost, int duration, boolean ally) {
+    }
 }
