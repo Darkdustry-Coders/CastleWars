@@ -83,8 +83,10 @@ public class CastleGenerator {
         CastleCosts.units.each((type, data) -> {
             if (type instanceof ErekirUnitType == isSerpulo) return;
 
-            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18, new UnitRoom(type, data, true));
-            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18 + 9, new UnitRoom(type, data, false));
+            if (data != null) {
+                addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18, new UnitRoom(type, data, true));
+                addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18 + 9, new UnitRoom(type, data, false));
+            }
 
             if (++offsetX % unitLimitX != 0) return;
             if (++offsetY % unitLimitY != 0) offsetX -= unitLimitX;
