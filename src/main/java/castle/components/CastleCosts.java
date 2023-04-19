@@ -55,7 +55,7 @@ public class CastleCosts {
                 UnitTypes.mega, new UnitData(900, 5, 200),
                 UnitTypes.quad, new UnitData(5250, 27, 900),
                 UnitTypes.oct, new UnitData(13000, 65, 1300),
-                UnitTypes.mono, null,
+                UnitTypes.mono, null, // Empty room
 
                 UnitTypes.stell, new UnitData(260, 2, 100),
                 UnitTypes.locus, new UnitData(800, 4, 250),
@@ -80,7 +80,7 @@ public class CastleCosts {
                 StatusEffects.overclock, new EffectData(4000, 20, true),
                 StatusEffects.overdrive, new EffectData(12000, 30, true),
                 StatusEffects.boss, new EffectData(36000, 40, true),
-                StatusEffects.shielded, new EffectData(72000, 20, true),
+                StatusEffects.shielded, new EffectData(72000, 10, true),
 
                 StatusEffects.sporeSlowed, new EffectData(12000, 25, false),
                 StatusEffects.electrified, new EffectData(24000, 20, false),

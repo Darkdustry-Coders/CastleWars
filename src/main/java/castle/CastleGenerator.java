@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class CastleGenerator {
 
-    public static final int unitLimitX = 5, unitLimitY = 3, effectLimitX = 4, effectLimitY = 6;
+    public static final int unitLimitX = 5, unitLimitY = 3, effectLimitX = 4;
     public static int offsetX, offsetY;
 
     public static void generate(boolean isSerpulo) {
