@@ -91,14 +91,16 @@ public class CastleGenerator {
             else offsetY -= unitLimitY;
         });
 
+        int unitOffsetX = offsetX, unitOffsetY = offsetY;
         offsetY = 0;
 
         CastleCosts.effects.each((effect, data) -> {
-            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 9, new EffectRoom(effect, data));
+            addShopRoom(shopX + offsetX * 9, shopY + unitOffsetY * 18 + offsetY * 9, new EffectRoom(effect, data));
 
-            if (++offsetX % effectLimitX != 0) return;
-            if (++offsetY % effectLimitY != 0) offsetX -= effectLimitX;
-            else offsetY -= effectLimitY;
+            if ((++offsetX - unitOffsetX) % effectLimitX == 0) {
+                offsetX -= effectLimitX;
+                offsetY++;
+            }
         });
     }
 

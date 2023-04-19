@@ -51,7 +51,7 @@ public class CastleCosts {
                 UnitTypes.antumbra, new UnitData(4100, 23, 850),
                 UnitTypes.eclipse, new UnitData(12000, 60, 1250),
 
-                UnitTypes.mono, new UnitData(350, 1, 90), // TODO
+                UnitTypes.mono, new UnitData(350, 1, 90),
                 UnitTypes.poly, new UnitData(350, 1, 90),
                 UnitTypes.mega, new UnitData(900, 5, 200),
                 UnitTypes.quad, new UnitData(5250, 27, 900),

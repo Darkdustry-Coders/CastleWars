@@ -15,7 +15,7 @@ ext {
 dependencies {
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
-    implementation "com.github.xzxADIxzx.Useful-Stuffs:bundle:954a8f990a"
+    implementation "com.github.xzxADIxzx.Useful-Stuffs:bundle:e3d1cf6ad2"
 }
 
 jar {
