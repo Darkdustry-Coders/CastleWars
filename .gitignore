@@ -1,7 +1,7 @@
 .gradle
 /build/
 
-# I rly need this
+# I really need this
 eclipse-formatter.xml
 /bin/
 /.vscode/

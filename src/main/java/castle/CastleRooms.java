@@ -206,17 +206,11 @@ public class CastleRooms {
         @Override
         public void buy(PlayerData data) {
             super.buy(data);
-
             Groups.unit.each(unit -> ally == (unit.team == data.player.team()), unit -> unit.apply(effect, duration * 60f));
 
-            // Visual thingy
+            // Visual things
             for (int i = 0; i < 36; i++)
                 Time.run(i, () -> Call.effect(Fx.coreLandDust, data.player.x, data.player.y, Mathf.random(360f), effect.color));
-        }
-
-        @Override
-        public boolean canBuy(PlayerData data) {
-            return super.canBuy(data);
         }
 
         @Override
