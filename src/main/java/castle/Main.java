@@ -2,28 +2,24 @@ package castle;
 
 import arc.Events;
 import arc.struct.Seq;
-import arc.util.Interval;
+import arc.util.Timer;
 import castle.CastleGenerator.Spawns;
 import castle.CastleRooms.Room;
-import castle.components.CastleCosts;
-import castle.components.PlayerData;
+import castle.components.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
-import mindustry.gen.Call;
-import mindustry.gen.Groups;
+import mindustry.gen.*;
 import mindustry.mod.Plugin;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.production.Drill;
 import useful.Bundle;
 
-import static castle.CastleUtils.isBreak;
-import static castle.components.CastleCosts.units;
-import static castle.components.PlayerData.datas;
+import static castle.CastleUtils.*;
+import static castle.components.CastleCosts.*;
+import static castle.components.PlayerData.*;
 import static mindustry.Vars.*;
 
 public class Main extends Plugin {
-
-    public static final Interval interval = new Interval();
 
     public static final Seq<Room> rooms = new Seq<>();
     public static final Spawns spawns = new Spawns();
@@ -56,7 +52,7 @@ public class Main extends Plugin {
                 return;
             }
 
-            data.handlePlayerJoin(event.player);
+            data.player(event.player);
         });
 
         Events.on(TapEvent.class, event -> {
@@ -76,32 +72,33 @@ public class Main extends Plugin {
             });
         });
 
+        Events.on(PlayEvent.class, event -> CastleUtils.applyRules(state.rules));
+
         Events.on(ResetEvent.class, event -> {
             rooms.clear();
             datas.filter(data -> data.player.con.isConnected()).each(PlayerData::reset);
-        });
 
-        Events.on(PlayEvent.class, event -> CastleUtils.applyRules(state.rules));
-
-        Events.on(WorldLoadEndEvent.class, event -> {
-            CastleGenerator.generate(CastleUtils.isSerpulo());
             timer = 45 * 60;
         });
 
-        Events.run(Trigger.update, () -> {
-            if (isBreak() || state.isPaused()) return;
+        Events.on(WorldLoadEndEvent.class, event -> CastleGenerator.generate(CastleUtils.isSerpulo()));
 
-            Groups.unit.each(unit -> !unit.spawnedByCore && (unit.tileOn() == null || unit.floorOn().solid), Call::unitEnvDeath);
+        Timer.schedule(() -> {
+            if (isBreak()) return;
 
             datas.each(PlayerData::update);
             rooms.each(Room::update);
 
-            if (!interval.get(60f)) return;
+            Groups.unit.each(unit -> !unit.spawnedByCore && (unit.tileOn() == null || unit.floorOn().solid), Call::unitEnvDeath);
+        }, 0f, 0.1f);
+
+        Timer.schedule(() -> {
+            if (isBreak()) return;
 
             datas.each(PlayerData::updateMoney);
             spawns.draw();
 
-            if (--timer <= 0) Events.fire(new GameOverEvent(Team.derelict));
-        });
+            if (--timer == 0) Events.fire(new GameOverEvent(Team.derelict));
+        }, 0f, 1f);
     }
 }

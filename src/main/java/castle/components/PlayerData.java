@@ -1,26 +1,21 @@
 package castle.components;
 
 import arc.struct.Seq;
-import mindustry.entities.Units;
 import mindustry.gen.Player;
 import useful.Bundle;
 
-import java.util.Locale;
-
-import static castle.CastleUtils.*;
 import static castle.Main.*;
+import static mindustry.Vars.*;
 
 public class PlayerData {
 
     public static final Seq<PlayerData> datas = new Seq<>();
 
     public Player player;
-    public Locale locale;
-
     public int money, income;
 
     public PlayerData(Player player) {
-        this.handlePlayerJoin(player);
+        this.player(player);
         this.reset();
     }
 
@@ -29,23 +24,19 @@ public class PlayerData {
     }
 
     public void update() {
-        if (!player.con.isConnected()) return;
-
-        int units = countUnits(player.team()), unitsLimit = Units.getCap(player.team());
-        Bundle.setHud(player, "ui.hud",
+        if (player.con.isConnected()) Bundle.setHud(player, "ui.hud",
                 money >= 0 ? "lime" : "scarlet", money,
                 income >= 0 ? "lime" : "scarlet", income,
-                units < unitsLimit ? "lightgray" : "scarlet", units, unitsLimit, timer);
+                player.team().data().unitCount < state.rules.unitCap ? "lightgray" : "scarlet",
+                player.team().data().unitCount, state.rules.unitCap, timer);
     }
 
     public void updateMoney() {
-        if (!player.con.isConnected()) return;
-        money += income;
+        if (player.con.isConnected()) money += income;
     }
 
-    public void handlePlayerJoin(Player player) {
+    public void player(Player player) {
         this.player = player;
-        this.locale = Bundle.locale(player);
     }
 
     public void reset() {

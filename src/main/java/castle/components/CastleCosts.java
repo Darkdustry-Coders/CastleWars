@@ -1,6 +1,6 @@
 package castle.components;
 
-import arc.struct.*;
+import arc.struct.OrderedMap;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.Turret;

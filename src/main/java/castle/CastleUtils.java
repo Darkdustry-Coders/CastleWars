@@ -34,16 +34,8 @@ public class CastleUtils {
         rules.bannedBlocks.addAll(content.blocks().select(block -> block instanceof CoreBlock || block instanceof UnitFactory || block.group == BlockGroup.turrets || block.group == BlockGroup.drills || block.group == BlockGroup.logic));
     }
 
-    public static int countUnits(Team team) {
-        return team.data().units.count(unit -> unit.type.useUnitCap);
-    }
-
-    public static char getIcon(MappableContent content) {
-        try {
-            return Reflect.get(Iconc.class, Strings.kebabToCamel(content.getContentType().name() + "-" + content.name));
-        } catch (Exception e) {
-            return '?';
-        }
+    public static char icon(MappableContent content) {
+        return Reflect.get(Iconc.class, Strings.kebabToCamel(content.getContentType().name() + "-" + content.name));
     }
 
     public static boolean isSerpulo() {
@@ -51,7 +43,7 @@ public class CastleUtils {
     }
 
     public static boolean isBreak() {
-        return world.isGenerating() || state.gameOver;
+        return world.isGenerating() || state.gameOver || state.isPaused();
     }
 
     public static boolean onEnemySide(Teamc teamc) {

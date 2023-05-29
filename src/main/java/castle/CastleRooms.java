@@ -5,7 +5,6 @@ import arc.util.*;
 import castle.components.CastleCosts.*;
 import castle.components.PlayerData;
 import mindustry.content.*;
-import mindustry.entities.Units;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -14,7 +13,6 @@ import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
-import static castle.CastleUtils.*;
 import static castle.Main.*;
 import static mindustry.Vars.*;
 
@@ -99,7 +97,7 @@ public class CastleRooms {
 
         @Override
         public String toString() {
-            return CastleUtils.getIcon(block) + " : " + cost;
+            return CastleUtils.icon(block) + " : " + cost;
         }
     }
 
@@ -139,7 +137,7 @@ public class CastleRooms {
 
         @Override
         public String toString() {
-            return "[" + CastleUtils.getIcon(item) + "]\n" + cost;
+            return "[" + CastleUtils.icon(item) + "]\n" + cost;
         }
     }
 
@@ -173,7 +171,7 @@ public class CastleRooms {
         public boolean canBuy(PlayerData data) {
             if (!super.canBuy(data)) return false;
 
-            if (countUnits(data.player.team()) >= Units.getCap(data.player.team())) {
+            if (data.player.team().data().unitCount >= state.rules.unitCap) {
                 Bundle.announce(data.player, "rooms.unit.limit");
                 return false;
             }
@@ -183,7 +181,7 @@ public class CastleRooms {
 
         @Override
         public String toString() {
-            return CastleUtils.getIcon(type) + " " + (attack ? "[accent]\uE865" : "[scarlet]\uE84D") +
+            return CastleUtils.icon(type) + " " + (attack ? "[accent]\uE865" : "[scarlet]\uE84D") +
                     "\n[gray]" + cost +
                     "\n[white]\uF8BA : " + (income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[crimson]") + income;
         }
@@ -215,7 +213,7 @@ public class CastleRooms {
 
         @Override
         public String toString() {
-            return CastleUtils.getIcon(effect) +
+            return CastleUtils.icon(effect) +
                     "\n[gray]" + cost +
                     "\n" + (ally ? "[stat]\uE804" : "[negstat]\uE805") + duration + "s";
         }
