@@ -87,7 +87,7 @@ public class CastleRooms {
 
             if (!(block instanceof CoreBlock)) tile.build.health(Float.MAX_VALUE);
 
-            Bundle.label(1f, drawX(), drawY(), "events.buy.block", data.player.coloredName());
+            Bundle.label(1f, drawX(), drawY(), "rooms.block.bought", data.player.coloredName());
         }
 
         @Override

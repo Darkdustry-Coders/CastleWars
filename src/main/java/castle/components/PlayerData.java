@@ -1,6 +1,7 @@
 package castle.components;
 
 import arc.struct.Seq;
+import mindustry.core.UI;
 import mindustry.gen.Player;
 import useful.Bundle;
 
@@ -28,7 +29,7 @@ public class PlayerData {
                 money >= 0 ? "lime" : "scarlet", money,
                 income >= 0 ? "lime" : "scarlet", income,
                 player.team().data().unitCount < state.rules.unitCap ? "lightgray" : "scarlet",
-                player.team().data().unitCount, state.rules.unitCap, timer);
+                player.team().data().unitCount, state.rules.unitCap, UI.formatTime(timer * 60f));
     }
 
     public void updateMoney() {
