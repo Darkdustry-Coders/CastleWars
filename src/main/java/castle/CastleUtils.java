@@ -34,10 +34,6 @@ public class CastleUtils {
         rules.bannedBlocks.addAll(content.blocks().select(block -> block instanceof CoreBlock || block instanceof UnitFactory || block.group == BlockGroup.turrets || block.group == BlockGroup.drills || block.group == BlockGroup.logic));
     }
 
-    public static char icon(MappableContent content) {
-        return Reflect.get(Iconc.class, Strings.kebabToCamel(content.getContentType().name() + "-" + content.name));
-    }
-
     public static boolean isSerpulo() {
         return state.rules.env == Planets.serpulo.defaultEnv || state.rules.hiddenBuildItems.equals(Planets.serpulo.hiddenItems.asSet());
     }

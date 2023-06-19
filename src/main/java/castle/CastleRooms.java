@@ -97,7 +97,7 @@ public class CastleRooms {
 
         @Override
         public String toString() {
-            return CastleUtils.icon(block) + " : " + cost;
+            return block.emoji() + " : " + cost;
         }
     }
 
@@ -137,7 +137,7 @@ public class CastleRooms {
 
         @Override
         public String toString() {
-            return "[" + CastleUtils.icon(item) + "]\n" + cost;
+            return "[" + item.emoji() + "]\n" + cost;
         }
     }
 
@@ -181,9 +181,9 @@ public class CastleRooms {
 
         @Override
         public String toString() {
-            return CastleUtils.icon(type) + " " + (attack ? "[accent]\uE865" : "[scarlet]\uE84D") +
+            return type.emoji() + " " + (attack ? "[accent]\uE865" : "[scarlet]\uE84D") +
                     "\n[gray]" + cost +
-                    "\n[white]\uF8BA : " + (income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[crimson]") + income;
+                    "\n[white]\uF8BA : " + (income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[scarlet]") + income;
         }
     }
 
@@ -213,7 +213,7 @@ public class CastleRooms {
 
         @Override
         public String toString() {
-            return CastleUtils.icon(effect) +
+            return effect.emoji() +
                     "\n[gray]" + cost +
                     "\n" + (ally ? "[stat]\uE804" : "[negstat]\uE805") + duration + "s";
         }
