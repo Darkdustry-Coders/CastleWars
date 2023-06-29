@@ -66,8 +66,7 @@ public class CastleRooms {
             return (y + (1 - size % 2) / 2f) * tilesize;
         }
 
-        public void update() {
-        }
+        public void update() {}
     }
 
     public static class BlockRoom extends Room {
@@ -113,9 +112,7 @@ public class CastleRooms {
         @Override
         public void spawn() {
             super.spawn();
-
-            var tile = world.tile(x, y);
-            tile.setBlock(core, team);
+            world.tile(x, y).setBlock(core, team);
         }
     }
 
@@ -144,16 +141,15 @@ public class CastleRooms {
 
     public static class UnitRoom extends Room {
         public final UnitType type;
-
-        public final int income;
         public final boolean attack;
+        public final int income;
 
         public UnitRoom(UnitType type, UnitData data, boolean attack) {
             this.type = type;
+            this.attack = attack;
 
             this.cost = data.cost();
             this.income = attack ? data.income() : -data.income();
-            this.attack = attack;
         }
 
         @Override
@@ -208,8 +204,8 @@ public class CastleRooms {
             Groups.unit.each(unit -> ally == (unit.team == data.player.team()), unit -> unit.apply(effect, duration * 60f));
 
             // Visual things
-            for (int i = 0; i < 36; i++)
-                Time.run(i, () -> Call.effect(Fx.coreLandDust, data.player.x, data.player.y, Mathf.random(360f), effect.color));
+            for (int rotation = 0; rotation < 36; rotation++)
+                Time.run(rotation, () -> Call.effect(Fx.coreLandDust, data.player.x, data.player.y, Mathf.random(360f), effect.color));
         }
 
         @Override

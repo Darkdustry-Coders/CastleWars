@@ -3,6 +3,8 @@ package castle;
 import mindustry.content.Planets;
 import mindustry.game.*;
 import mindustry.gen.Teamc;
+import mindustry.world.blocks.defense.turrets.Turret;
+import mindustry.world.blocks.production.Drill;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockGroup;
@@ -13,13 +15,12 @@ public class CastleUtils {
 
     public static void applyRules(Rules rules) {
         rules.waveTimer = rules.waves = rules.waveSending = false;
-        rules.pvp = rules.attackMode = true;
+        rules.pvp = rules.attackMode = rules.polygonCoreProtection = true;
 
         rules.unitCap = 500;
         rules.unitCapVariable = false;
-        rules.dropZoneRadius = 48f;
 
-        rules.polygonCoreProtection = true;
+        rules.dropZoneRadius = 48f;
         rules.buildSpeedMultiplier = 0.5f;
 
         rules.modeName = "Castle Wars";
@@ -28,7 +29,7 @@ public class CastleUtils {
         rules.teams.get(Team.blue).cheat = true;
 
         rules.weather.clear();
-        rules.bannedBlocks.addAll(content.blocks().select(block -> block instanceof CoreBlock || block instanceof UnitFactory || block.group == BlockGroup.turrets || block.group == BlockGroup.drills || block.group == BlockGroup.logic));
+        rules.bannedBlocks.addAll(content.blocks().select(block -> block instanceof Turret || block instanceof Drill || block instanceof UnitFactory || block instanceof CoreBlock || block.group == BlockGroup.logic));
     }
 
     public static boolean isSerpulo() {
@@ -36,7 +37,7 @@ public class CastleUtils {
     }
 
     public static boolean isBreak() {
-        return world.isGenerating() || state.gameOver || state.isPaused();
+        return state.gameOver || state.isPaused() || world.isGenerating();
     }
 
     public static boolean onEnemySide(Teamc teamc) {

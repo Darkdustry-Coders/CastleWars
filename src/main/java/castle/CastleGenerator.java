@@ -74,7 +74,7 @@ public class CastleGenerator {
 
         // endregion
 
-        generateShop(7, saved.height + 6, !serpulo);
+        generateShop(7, saved.height + 6, serpulo);
     }
 
     public static void generateShop(int shopX, int shopY, boolean serpulo) {
