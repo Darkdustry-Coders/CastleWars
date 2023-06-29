@@ -66,7 +66,8 @@ public class CastleRooms {
             return (y + (1 - size % 2) / 2f) * tilesize;
         }
 
-        public void update() {}
+        public void update() {
+        }
     }
 
     public static class BlockRoom extends Room {
