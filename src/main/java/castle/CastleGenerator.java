@@ -5,19 +5,22 @@ import arc.math.Mathf;
 import arc.math.geom.Point2;
 import arc.struct.Seq;
 import castle.components.CastleCosts;
-import mindustry.content.*;
+import mindustry.content.Blocks;
+import mindustry.content.Fx;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.type.UnitType;
 import mindustry.type.unit.ErekirUnitType;
-import mindustry.world.*;
+import mindustry.type.unit.NeoplasmUnitType;
+import mindustry.world.Block;
+import mindustry.world.Tile;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.distribution.Sorter.SorterBuild;
 import mindustry.world.blocks.environment.SpawnBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import static castle.CastleRooms.*;
-import static castle.Main.*;
+import static castle.Main.spawns;
 import static mindustry.Vars.*;
 
 public class CastleGenerator {
@@ -25,7 +28,7 @@ public class CastleGenerator {
     public static final int unitLimitX = 5, unitLimitY = 3, effectLimitX = 4;
     public static int offsetX, offsetY;
 
-    public static void generate(boolean isSerpulo) {
+    public static void generate(boolean serpulo) {
         var saved = world.tiles;
         world.resize(world.width(), world.height() * 2 + 58);
 
@@ -57,15 +60,15 @@ public class CastleGenerator {
             if (!tile.isCenter()) return;
 
             if (tile.block() instanceof CoreBlock core) {
-                var upgrade = isSerpulo ? Blocks.coreNucleus : Blocks.coreAcropolis;
+                var upgrade = serpulo ? Blocks.coreNucleus : Blocks.coreAcropolis;
                 addRoom(x, y, upgrade.size, () -> new CoreRoom(core, upgrade, 5000));
             }
 
-            if (tile.block() instanceof Turret turret && turret.environmentBuildable() && CastleCosts.turrets.containsKey(turret))
+            if (tile.block() instanceof Turret turret && CastleCosts.turrets.containsKey(turret))
                 addRoom(x, y, turret.size, () -> new BlockRoom(turret, CastleCosts.turrets.get(turret)));
 
             if (tile.build instanceof SorterBuild sorter && CastleCosts.items.containsKey(sorter.config())) {
-                var drill = isSerpulo ? Blocks.laserDrill : Blocks.impactDrill;
+                var drill = serpulo ? Blocks.laserDrill : Blocks.impactDrill;
                 addRoom(x, y, drill.size, () -> new MinerRoom(drill, sorter.config(), CastleCosts.items.get(sorter.config())));
             }
 
@@ -74,28 +77,36 @@ public class CastleGenerator {
 
         // endregion
 
-        generateShop(7, saved.height + 6, isSerpulo);
+        generateShop(7, saved.height + 6, !serpulo);
     }
 
-    public static void generateShop(int shopX, int shopY, boolean isSerpulo) {
+    public static void generateShop(int shopX, int shopY, boolean serpulo) {
         offsetX = offsetY = 0;
 
+        // Spawn unit rooms
         CastleCosts.units.each((type, data) -> {
-            if (type instanceof ErekirUnitType == isSerpulo) return;
+            if ((type instanceof ErekirUnitType || type instanceof NeoplasmUnitType) == serpulo) return;
 
-            if (data != null) {
-                addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18, new UnitRoom(type, data, true));
-                addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18 + 9, new UnitRoom(type, data, false));
-            }
+            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18, new UnitRoom(type, data, true));
+            addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18 + 9, new UnitRoom(type, data, false));
 
-            if (++offsetX % unitLimitX != 0) return;
-            if (++offsetY % unitLimitY != 0) offsetX -= unitLimitX;
+            if (++offsetX % unitLimitX > 0) return;
+            if (++offsetY % unitLimitY > 0) offsetX -= unitLimitX;
             else offsetY -= unitLimitY;
         });
+
+        if (offsetX % unitLimitX > 0) {
+            offsetX += unitLimitX;
+            offsetX -= offsetX % unitLimitX;
+
+            if (++offsetY % unitLimitY > 0) offsetX -= unitLimitX;
+            else offsetY -= unitLimitY;
+        }
 
         int unitOffsetX = offsetX, unitOffsetY = offsetY;
         offsetY = 0;
 
+        // Spawn effect rooms
         CastleCosts.effects.each((effect, data) -> {
             addShopRoom(shopX + offsetX * 9, shopY + unitOffsetY * 18 + offsetY * 9, new EffectRoom(effect, data));
 
@@ -147,7 +158,7 @@ public class CastleGenerator {
         }
 
         public void spawn(Team team, UnitType type) {
-            var spawn = get(team).cpy().add(Mathf.range(6), Mathf.range(6));
+            var spawn = get(team).cpy().add(Mathf.range(tilesize), Mathf.range(tilesize));
             type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
         }
 

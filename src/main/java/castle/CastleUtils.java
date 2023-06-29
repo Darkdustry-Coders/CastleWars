@@ -1,10 +1,9 @@
 package castle;
 
-import arc.util.*;
 import mindustry.content.Planets;
-import mindustry.ctype.MappableContent;
-import mindustry.game.*;
-import mindustry.gen.*;
+import mindustry.game.Rules;
+import mindustry.game.Team;
+import mindustry.gen.Teamc;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockGroup;
@@ -20,7 +19,6 @@ public class CastleUtils {
         rules.unitCap = 500;
         rules.unitCapVariable = false;
         rules.dropZoneRadius = 48f;
-        rules.showSpawns = true;
 
         rules.polygonCoreProtection = true;
         rules.buildSpeedMultiplier = 0.5f;

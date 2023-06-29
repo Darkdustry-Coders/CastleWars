@@ -6,6 +6,8 @@ import arc.util.Timer;
 import castle.CastleGenerator.Spawns;
 import castle.CastleRooms.Room;
 import castle.components.*;
+import mindustry.ai.ControlPathfinder;
+import mindustry.content.UnitTypes;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
 import mindustry.gen.*;
@@ -35,7 +37,12 @@ public class Main extends Plugin {
             type.controller = unit -> new CastleCommandAI();
         });
 
-        Bundle.load(Main.class);
+        UnitTypes.omura.abilities.clear();
+
+        UnitTypes.renale.pathCost = ControlPathfinder.costLegs;
+        UnitTypes.latum.pathCost = ControlPathfinder.costLegs;
+
+        Bundle.load(getClass());
         CastleCosts.load();
 
         netServer.admins.addActionFilter(action -> {

@@ -55,25 +55,27 @@ public class CastleCosts {
                 UnitTypes.mega, new UnitData(900, 5, 200),
                 UnitTypes.quad, new UnitData(5250, 27, 900),
                 UnitTypes.oct, new UnitData(13000, 65, 1300),
-                UnitTypes.mono, null, // Empty room
 
                 UnitTypes.stell, new UnitData(260, 2, 100),
                 UnitTypes.locus, new UnitData(800, 4, 250),
-                UnitTypes.precept, new UnitData(2000, 14, 600),
-                UnitTypes.vanquish, new UnitData(5500, 27, 1000),
+                UnitTypes.precept, new UnitData(2000, 12, 600),
+                UnitTypes.vanquish, new UnitData(5000, 26, 1000),
                 UnitTypes.conquer, new UnitData(10000, 60, 1700),
 
                 UnitTypes.merui, new UnitData(280, 2, 100),
                 UnitTypes.cleroi, new UnitData(900, 4, 400),
                 UnitTypes.anthicus, new UnitData(2450, 14, 750),
-                UnitTypes.tecta, new UnitData(5500, 26, 1100),
+                UnitTypes.tecta, new UnitData(5500, 27, 1100),
                 UnitTypes.collaris, new UnitData(11000, 55, 1900),
 
                 UnitTypes.elude, new UnitData(300, 2, 110),
                 UnitTypes.avert, new UnitData(900, 4, 300),
-                UnitTypes.obviate, new UnitData(2200, 12, 750),
+                UnitTypes.obviate, new UnitData(2200, 13, 750),
                 UnitTypes.quell, new UnitData(4750, 25, 1500),
-                UnitTypes.disrupt, new UnitData(11500, 45, 2300)
+                UnitTypes.disrupt, new UnitData(11500, 45, 2300),
+
+                UnitTypes.renale, new UnitData(750, 4, 250),
+                UnitTypes.latum, new UnitData(15000, 75, 3000)
         );
 
         effects = OrderedMap.of(
