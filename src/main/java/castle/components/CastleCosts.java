@@ -74,8 +74,8 @@ public class CastleCosts {
                 UnitTypes.quell, new UnitData(4750, 25, 1500),
                 UnitTypes.disrupt, new UnitData(11500, 45, 2300),
 
-                UnitTypes.renale, new UnitData(750, 4, 250),
-                UnitTypes.latum, new UnitData(15000, 75, 3000)
+                UnitTypes.renale, new UnitData(1500, 6, 500),
+                UnitTypes.latum, new UnitData(20000, 80, 5000)
         );
 
         effects = OrderedMap.of(
