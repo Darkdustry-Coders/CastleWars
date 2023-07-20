@@ -14,10 +14,13 @@ public class CastleCommandAI extends CommandAI {
     @Override
     public void updateUnit() {
         if (!hasCommand() && onEnemySide(unit)) {
-            attackTarget = target = unit.closestEnemyCore();
+             target = attackTarget = unit.closestEnemyCore();
 
             if (unit.type.flying) moveTo(target, unit.type.range * 0.8f);
             else pathfind(Pathfinder.fieldCore);
+
+            if (!invalid(target) && unit.type.circleTarget)
+                circleAttack(80f);
 
             updateWeapons();
             faceTarget();
