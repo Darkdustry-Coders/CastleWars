@@ -29,7 +29,8 @@ public class CastleGenerator {
         var saved = world.tiles;
         world.resize(world.width(), world.height() * 2 + 58);
 
-        // region tiles
+        // Set half height for further use
+        halfHeight = saved.height;
 
         saved.each((x, y) -> {
             var tile = saved.get(x, y);
@@ -45,9 +46,6 @@ public class CastleGenerator {
         for (int x = 0; x < saved.width; x++)
             for (int y = saved.height; y < world.tiles.height - saved.height; y++)
                 addTile(x, y, Blocks.space, Blocks.air, Blocks.air);
-
-        // endregion
-        // region rooms
 
         spawns.clear();
         state.teams.getActive().each(data -> data.cores.each(state.teams::unregisterCore));
@@ -71,8 +69,6 @@ public class CastleGenerator {
 
             if (tile.overlay() instanceof SpawnBlock) spawns.add(x, y);
         });
-
-        // endregion
 
         generateShop(7, saved.height + 6, serpulo);
     }

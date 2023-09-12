@@ -5,20 +5,22 @@ import arc.struct.Seq;
 import arc.util.Timer;
 import castle.CastleGenerator.Spawns;
 import castle.CastleRooms.Room;
-import castle.components.*;
+import castle.components.CastleCosts;
+import castle.components.PlayerData;
 import mindustry.ai.ControlPathfinder;
 import mindustry.content.UnitTypes;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
-import mindustry.gen.*;
+import mindustry.gen.Call;
+import mindustry.gen.Groups;
 import mindustry.mod.Plugin;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.production.Drill;
 import useful.Bundle;
 
-import static castle.CastleUtils.*;
-import static castle.components.CastleCosts.*;
-import static castle.components.PlayerData.*;
+import static castle.CastleUtils.isBreak;
+import static castle.components.CastleCosts.units;
+import static castle.components.PlayerData.datas;
 import static mindustry.Vars.*;
 
 public class Main extends Plugin {
@@ -26,7 +28,7 @@ public class Main extends Plugin {
     public static final Seq<Room> rooms = new Seq<>();
     public static final Spawns spawns = new Spawns();
 
-    public static int timer = 0;
+    public static int timer, halfHeight;
 
     @Override
     public void init() {
@@ -83,7 +85,7 @@ public class Main extends Plugin {
 
         Events.on(ResetEvent.class, event -> {
             rooms.clear();
-            datas.filter(data -> data.player.con.isConnected()).each(PlayerData::reset);
+            datas.retainAll(data -> data.player.con.isConnected()).each(PlayerData::reset);
 
             timer = 45 * 60;
         });
@@ -96,7 +98,15 @@ public class Main extends Plugin {
             datas.each(PlayerData::update);
             rooms.each(Room::update);
 
-            Groups.unit.each(unit -> !unit.spawnedByCore && (unit.tileOn() == null || unit.floorOn().solid), Call::unitEnvDeath);
+            Groups.unit.each(unit -> {
+                if (unit.spawnedByCore)
+                    return false;
+
+                if (!world.tiles.in(unit.tileX(), unit.tileY()))
+                    return true;
+
+                return unit.tileY() >= halfHeight && unit.tileY() <= world.height() - 1 - halfHeight;
+            }, Call::unitEnvDeath);
         }, 0f, 0.1f);
 
         Timer.schedule(() -> {
