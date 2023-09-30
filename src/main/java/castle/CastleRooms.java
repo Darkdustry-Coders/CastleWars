@@ -146,9 +146,9 @@ public class CastleRooms {
 
         public UnitRoom(UnitType type, UnitData data, boolean attack) {
             this.type = type;
-            this.attack = attack;
-
             this.cost = data.cost();
+
+            this.attack = attack;
             this.income = attack ? data.income() : -data.income();
         }
 
