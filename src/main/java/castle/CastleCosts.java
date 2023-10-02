@@ -1,4 +1,4 @@
-package castle.components;
+package castle;
 
 import arc.struct.OrderedMap;
 import mindustry.content.*;

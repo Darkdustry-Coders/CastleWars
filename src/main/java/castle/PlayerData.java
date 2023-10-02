@@ -1,4 +1,4 @@
-package castle.components;
+package castle;
 
 import arc.struct.Seq;
 import mindustry.core.UI;
@@ -16,7 +16,7 @@ public class PlayerData {
     public int money, income;
 
     public PlayerData(Player player) {
-        this.player(player);
+        this.player = player;
         this.reset();
     }
 
@@ -34,10 +34,6 @@ public class PlayerData {
 
     public void updateMoney() {
         if (player.con.isConnected()) money += income;
-    }
-
-    public void player(Player player) {
-        this.player = player;
     }
 
     public void reset() {

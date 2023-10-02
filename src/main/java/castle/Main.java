@@ -61,7 +61,7 @@ public class Main extends Plugin {
                 return;
             }
 
-            data.player(event.player);
+            data.player = event.player;
         });
 
         Events.on(TapEvent.class, event -> {
@@ -105,7 +105,7 @@ public class Main extends Plugin {
                 if (!world.tiles.in(unit.tileX(), unit.tileY()))
                     return true;
 
-                return unit.tileY() >= halfHeight && unit.tileY() <= world.height() - 1 - halfHeight;
+                return unit.tileY() >= halfHeight && unit.tileY() <= world.height() - halfHeight - 1;
             }, Call::unitEnvDeath);
         }, 0f, 0.1f);
 
