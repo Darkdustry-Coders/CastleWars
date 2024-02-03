@@ -2,8 +2,8 @@ package castle;
 
 import arc.math.Mathf;
 import arc.util.*;
-import castle.components.CastleCosts.*;
-import castle.components.PlayerData;
+import castle.CastleCosts.*;
+import castle.PlayerData;
 import mindustry.content.*;
 import mindustry.game.Team;
 import mindustry.gen.*;
