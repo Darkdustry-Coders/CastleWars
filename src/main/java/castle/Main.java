@@ -62,6 +62,7 @@ public class Main extends Plugin {
         });
 
         Events.on(TapEvent.class, event -> {
+            if (event.player.team().core() == null) return;
             var data = PlayerData.getData(event.player);
             if (data == null) return; // Why
 
