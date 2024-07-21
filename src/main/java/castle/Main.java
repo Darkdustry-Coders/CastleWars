@@ -73,7 +73,7 @@ public class Main extends Plugin {
             if (!units.containsKey(event.unit.type)) return;
 
             int income = units.get(event.unit.type).drop();
-            datas.each(data -> data.player.team() != event.unit.team, data -> {
+            datas.each(data -> data.player.team() != event.unit.team && data.player.team().core() != null, data -> {
                 data.money += income;
                 Call.label(data.player.con, "[lime]+[accent] " + income, 1f, event.unit.x, event.unit.y);
             });
