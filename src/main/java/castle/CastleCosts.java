@@ -79,15 +79,15 @@ public class CastleCosts {
         );
 
         effects = OrderedMap.of(
-                StatusEffects.overclock, new EffectData(4000, 20, true),
-                StatusEffects.overdrive, new EffectData(12000, 30, true),
-                StatusEffects.boss, new EffectData(36000, 40, true),
-                StatusEffects.shielded, new EffectData(72000, 10, true),
+                StatusEffects.overclock, new EffectData(4000, 20, true, 20f),
+                StatusEffects.overdrive, new EffectData(12000, 30, true, 30f),
+                StatusEffects.boss, new EffectData(36000, 40, true, 40f),
+                StatusEffects.shielded, new EffectData(72000, 10, true, 10f),
 
-                StatusEffects.sporeSlowed, new EffectData(12000, 25, false),
-                StatusEffects.electrified, new EffectData(24000, 20, false),
-                StatusEffects.sapped, new EffectData(36000, 15, false),
-                StatusEffects.unmoving, new EffectData(96000, 5, false)
+                StatusEffects.sporeSlowed, new EffectData(12000, 25, false, 25f),
+                StatusEffects.electrified, new EffectData(24000, 20, false, 20f),
+                StatusEffects.sapped, new EffectData(36000, 15, false, 15f),
+                StatusEffects.unmoving, new EffectData(96000, 5, false, 25f)
         );
 
         turrets = OrderedMap.of(
@@ -144,6 +144,6 @@ public class CastleCosts {
     public record UnitData(int cost, int income, int drop) {
     }
 
-    public record EffectData(int cost, int duration, boolean ally) {
+    public record EffectData(int cost, int duration, boolean ally, float delay) {
     }
 }

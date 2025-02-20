@@ -17,7 +17,6 @@ import useful.Bundle;
 
 import static castle.CastleCosts.*;
 import static castle.CastleUtils.*;
-import static castle.PlayerData.*;
 import static mindustry.Vars.*;
 
 public class Main extends Plugin {
@@ -54,7 +53,7 @@ public class Main extends Plugin {
         Events.on(PlayerJoin.class, event -> {
             var data = PlayerData.getData(event.player);
             if (data == null) {
-                datas.add(new PlayerData(event.player));
+                PlayerData.datas.add(new PlayerData(event.player));
                 return;
             }
 
@@ -73,7 +72,7 @@ public class Main extends Plugin {
             if (!units.containsKey(event.unit.type)) return;
 
             int income = units.get(event.unit.type).drop();
-            datas.each(data -> data.player.team() != event.unit.team && data.player.team().core() != null, data -> {
+            PlayerData.datas.each(data -> data.player.team() != event.unit.team && data.player.team().core() != null, data -> {
                 data.money += income;
                 Call.label(data.player.con, "[lime]+[accent] " + income, 1f, event.unit.x, event.unit.y);
             });
@@ -83,7 +82,8 @@ public class Main extends Plugin {
 
         Events.on(ResetEvent.class, event -> {
             rooms.clear();
-            datas.retainAll(data -> data.player.con.isConnected()).each(PlayerData::reset);
+            PlayerData.datas.retainAll(data -> data.player.con.isConnected()).each(PlayerData::reset);
+            TeamData.datas.clear();
 
             timer = 45 * 60;
         });
@@ -93,7 +93,7 @@ public class Main extends Plugin {
         Timer.schedule(() -> {
             if (isBreak()) return;
 
-            datas.each(PlayerData::update);
+            PlayerData.datas.each(PlayerData::update);
             rooms.each(Room::update);
 
             Groups.unit.each(unit -> {
@@ -110,7 +110,7 @@ public class Main extends Plugin {
         Timer.schedule(() -> {
             if (isBreak()) return;
 
-            datas.each(PlayerData::updateMoney);
+            PlayerData.datas.each(PlayerData::updateMoney);
             spawns.draw();
 
             if (--timer == 0) Events.fire(new GameOverEvent(Team.derelict));

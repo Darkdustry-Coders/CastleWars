@@ -40,4 +40,8 @@ public class PlayerData {
         this.money = 0;
         this.income = 15;
     }
+
+    public TeamData team() {
+        return TeamData.getData(this.player.team());
+    }
 }

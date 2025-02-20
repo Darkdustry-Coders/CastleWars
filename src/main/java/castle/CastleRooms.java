@@ -187,19 +187,32 @@ public class CastleRooms {
     public static class EffectRoom extends Room {
         public final StatusEffect effect;
 
+        public final float delay;
         public final int duration;
         public final boolean ally;
 
         public EffectRoom(StatusEffect effect, EffectData data) {
             this.effect = effect;
-
             this.cost = data.cost();
             this.duration = data.duration();
             this.ally = data.ally();
+            this.delay = data.delay();
+        }
+
+        @Override
+        public boolean canBuy(PlayerData data) {
+            if (!super.canBuy(data)) return false;
+            if (data.team().locked(this)) {
+                Bundle.announce(data.player, "rooms.effect.limit");
+                return false;
+            }
+            return true;
         }
 
         @Override
         public void buy(PlayerData data) {
+            if (!data.team().lock(this)) return;
+
             super.buy(data);
             Groups.unit.each(unit -> ally == (unit.team == data.player.team()), unit -> unit.apply(effect, duration * 60f));
 
