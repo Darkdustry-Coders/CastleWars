@@ -52,7 +52,8 @@ public class CastleGenerator {
 
         saved.each((x, y) -> {
             var tile = saved.get(x, y);
-            if (!tile.isCenter()) return;
+            if (!tile.isCenter())
+                return;
 
             if (tile.block() instanceof CoreBlock core) {
                 var upgrade = serpulo ? Blocks.coreNucleus : Blocks.coreAcropolis;
@@ -64,10 +65,12 @@ public class CastleGenerator {
 
             if (tile.build instanceof SorterBuild sorter && CastleCosts.items.containsKey(sorter.config())) {
                 var drill = serpulo ? Blocks.laserDrill : Blocks.impactDrill;
-                addRoom(x, y, drill.size, () -> new MinerRoom(drill, sorter.config(), CastleCosts.items.get(sorter.config())));
+                addRoom(x, y, drill.size,
+                        () -> new MinerRoom(drill, sorter.config(), CastleCosts.items.get(sorter.config())));
             }
 
-            if (tile.overlay() instanceof SpawnBlock) spawns.add(x, y);
+            if (tile.overlay() instanceof SpawnBlock)
+                spawns.add(x, y);
         });
 
         generateShop(7, saved.height + 6, serpulo);
@@ -78,22 +81,28 @@ public class CastleGenerator {
 
         // Spawn unit rooms
         CastleCosts.units.each((type, data) -> {
-            if ((type instanceof ErekirUnitType || type instanceof NeoplasmUnitType) == serpulo) return;
+            if ((type instanceof ErekirUnitType || type instanceof NeoplasmUnitType) == serpulo)
+                return;
 
             addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18, new UnitRoom(type, data, true));
             addShopRoom(shopX + offsetX * 9, shopY + offsetY * 18 + 9, new UnitRoom(type, data, false));
 
-            if (++offsetX % unitLimitX > 0) return;
-            if (++offsetY % unitLimitY > 0) offsetX -= unitLimitX;
-            else offsetY -= unitLimitY;
+            if (++offsetX % unitLimitX > 0)
+                return;
+            if (++offsetY % unitLimitY > 0)
+                offsetX -= unitLimitX;
+            else
+                offsetY -= unitLimitY;
         });
 
         if (offsetX % unitLimitX > 0) {
             offsetX += unitLimitX;
             offsetX -= offsetX % unitLimitX;
 
-            if (++offsetY % unitLimitY > 0) offsetX -= unitLimitX;
-            else offsetY -= unitLimitY;
+            if (++offsetY % unitLimitY > 0)
+                offsetX -= unitLimitX;
+            else
+                offsetY -= unitLimitY;
         }
 
         int unitOffsetX = offsetX, unitOffsetY = offsetY;
@@ -150,14 +159,37 @@ public class CastleGenerator {
             blue.clear();
         }
 
+        private boolean validFor(UnitType type, Point2 pos) {
+            int x = (int) pos.x;
+            int y = (int) pos.y;
+
+            var tile = world.tile(x, y);
+            if (tile == null)
+                return false;
+            // TODO: Check if tile is in death zone.
+            if (!type.flying && !tile.block().isAir())
+                return false;
+            if (type.naval && !tile.floor().isLiquid)
+                return false;
+
+            return true;
+        }
+
         public void spawn(Team team, UnitType type) {
-            var spawn = get(team).cpy().add(Mathf.range(tilesize), Mathf.range(tilesize));
+            Point2 spawn;
+            do {
+                spawn = get(team).cpy().add(Mathf.range(tilesize), Mathf.range(tilesize));
+            } while (!validFor(type, spawn));
             type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
         }
 
         public boolean within(Tile tile) {
-            for (var spawn : sharded) if (within(tile, spawn)) return true;
-            for (var spawn : blue) if (within(tile, spawn)) return true;
+            for (var spawn : sharded)
+                if (within(tile, spawn))
+                    return true;
+            for (var spawn : blue)
+                if (within(tile, spawn))
+                    return true;
 
             return false;
         }

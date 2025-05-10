@@ -1,0 +1,38 @@
+import groovy.json.JsonSlurper
+
+plugins {
+    id "java"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+    maven { url = "https://jitpack.io" }
+}
+
+def json = (new JsonSlurper()).parse("src/main/resources/plugin.json" as File)
+def mindustryVersion = json["minGameVersion"]
+def usefulHash = "2f1d9eb899"
+project.version = json["version"]
+
+dependencies {
+    compileOnly "com.github.Anuken.Arc:arc-core:v$mindustryVersion" 
+    compileOnly "com.github.Anuken.Mindustry:core:v$mindustryVersion" 
+
+    implementation "com.github.xzxADIxzx.useful-stuffs:bundle:$usefulHash" 
+}
+
+tasks.jar {
+    from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}

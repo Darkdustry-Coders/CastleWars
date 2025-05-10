@@ -11,6 +11,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.mod.Plugin;
+import mindustry.net.Administration.ActionType;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.production.Drill;
 import useful.Bundle;
@@ -44,10 +45,13 @@ public class Main extends Plugin {
         CastleCosts.load();
 
         netServer.admins.addActionFilter(action -> {
-            if (action.tile == null) return true;
-            if (spawns.within(action.tile)) return false;
+            if (action.tile == null)
+                return true;
+            if (spawns.within(action.tile))
+                return false;
 
-            return !(action.tile.block() instanceof Turret || action.tile.block() instanceof Drill);
+            return !((action.tile.block() instanceof Turret && action.type != ActionType.depositItem)
+                    || action.tile.block() instanceof Drill);
         });
 
         Events.on(PlayerJoin.class, event -> {
@@ -61,21 +65,25 @@ public class Main extends Plugin {
         });
 
         Events.on(TapEvent.class, event -> {
-            if (event.player.team().core() == null) return;
+            if (event.player.team().core() == null)
+                return;
             var data = PlayerData.getData(event.player);
-            if (data == null) return; // Why
+            if (data == null)
+                return; // Why
 
             rooms.each(room -> room.check(event.tile) && room.canBuy(data), room -> room.buy(data));
         });
 
         Events.on(UnitDestroyEvent.class, event -> {
-            if (!units.containsKey(event.unit.type)) return;
+            if (!units.containsKey(event.unit.type))
+                return;
 
             int income = units.get(event.unit.type).drop();
-            PlayerData.datas.each(data -> data.player.team() != event.unit.team && data.player.team().core() != null, data -> {
-                data.money += income;
-                Call.label(data.player.con, "[lime]+[accent] " + income, 1f, event.unit.x, event.unit.y);
-            });
+            PlayerData.datas.each(data -> data.player.team() != event.unit.team && data.player.team().core() != null,
+                    data -> {
+                        data.money += income;
+                        Call.label(data.player.con, "[lime]+[accent] " + income, 1f, event.unit.x, event.unit.y);
+                    });
         });
 
         Events.on(PlayEvent.class, event -> CastleUtils.applyRules(state.rules));
@@ -91,7 +99,8 @@ public class Main extends Plugin {
         Events.on(WorldLoadEndEvent.class, event -> CastleGenerator.generate(CastleUtils.isSerpulo()));
 
         Timer.schedule(() -> {
-            if (isBreak()) return;
+            if (isBreak())
+                return;
 
             PlayerData.datas.each(PlayerData::update);
             rooms.each(Room::update);
@@ -108,12 +117,14 @@ public class Main extends Plugin {
         }, 0f, 0.1f);
 
         Timer.schedule(() -> {
-            if (isBreak()) return;
+            if (isBreak())
+                return;
 
             PlayerData.datas.each(PlayerData::updateMoney);
             spawns.draw();
 
-            if (--timer == 0) Events.fire(new GameOverEvent(Team.derelict));
+            if (--timer == 0)
+                Events.fire(new GameOverEvent(Team.derelict));
         }, 0f, 1f);
     }
 }
