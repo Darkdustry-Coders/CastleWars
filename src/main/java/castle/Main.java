@@ -1,10 +1,15 @@
 package castle;
 
+import arc.Core;
 import arc.Events;
 import arc.struct.Seq;
+import arc.util.Log;
 import arc.util.Timer;
+import arc.util.io.ReusableByteOutStream;
+import arc.util.io.Writes;
 import castle.CastleGenerator.Spawns;
 import castle.CastleRooms.Room;
+import mindustry.Vars;
 import mindustry.ai.ControlPathfinder;
 import mindustry.content.UnitTypes;
 import mindustry.game.EventType.*;
@@ -13,12 +18,16 @@ import mindustry.gen.*;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration.ActionType;
 import mindustry.world.blocks.defense.turrets.Turret;
+import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
 import mindustry.world.blocks.production.Drill;
 import useful.Bundle;
 
 import static castle.CastleCosts.*;
 import static castle.CastleUtils.*;
 import static mindustry.Vars.*;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class Main extends Plugin {
 
@@ -29,6 +38,13 @@ public class Main extends Plugin {
 
     @Override
     public void init() {
+        try {
+            netServer.getClass().getDeclaredField("syncStream").setAccessible(true);
+            netServer.getClass().getDeclaredField("dataStream").setAccessible(true);
+        } catch (Exception failure) {
+            throw new RuntimeException(failure);
+        }
+
         content.statusEffects().each(effect -> effect.permanent = false);
 
         content.units().each(type -> type.playerControllable, type -> {
@@ -62,6 +78,34 @@ public class Main extends Plugin {
             }
 
             data.player = event.player;
+        });
+
+        Events.on(PlayerConnectionConfirmed.class, event -> {
+            try {
+                var netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+                var netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
+                Groups.build.each(b -> {
+                    if (b instanceof TurretBuild t) {
+                        if (t.ammo.size > 1) {
+                            Core.app.post(() -> {
+                                try {
+                                    netServerSyncStream.reset();
+                                    netServerDataStream.writeInt(t.pos());
+                                    netServerDataStream.writeShort(t.block().id);
+                                    t.writeAll(Writes.get(netServerDataStream));
+                                    netServerDataStream.close();
+                                    Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
+                                    netServerSyncStream.reset();
+                                } catch (IOException e) {
+                                    Log.err(e);
+                                }
+                            });
+                        }
+                    }
+                });
+            } catch (Exception ohno) {
+                throw new RuntimeException(ohno);
+            }
         });
 
         Events.on(TapEvent.class, event -> {
