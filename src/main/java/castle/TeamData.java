@@ -21,7 +21,7 @@ public class TeamData {
     }
 
     public int getUnitCount() {
-        return team.data().unitCount - team.data().players.size;
+        return team.data().unitCount - team.data().players.count(player -> player.unit() != null && player.unit().spawnedByCore());
     }
 
     public boolean locked(CastleRooms.EffectRoom room) {

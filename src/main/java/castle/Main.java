@@ -9,7 +9,10 @@ import arc.util.io.ReusableByteOutStream;
 import arc.util.io.Writes;
 import castle.CastleGenerator.Spawns;
 import castle.CastleRooms.Room;
+import mindustry.Vars;
 import mindustry.ai.ControlPathfinder;
+import mindustry.content.Blocks;
+import mindustry.content.Liquids;
 import mindustry.content.UnitTypes;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
@@ -17,6 +20,7 @@ import mindustry.gen.*;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration.ActionType;
 import mindustry.world.blocks.defense.turrets.Turret;
+import mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.ContinuousLiquidTurretBuild;
 import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
 import mindustry.world.blocks.production.Drill;
 import useful.Bundle;
@@ -157,6 +161,48 @@ public class Main extends Plugin {
 
                 return unit.tileY() >= halfHeight && unit.tileY() <= world.height() - halfHeight - 1;
             }, Call::unitEnvDeath);
+        }, 0f, 0.1f);
+
+        Timer.schedule(() -> {
+            if (isBreak())
+                return;
+
+            Groups.build.each(build -> {
+                try {
+                    if (build.block != Blocks.sublimate) return;
+                    if (build instanceof ContinuousLiquidTurretBuild subl) {
+                        if (subl.liquids().current() != Liquids.ozone) return;
+                        var hasCyan = false;
+                        a: for (var dx = -2; dx <= 2; dx++) for (var dy = -2; dy <= 2; dy++) {
+                            var build2 = Vars.world.build((int) (subl.x) + dx, (int) (subl.y) + dy);
+                            if (build2 == null) continue;
+                            if (!build2.block().hasLiquids) continue;
+                            if (build2.liquids().current() != Liquids.cyanogen) continue;
+                            hasCyan = true;
+                            break a;
+                        }
+                        if (!hasCyan) return;
+                        subl.liquids.set(Liquids.cyanogen, 1f);
+                        var netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+                        var netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
+                        Core.app.post(() -> {
+                            try {
+                                netServerSyncStream.reset();
+                                netServerDataStream.writeInt(subl.pos());
+                                netServerDataStream.writeShort(subl.block().id);
+                                subl.writeAll(Writes.get(netServerDataStream));
+                                netServerDataStream.close();
+                                Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
+                                netServerSyncStream.reset();
+                            } catch (IOException e) {
+                                Log.err(e);
+                            }
+                        });
+                    }
+                } catch (Exception ohno) {
+                    throw new RuntimeException(ohno);
+                }
+            });
         }, 0f, 0.1f);
 
         Timer.schedule(() -> {

@@ -185,7 +185,7 @@ public class CastleGenerator {
             state.rules.unitCap = Integer.MAX_VALUE;
             var unit = type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
             state.rules.unitCap = prevLimit;
-            Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", player.coloredName());
+            Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", summonner.coloredName());
         }
 
         public boolean within(Tile tile) {

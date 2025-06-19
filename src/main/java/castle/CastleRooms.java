@@ -3,6 +3,7 @@ package castle;
 import arc.math.Mathf;
 import arc.util.*;
 import castle.CastleCosts.*;
+import mindustry.Vars;
 import mindustry.content.*;
 import mindustry.game.Team;
 import mindustry.gen.*;
@@ -13,7 +14,6 @@ import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
 import static castle.Main.*;
-import static mindustry.Vars.*;
 
 public class CastleRooms {
     public static class Room {
@@ -33,7 +33,7 @@ public class CastleRooms {
         }
 
         public void spawn() {
-            world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size), tile -> tile.setFloor(Blocks.metalFloor.asFloor()));
+            Vars.world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size), tile -> tile.setFloor(Blocks.metalFloor.asFloor()));
 
             label.set(drawX(), drawY());
             label.text(toString());
@@ -57,11 +57,11 @@ public class CastleRooms {
         }
 
         public float drawX() {
-            return (x + (1 - size % 2) / 2f) * tilesize;
+            return (x + (1 - size % 2) / 2f) * Vars.tilesize;
         }
 
         public float drawY() {
-            return (y + (1 - size % 2) / 2f) * tilesize;
+            return (y + (1 - size % 2) / 2f) * Vars.tilesize;
         }
 
         public void update() {}
@@ -80,12 +80,27 @@ public class CastleRooms {
             super.buy(data);
             label.hide();
 
-            var tile = world.tile(x, y);
+            final int[][] coreItems;
+            var tile = Vars.world.tile(x, y);
             tile.setNet(block, team, 0);
 
-            if (!(block instanceof CoreBlock)) tile.build.health(Float.MAX_VALUE);
+            if (!(block instanceof CoreBlock)) {
+                tile.build.health(Float.MAX_VALUE);
+                coreItems = null;
+            }
+            else {
+                coreItems = new int[][] { new int[Vars.content.items().size] };
+                team.core().items().each((item, count) -> {
+                    var t = coreItems[0];
+                    t[item.id] = count;
+                });
+            }
 
             Bundle.label(1f, drawX(), drawY(), "rooms.block.bought", data.player.coloredName());
+
+            if (coreItems != null)
+                for (int id = 0; id < coreItems[0].length; id++)
+                    team.core().items().set(Vars.content.item(id), coreItems[0][id]);
         }
 
         @Override
@@ -110,7 +125,7 @@ public class CastleRooms {
         @Override
         public void spawn() {
             super.spawn();
-            world.tile(x, y).setBlock(core, team);
+            Vars.world.tile(x, y).setBlock(core, team);
         }
     }
 
@@ -155,14 +170,14 @@ public class CastleRooms {
             super.buy(data);
             data.income += income;
 
-            if (attack) spawns.spawn(player, data.player.team(), type);
+            if (attack) spawns.spawn(data.player, data.player.team(), type);
             else if (data.player.core() != null) {
                 var core = data.player.core();
-                var prevLimit = state.rules.unitCap;
-                state.rules.unitCap = Integer.MAX_VALUE;
+                var prevLimit = Vars.state.rules.unitCap;
+                Vars.state.rules.unitCap = Integer.MAX_VALUE;
                 var unit = type.spawn(data.player.team(), core.x + 48f, core.y + Mathf.range(48f));
                 Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", data.player.coloredName());
-                state.rules.unitCap = prevLimit;
+                Vars.state.rules.unitCap = prevLimit;
             }
         }
 
@@ -170,7 +185,7 @@ public class CastleRooms {
         public boolean canBuy(PlayerData data) {
             if (!super.canBuy(data)) return false;
 
-            if (data.team().getUnitCount() >= state.rules.unitCap) {
+            if (data.team().getUnitCount() >= Vars.state.rules.unitCap) {
                 Bundle.announce(data.player, "rooms.unit.limit");
                 return false;
             }
