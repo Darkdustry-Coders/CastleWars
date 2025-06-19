@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock;
+import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
@@ -86,6 +87,7 @@ public class CastleRooms {
             tile.setNet(block, team, 0);
 
             if (!(block instanceof CoreBlock)) tile.build.health(Float.MAX_VALUE);
+            if (tile.build instanceof TurretBuild t) t.ammo.clear();
 
             Bundle.label(1f, drawX(), drawY(), "rooms.block.bought", data.player.coloredName());
         }
