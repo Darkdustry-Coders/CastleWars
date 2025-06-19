@@ -20,6 +20,10 @@ public class TeamData {
         return dat;
     }
 
+    public int getUnitCount() {
+        return team.data().unitCount - team.data().players.size;
+    }
+
     public boolean locked(CastleRooms.EffectRoom room) {
         return lockedRooms.contains(x -> x == room);
     }

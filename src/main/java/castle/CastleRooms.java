@@ -3,14 +3,12 @@ package castle;
 import arc.math.Mathf;
 import arc.util.*;
 import castle.CastleCosts.*;
-import castle.PlayerData;
 import mindustry.content.*;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock;
-import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
@@ -18,7 +16,6 @@ import static castle.Main.*;
 import static mindustry.Vars.*;
 
 public class CastleRooms {
-
     public static class Room {
         public int x, y;
         public int size, cost, offset;
@@ -161,7 +158,10 @@ public class CastleRooms {
             if (attack) spawns.spawn(data.player.team(), type);
             else if (data.player.core() != null) {
                 var core = data.player.core();
+                var prevLimit = state.rules.unitCap;
+                state.rules.unitCap = Integer.MAX_VALUE;
                 type.spawn(data.player.team(), core.x + 48f, core.y + Mathf.range(48f));
+                state.rules.unitCap = prevLimit;
             }
         }
 
@@ -169,7 +169,7 @@ public class CastleRooms {
         public boolean canBuy(PlayerData data) {
             if (!super.canBuy(data)) return false;
 
-            if (data.player.team().data().unitCount >= state.rules.unitCap) {
+            if (data.team().getUnitCount() >= state.rules.unitCap) {
                 Bundle.announce(data.player, "rooms.unit.limit");
                 return false;
             }
@@ -180,8 +180,8 @@ public class CastleRooms {
         @Override
         public String toString() {
             return type.emoji() + " " + (attack ? "[accent]\uE865" : "[scarlet]\uE84D") +
-                    "\n[gray]" + cost +
-                    "\n[white]\uF8BA : " + (income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[scarlet]") + income;
+                "\n[gray]" + cost +
+                "\n[white]\uF8BA : " + (income > 0 ? "[lime]+" : income == 0 ? "[gray]" : "[scarlet]") + income;
         }
     }
 
@@ -225,8 +225,8 @@ public class CastleRooms {
         @Override
         public String toString() {
             return effect.emoji() +
-                    "\n[gray]" + cost +
-                    "\n" + (ally ? "[stat]\uE804" : "[negstat]\uE805") + duration + "s";
+                "\n[gray]" + cost +
+                "\n" + (ally ? "[stat]\uE804" : "[negstat]\uE805") + duration + "s";
         }
     }
 }

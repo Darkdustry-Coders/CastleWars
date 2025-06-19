@@ -179,7 +179,10 @@ public class CastleGenerator {
             do {
                 spawn = get(team).cpy().add(Mathf.range(tilesize), Mathf.range(tilesize));
             } while (!validFor(type, spawn));
+            var prevLimit = state.rules.unitCap;
+            state.rules.unitCap = Integer.MAX_VALUE;
             type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
+            state.rules.unitCap = prevLimit;
         }
 
         public boolean within(Tile tile) {

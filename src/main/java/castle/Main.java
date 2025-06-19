@@ -9,7 +9,6 @@ import arc.util.io.ReusableByteOutStream;
 import arc.util.io.Writes;
 import castle.CastleGenerator.Spawns;
 import castle.CastleRooms.Room;
-import mindustry.Vars;
 import mindustry.ai.ControlPathfinder;
 import mindustry.content.UnitTypes;
 import mindustry.game.EventType.*;
