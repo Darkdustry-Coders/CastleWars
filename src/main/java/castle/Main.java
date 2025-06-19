@@ -174,7 +174,7 @@ public class Main extends Plugin {
                         if (subl.liquids().current() != Liquids.ozone) return;
                         var hasCyan = false;
                         a: for (var dx = -2; dx <= 2; dx++) for (var dy = -2; dy <= 2; dy++) {
-                            var build2 = Vars.world.build((int) (subl.x) + dx, (int) (subl.y) + dy);
+                            var build2 = Vars.world.build(subl.tileX() + dx, subl.tileY() + dy);
                             if (build2 == null) continue;
                             if (!build2.block().hasLiquids) continue;
                             if (build2.liquids().current() != Liquids.cyanogen) continue;
@@ -182,7 +182,7 @@ public class Main extends Plugin {
                             break a;
                         }
                         if (!hasCyan) return;
-                        subl.liquids.set(Liquids.cyanogen, 1f);
+                        subl.liquids.clear();
                         var netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
                         var netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                         Core.app.post(() -> {
