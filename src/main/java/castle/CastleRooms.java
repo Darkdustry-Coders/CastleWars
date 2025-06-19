@@ -155,12 +155,13 @@ public class CastleRooms {
             super.buy(data);
             data.income += income;
 
-            if (attack) spawns.spawn(data.player.team(), type);
+            if (attack) spawns.spawn(player, data.player.team(), type);
             else if (data.player.core() != null) {
                 var core = data.player.core();
                 var prevLimit = state.rules.unitCap;
                 state.rules.unitCap = Integer.MAX_VALUE;
-                type.spawn(data.player.team(), core.x + 48f, core.y + Mathf.range(48f));
+                var unit = type.spawn(data.player.team(), core.x + 48f, core.y + Mathf.range(48f));
+                Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", data.player.coloredName());
                 state.rules.unitCap = prevLimit;
             }
         }
@@ -220,6 +221,8 @@ public class CastleRooms {
             // Visual things
             for (int rotation = 0; rotation < 36; rotation++)
                 Time.run(rotation, () -> Call.effect(Fx.coreLandDust, data.player.x, data.player.y, Mathf.random(360f), effect.color));
+
+            Bundle.label(1f, drawX(), drawY(), "rooms.effect.bought", data.player.coloredName());
         }
 
         @Override

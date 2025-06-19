@@ -7,6 +7,7 @@ import arc.struct.Seq;
 import mindustry.content.*;
 import mindustry.game.Team;
 import mindustry.gen.Call;
+import mindustry.gen.Player;
 import mindustry.type.UnitType;
 import mindustry.type.unit.*;
 import mindustry.world.*;
@@ -14,6 +15,7 @@ import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.distribution.Sorter.SorterBuild;
 import mindustry.world.blocks.environment.SpawnBlock;
 import mindustry.world.blocks.storage.CoreBlock;
+import useful.Bundle;
 
 import static castle.CastleRooms.*;
 import static castle.Main.*;
@@ -174,15 +176,16 @@ public class CastleGenerator {
             return true;
         }
 
-        public void spawn(Team team, UnitType type) {
+        public void spawn(Player summonner, Team team, UnitType type) {
             Point2 spawn;
             do {
                 spawn = get(team).cpy().add(Mathf.range(tilesize), Mathf.range(tilesize));
             } while (!validFor(type, spawn));
             var prevLimit = state.rules.unitCap;
             state.rules.unitCap = Integer.MAX_VALUE;
-            type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
+            var unit = type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
             state.rules.unitCap = prevLimit;
+            Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", player.coloredName());
         }
 
         public boolean within(Tile tile) {
