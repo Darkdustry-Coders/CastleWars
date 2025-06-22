@@ -1,5 +1,6 @@
 .gradle
 /build/
+/run
 
 # I really need this
 eclipse-formatter.xml

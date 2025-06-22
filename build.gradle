@@ -1,4 +1,6 @@
 import groovy.json.JsonSlurper
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 plugins {
     id "java"
@@ -35,4 +37,45 @@ tasks.jar {
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
+}
+
+tasks.register("runServer") {
+    dependsOn build
+
+    doLast {
+        def path = rootProject.rootDir.toPath().resolve("run")
+        Files.createDirectories(path.resolve("config/mods"))
+        Files.createDirectories(path.resolve("config/maps"))
+
+        if (!Files.exists(path.resolve("server.jar"))) {
+            println "Downloading Mindustry server..."
+            Files.copy(
+                    new URI("https://github.com/5GameMaker/MindustryHotfixv7/releases/download/v146.7/server-release.jar").toURL().openStream(),
+                    path.resolve("server.jar"))
+            Files.copy(
+                    rootDir.toPath().resolve("assets/Prophit.msav"),
+                    path.resolve("config/maps/Prophit.msav"))
+            Files.copy(
+                    rootDir.toPath().resolve("assets/settings.bin"),
+                    path.resolve("config/settings.bin"))
+        }
+
+        Files.copy(
+                jar.archiveFile.get().asFile.toPath(),
+                path.resolve("config/mods/Debug.jar"),
+                StandardCopyOption.REPLACE_EXISTING)
+
+        javaexec {
+            classpath = files(path.resolve("server.jar"))
+            workingDir = path.toFile()
+            standardInput = System.in
+
+            debugOptions {
+                enabled = true
+                port = 7857
+                server = true
+                suspend = false
+            }
+        }
+    }
 }

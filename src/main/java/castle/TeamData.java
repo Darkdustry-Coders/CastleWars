@@ -7,21 +7,24 @@ import mindustry.game.Team;
 public class TeamData {
     public static final Seq<TeamData> datas = new Seq<>();
 
-    private Team team;
+    public final Team team;
     private Seq<CastleRooms.EffectRoom> lockedRooms = new Seq<>();
+
+    private TeamData(Team team) {
+        this.team = team;
+    }
 
     public static TeamData getData(Team team) {
         var dat = datas.find(data -> data.team.equals(team));
         if (dat == null) {
-            dat = new TeamData();
-            dat.team = team;
+            dat = new TeamData(team);
             datas.add(dat);
         }
         return dat;
     }
 
     public int getUnitCount() {
-        return team.data().unitCount - team.data().players.count(player -> player.unit() != null && player.unit().spawnedByCore());
+        return team.data().units.count(unit -> !unit.spawnedByCore() && unit.type().useUnitCap);
     }
 
     public boolean locked(CastleRooms.EffectRoom room) {

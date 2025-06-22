@@ -143,7 +143,7 @@ public class Main extends Plugin {
             timer = 45 * 60;
         });
 
-        Events.on(WorldLoadEndEvent.class, event -> CastleGenerator.generate(CastleUtils.isSerpulo()));
+        Events.on(WorldLoadEndEvent.class, event -> CastleGenerator.generate());
 
         Timer.schedule(() -> {
             if (isBreak())

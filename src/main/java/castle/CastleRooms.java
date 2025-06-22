@@ -13,6 +13,10 @@ import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle;
 
+import static castle.CastleUtils.boatSpawnX;
+import static castle.CastleUtils.boatSpawnY;
+import static castle.CastleUtils.generatePlatforms;
+import static castle.CastleUtils.platformSource;
 import static castle.Main.*;
 
 public class CastleRooms {
@@ -33,7 +37,13 @@ public class CastleRooms {
         }
 
         public void spawn() {
-            Vars.world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size), tile -> tile.setFloor(Blocks.metalFloor.asFloor()));
+            if (generatePlatforms && !(this instanceof UnitRoom || this instanceof EffectRoom))
+                Vars.world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size), tile -> tile.setFloor(Blocks.metalFloor.asFloor()));
+            else if (this instanceof UnitRoom || this instanceof EffectRoom)
+                Vars.world.tile(x, y).getLinkedTilesAs(ConstructBlock.get(size), tile -> {
+                    var source = platformSource.random();
+                    tile.setFloor(source.get(tile.x + offset - x, tile.y + offset - y).floor());
+                });
 
             label.set(drawX(), drawY());
             label.text(toString());
@@ -61,18 +71,26 @@ public class CastleRooms {
         }
 
         public float drawY() {
-            return (y + (1 - size % 2) / 2f) * Vars.tilesize;
+            return (y + (1 - size % 2) / 2f) * Vars.tilesize + 2;
         }
 
         public void update() {}
     }
 
     public static class BlockRoom extends Room {
+        public final @Nullable Block starting;
         public final Block block;
 
         public BlockRoom(Block block, int cost) {
             this.block = block;
             this.cost = cost;
+            this.starting = null;
+        }
+
+        public BlockRoom(Block block, int cost, @Nullable Block starting) {
+            this.block = block;
+            this.cost = cost;
+            this.starting = starting;
         }
 
         @Override
@@ -112,20 +130,17 @@ public class CastleRooms {
         public String toString() {
             return block.emoji() + " : " + cost;
         }
-    }
 
-    public static class CoreRoom extends BlockRoom {
-        public final Block core;
-
-        public CoreRoom(Block core, Block upgrade, int cost) {
-            super(upgrade, cost);
-            this.core = core;
+        @Override
+        public float drawY() {
+            return super.drawY() + 1;
         }
 
         @Override
         public void spawn() {
             super.spawn();
-            Vars.world.tile(x, y).setBlock(core, team);
+            if (starting != null) 
+                Vars.world.tile(x, y).setBlock(starting, team, 0);
         }
     }
 
@@ -171,6 +186,16 @@ public class CastleRooms {
             data.income += income;
 
             if (attack) spawns.spawn(data.player, data.player.team(), type);
+            else if ((boatSpawnX > 0 && boatSpawnY > 0) && type.naval) {
+                var prevLimit = Vars.state.rules.unitCap;
+                Vars.state.rules.unitCap = Integer.MAX_VALUE;
+                var unit = type.spawn(
+                    data.player.team(),
+                    boatSpawnX * 8f,
+                    (data.team().team == Team.blue ? Vars.world.height() - boatSpawnY : boatSpawnY) * 8f + Mathf.range(48f));
+                Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", data.player.coloredName());
+                Vars.state.rules.unitCap = prevLimit;
+            }
             else if (data.player.core() != null) {
                 var core = data.player.core();
                 var prevLimit = Vars.state.rules.unitCap;
