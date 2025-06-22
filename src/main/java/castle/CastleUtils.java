@@ -1,5 +1,6 @@
 package castle;
 
+import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.content.Planets;
@@ -8,6 +9,8 @@ import mindustry.game.MapObjectives.FlagObjective;
 import mindustry.gen.Teamc;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
+import mindustry.type.unit.ErekirUnitType;
+import mindustry.type.unit.NeoplasmUnitType;
 import mindustry.world.Block;
 import mindustry.world.Tiles;
 import mindustry.world.blocks.defense.turrets.Turret;
@@ -46,8 +49,10 @@ public class CastleUtils {
 
     public static void refreshMeta() {
         revealedUnits.clear();
-        if (isSerpulo()) revealedUnits.addAll(content.units().select(unit -> !unit.internal && !unit.hidden && !unit.supportsEnv(Env.scorching)));
-        if (isErekir()) revealedUnits.addAll(content.units().select(unit -> !unit.internal && !unit.hidden && unit.supportsEnv(Env.scorching)));
+        if (isSerpulo()) revealedUnits.addAll(content.units().select(unit -> !unit.internal && !(unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
+        Log.info(revealedUnits);
+        if (isErekir()) revealedUnits.addAll(content.units().select(unit -> !unit.internal && (unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
+        Log.info(revealedUnits);
 
         generatePlatforms = false;
         platformSource.clear();
@@ -153,13 +158,15 @@ public class CastleUtils {
     public static boolean isSerpulo() {
         return state.rules.planet == Planets.serpulo
             || state.rules.planet == Planets.sun
-            || state.rules.hiddenBuildItems.isEmpty();
+            || state.rules.hiddenBuildItems.isEmpty()
+            || !state.rules.hasEnv(Env.scorching);
     }
 
     public static boolean isErekir() {
         return state.rules.planet == Planets.erekir
             || state.rules.planet == Planets.sun
-            || state.rules.hiddenBuildItems.isEmpty();
+            || state.rules.hiddenBuildItems.isEmpty()
+            || state.rules.hasEnv(Env.scorching);
     }
 
     public static Block drill(Item item) {
