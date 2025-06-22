@@ -50,9 +50,7 @@ public class CastleUtils {
     public static void refreshMeta() {
         revealedUnits.clear();
         if (isSerpulo()) revealedUnits.addAll(content.units().select(unit -> !unit.internal && !(unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
-        Log.info(revealedUnits);
         if (isErekir()) revealedUnits.addAll(content.units().select(unit -> !unit.internal && (unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
-        Log.info(revealedUnits);
 
         generatePlatforms = false;
         platformSource.clear();
