@@ -52,7 +52,7 @@ public class CastleUtils {
         if (isSerpulo()) revealedUnits.addAll(content.units().select(unit -> !unit.internal && !(unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
         if (isErekir()) revealedUnits.addAll(content.units().select(unit -> !unit.internal && (unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
 
-        generatePlatforms = false;
+        generatePlatforms = true;
         platformSource.clear();
         shopFloor = Blocks.space.asFloor();
         boatSpawnX = -1;
