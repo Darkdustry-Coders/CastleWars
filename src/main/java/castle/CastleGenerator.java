@@ -44,13 +44,31 @@ public class CastleGenerator {
             var block = !tile.block().hasBuilding() && tile.isCenter() ? tile.block() : Blocks.air;
             var overlay = tile.overlay().needsSurface ? tile.overlay() : Blocks.air;
 
-            addTile(x, y, floor, block, overlay);
-            addTile(x, world.tiles.height - y - 1, floor, block, overlay);
+            addTile(x, y, floor, block, overlay, tile.data);
+            addTile(x, world.tiles.height - y - 1, floor, block, overlay, tile.data);
+
+            if (block == Blocks.cliff) {
+                for (byte i = 0; i < 3; i++) {
+                    var ba = (byte) (1 << (i + 1));
+                    var bb = (byte) (1 << (7 - i));
+                    byte addMask = 0;
+                    byte remMask = 0;
+                    if ((tile.data & ba) != 0) {
+                        addMask += bb;
+                        remMask += ba;
+                    }
+                    if ((tile.data & bb) != 0) {
+                        addMask += ba;
+                        remMask += bb;
+                    }
+                    world.tile(x, world.tiles.height - y - 1).data = (byte) ((tile.data & ~remMask) | addMask);
+                }
+            }
         });
 
         for (int x = 0; x < saved.width; x++)
             for (int y = saved.height; y < world.tiles.height - saved.height; y++)
-                addTile(x, y, shopFloor, Blocks.air, Blocks.air);
+                addTile(x, y, shopFloor, Blocks.air, Blocks.air, (byte) 0);
 
         spawns.clear();
         state.teams.getActive().each(data -> data.cores.each(state.teams::unregisterCore));
@@ -127,8 +145,10 @@ public class CastleGenerator {
         });
     }
 
-    private static void addTile(int x, int y, Block floor, Block block, Block overlay) {
-        world.tiles.set(x, y, new Tile(x, y, floor, overlay, block));
+    private static void addTile(int x, int y, Block floor, Block block, Block overlay, byte data) {
+        var tile = new Tile(x, y, floor, overlay, block);
+        tile.data = data;
+        world.tiles.set(x, y, tile);
     }
 
     private static void addRoom(int x, int y, int size, Prov<Room> create) {
