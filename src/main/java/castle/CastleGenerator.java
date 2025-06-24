@@ -43,9 +43,7 @@ public class CastleGenerator {
             var floor = tile.floor();
             var block = !tile.block().hasBuilding() && tile.isCenter() ? tile.block() : Blocks.air;
             var overlay = tile.overlay().needsSurface ? tile.overlay() : Blocks.air;
-
-            addTile(x, y, floor, block, overlay, tile.data);
-            addTile(x, world.tiles.height - y - 1, floor, block, overlay, tile.data);
+            var data = tile.data;
 
             if (block == Blocks.cliff) {
                 for (byte i = 0; i < 3; i++) {
@@ -61,9 +59,12 @@ public class CastleGenerator {
                         addMask += ba;
                         remMask += bb;
                     }
-                    world.tile(x, world.tiles.height - y - 1).data = (byte) ((tile.data & ~remMask) | addMask);
+                    data = (byte) ((data & ~remMask) | addMask);
                 }
             }
+
+            addTile(x, y, floor, block, overlay, tile.data);
+            addTile(x, world.tiles.height - y - 1, floor, block, overlay, data);
         });
 
         for (int x = 0; x < saved.width; x++)

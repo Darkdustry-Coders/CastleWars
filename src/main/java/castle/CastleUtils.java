@@ -49,8 +49,12 @@ public class CastleUtils {
 
     public static void refreshMeta() {
         revealedUnits.clear();
-        if (isSerpulo()) revealedUnits.addAll(content.units().select(unit -> !unit.internal && !(unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
-        if (isErekir()) revealedUnits.addAll(content.units().select(unit -> !unit.internal && (unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
+        if (isSerpulo()) revealedUnits.addAll(content.units()
+            .select(unit -> !unit.internal
+                && !(unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
+        if (isErekir()) revealedUnits.addAll(content.units()
+            .select(unit -> !unit.internal
+                && (unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
 
         generatePlatforms = true;
         platformSource.clear();
@@ -190,7 +194,7 @@ public class CastleUtils {
     }
 
     public static boolean onEnemySide(Teamc teamc) {
-        return (teamc.team() == Team.sharded && teamc.y() > world.unitHeight() / 2f) ||
-                (teamc.team() == Team.blue && teamc.y() < world.unitHeight() / 2f);
+        return (teamc.team() == Team.sharded && teamc.y() > world.unitHeight() / 2f)
+            || (teamc.team() == Team.blue && teamc.y() < world.unitHeight() / 2f);
     }
 }
