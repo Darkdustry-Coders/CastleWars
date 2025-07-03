@@ -42,7 +42,7 @@ public class CastleUtils {
 
     public static boolean any(String[] array, String value) {
         for (var test : array)
-            if (test == value)
+            if (test.equals(value))
                 return true;
         return false;
     }
