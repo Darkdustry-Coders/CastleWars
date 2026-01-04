@@ -39,6 +39,8 @@ public class CastleUtils {
     public static short landSpawnY = -1;
     public static short airSpawnX = -1;
     public static short airSpawnY = -1;
+    public static short DefenseCap = -1;
+    public static short AttackCap = -1;
 
     public static boolean any(String[] array, String value) {
         for (var test : array)
@@ -61,6 +63,12 @@ public class CastleUtils {
         shopFloor = Blocks.space.asFloor();
         boatSpawnX = -1;
         boatSpawnY = -1;
+        landSpawnX = -1;
+        landSpawnY = -1;
+        airSpawnX = -1;
+        airSpawnY = -1;
+        DefenseCap = 150;
+        AttackCap = 350;
 
         for (var objective : state.rules.objectives.all) {
             if (objective instanceof FlagObjective flag) {
@@ -124,6 +132,24 @@ public class CastleUtils {
                         Log.warn("Failed to set air spawn!\n" + error);
                         airSpawnX = -1;
                         airSpawnY = -1;
+                    }
+                }
+                if (flag.flag.startsWith("DefenseCap")) {
+                    try {
+                        String[] args = flag.flag.split(" ");
+                        DefenseCap = Short.valueOf(args[1]);
+                    } catch (Exception error) {
+                        Log.warn("Failed to set Defense Cap!\n" + error);
+                        DefenseCap = 150;
+                    }
+                }
+                if (flag.flag.startsWith("AttackCap")) {
+                    try {
+                        String[] args = flag.flag.split(" ");
+                        AttackCap = Short.valueOf(args[1]);
+                    } catch (Exception error) {
+                        Log.warn("Failed to set Attack Cap!\n" + error);
+                        AttackCap = 350;
                     }
                 }
             }

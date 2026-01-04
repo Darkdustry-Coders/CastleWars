@@ -1,22 +1,33 @@
 package castle;
 
+import arc.math.geom.Point2;
+import arc.struct.Seq;
 import arc.math.Mathf;
 import arc.util.*;
 import castle.CastleCosts.*;
 import mindustry.Vars;
 import mindustry.content.*;
+import mindustry.world.*;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.gen.Player;
+import mindustry.type.UnitType;
 import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.storage.CoreBlock;
-import useful.Bundle;
-
+import useful.Bundle; 
+import static mindustry.Vars.*;
 import static castle.CastleUtils.boatSpawnX;
 import static castle.CastleUtils.boatSpawnY;
+import static castle.CastleUtils.landSpawnX;
+import static castle.CastleUtils.landSpawnY;
+import static castle.CastleUtils.airSpawnX;
+import static castle.CastleUtils.airSpawnY;
 import static castle.CastleUtils.generatePlatforms;
 import static castle.CastleUtils.platformSource;
+import static castle.CastleUtils.DefenseCap;
+import static castle.CastleUtils.AttackCap;
 import static castle.Main.*;
 
 public class CastleRooms {
@@ -180,6 +191,20 @@ public class CastleRooms {
             this.income = attack ? data.income() : -data.income();
         }
 
+        private boolean validFor(UnitType type, int x,int y) {
+
+            var tile = world.tile(x, y);
+            if (tile == null)
+                return false;
+            if (!type.flying && !tile.block().isAir())
+                return false;
+            if (type.naval && !tile.floor().isLiquid)
+                return false;
+            if (!type.flying && !type.naval && tile.floor().isLiquid)
+                return false;
+            return true;
+        }
+
         @Override
         public void buy(PlayerData data) {
             super.buy(data);
@@ -188,22 +213,67 @@ public class CastleRooms {
             if (attack) spawns.spawn(data.player, data.player.team(), type);
             else if ((boatSpawnX > 0 && boatSpawnY > 0) && type.naval) {
                 var prevLimit = Vars.state.rules.unitCap;
-                Vars.state.rules.unitCap = Integer.MAX_VALUE;
-                var unit = type.spawn(
+                Unit unit = null;
+                var i = 0;
+                Vars.state.rules.unitCap = Integer.MAX_VALUE;;
+                var y_coordinate = Math.round((data.team().team == Team.blue ? Vars.world.height() - boatSpawnY : boatSpawnY) * 8 + Mathf.range(48f));
+                while(i < 10 && !validFor(type,Math.round((int)boatSpawnX),Math.round((int)y_coordinate/8))){
+                        y_coordinate = Math.round((data.team().team == Team.blue ? Vars.world.height() - boatSpawnY : boatSpawnY) * 8 + Mathf.range(48f));
+                        i++;
+                }
+                unit = type.spawn(
                     data.player.team(),
-                    boatSpawnX * 8f,
-                    (data.team().team == Team.blue ? Vars.world.height() - boatSpawnY : boatSpawnY) * 8f + Mathf.range(48f));
+                    boatSpawnX * 8f,Math.round(y_coordinate));
+                Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", data.player.coloredName());
+                Vars.state.rules.unitCap = prevLimit;
+            }
+            else if ((landSpawnX > 0 && landSpawnY > 0) && !type.naval && !type.flying) {
+                var prevLimit = Vars.state.rules.unitCap;
+                Unit unit = null;
+                var i = 0;
+                Vars.state.rules.unitCap = Integer.MAX_VALUE;;
+                var y_coordinate = Math.round((data.team().team == Team.blue ? Vars.world.height() - landSpawnY : landSpawnY) * 8 + Mathf.range(48f));
+                while(i < 10 && !validFor(type,Math.round((int)landSpawnX),Math.round((int)y_coordinate/8))){
+                        y_coordinate = Math.round((data.team().team == Team.blue ? Vars.world.height() - landSpawnY : landSpawnY) * 8 + Mathf.range(48f));
+                        i++;
+                }
+                unit = type.spawn(
+                    data.player.team(),
+                    landSpawnX * 8f,Math.round(y_coordinate));
+                Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", data.player.coloredName());
+                Vars.state.rules.unitCap = prevLimit;
+            }
+            else if ((airSpawnX > 0 && airSpawnY > 0) && type.flying) {
+                var prevLimit = Vars.state.rules.unitCap;
+                Unit unit = null;
+                var i = 0;
+                Vars.state.rules.unitCap = Integer.MAX_VALUE;;
+                var y_coordinate = Math.round((data.team().team == Team.blue ? Vars.world.height() - airSpawnY : airSpawnY) * 8 + Mathf.range(48f));
+                while(i < 10 && !validFor(type,Math.round((int)airSpawnX),Math.round((int)y_coordinate/8))){
+                        y_coordinate = Math.round((data.team().team == Team.blue ? Vars.world.height() - airSpawnY : airSpawnY) * 8 + Mathf.range(48f));
+                        i++;
+                }
+                unit = type.spawn(
+                    data.player.team(),
+                    airSpawnX * 8f,Math.round(y_coordinate));
                 Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", data.player.coloredName());
                 Vars.state.rules.unitCap = prevLimit;
             }
             else if (data.player.core() != null) {
                 var core = data.player.core();
                 var prevLimit = Vars.state.rules.unitCap;
+                Unit unit = null;
+                var i = 0;
                 Vars.state.rules.unitCap = Integer.MAX_VALUE;
-                var unit = type.spawn(data.player.team(), core.x + 48f, core.y + Mathf.range(48f));
+                var y_coordinate = core.y + Mathf.range(48f);
+                while(i < 10 && !validFor(type,Math.round((int)(core.x + 48f)/8),Math.round((int)y_coordinate/8))){
+                        y_coordinate = core.y + Mathf.range(48f);
+                        i++;
+                }
+                unit = type.spawn(data.player.team(), Math.round(core.x + 48f), Math.round(y_coordinate));
                 Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", data.player.coloredName());
                 Vars.state.rules.unitCap = prevLimit;
-            }
+            };
         }
 
         @Override
