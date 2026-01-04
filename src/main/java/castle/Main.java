@@ -22,6 +22,7 @@ import mindustry.mod.Plugin;
 import mindustry.net.Administration.ActionType;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.ContinuousLiquidTurretBuild;
+import mindustry.world.blocks.defense.turrets.LiquidTurret.LiquidTurretBuild;
 import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
 import mindustry.world.blocks.production.Drill;
 import useful.Bundle;
@@ -220,6 +221,34 @@ public class Main extends Plugin {
                             }});
                         }
                                             
+                    }       
+                    if (build instanceof LiquidTurretBuild LiqTurret) {
+                        var hasLiq = false;
+                        a: for (var dx = -2; dx <= 2; dx++) for (var dy = -2; dy <= 2; dy++) {
+                            var build2 = Vars.world.build(LiqTurret.tileX() + dx, LiqTurret.tileY() + dy);
+                            if (build2 == null) continue;
+                            if (!build2.block().hasLiquids) continue;
+                            if (build2.liquids().current() == LiqTurret.liquids().current()) continue;
+                            hasLiq = true;
+                            break a;
+                        }
+                        if (!hasLiq) return;
+                        LiqTurret.liquids.clear();
+                        var netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+                        var netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
+                        Core.app.post(() -> {
+                            try {
+                                netServerSyncStream.reset();
+                                netServerDataStream.writeInt(LiqTurret.pos());
+                                netServerDataStream.writeShort(LiqTurret.block().id);
+                                LiqTurret.writeAll(Writes.get(netServerDataStream));
+                                netServerDataStream.close();
+                                Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
+                                netServerSyncStream.reset();
+                            } catch (IOException e) {
+                                Log.err(e);
+                            }
+                        });
                     }
                     if (build.block != Blocks.sublimate) return;
                     if (build instanceof ContinuousLiquidTurretBuild subl) {
