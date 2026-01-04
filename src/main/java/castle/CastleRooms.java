@@ -203,9 +203,6 @@ public class CastleRooms {
         }
 
         private void SpawnUnit(PlayerData data, float x, float y, UnitType type, boolean core_spawn) {
-            System.out.println(x);
-            System.out.println(y);
-            System.out.println(core_spawn);
             var prevLimit = Vars.state.rules.unitCap;
             Unit unit = null;
             var i = 0;
@@ -225,7 +222,6 @@ public class CastleRooms {
                     }
                     i++;
             }
-            System.out.println(y_coordinate);
             unit = type.spawn(
                 data.player.team(),
                 x * 8 + 48f,Math.round(y_coordinate));
