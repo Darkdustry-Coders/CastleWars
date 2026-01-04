@@ -39,8 +39,8 @@ public class CastleUtils {
     public static short landSpawnY = -1;
     public static short airSpawnX = -1;
     public static short airSpawnY = -1;
-    public static short DefenseCap = -1;
-    public static short AttackCap = -1;
+    public static short DefenseCap = 150;
+    public static short AttackCap = 350;
 
     public static boolean any(String[] array, String value) {
         for (var test : array)
@@ -61,14 +61,6 @@ public class CastleUtils {
         generatePlatforms = true;
         platformSource.clear();
         shopFloor = Blocks.space.asFloor();
-        boatSpawnX = -1;
-        boatSpawnY = -1;
-        landSpawnX = -1;
-        landSpawnY = -1;
-        airSpawnX = -1;
-        airSpawnY = -1;
-        DefenseCap = 150;
-        AttackCap = 350;
 
         for (var objective : state.rules.objectives.all) {
             if (objective instanceof FlagObjective flag) {

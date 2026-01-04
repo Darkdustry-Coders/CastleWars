@@ -210,7 +210,7 @@ public class CastleGenerator {
                 spawn = get(team).cpy().add(Mathf.range(tilesize), Mathf.range(tilesize));
             } while (!validFor(type, spawn));
             var prevLimit = state.rules.unitCap;
-            state.rules.unitCap = Integer.MAX_VALUE;
+            state.rules.unitCap = 500;
             var unit = type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
             state.rules.unitCap = prevLimit;
             Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", summonner.coloredName());
