@@ -119,7 +119,7 @@ public class Main extends Plugin {
         });
 
         Events.on(TapEvent.class, event -> {
-            if (event.player.team().core() == null) return;
+            if (event.player.team().core() == null || event.player.unit() == null) return;
             var data = PlayerData.getData(event.player);
             if (data == null) return;
             Tile tapped = event.tile;
@@ -144,6 +144,7 @@ public class Main extends Plugin {
                         if (elapsed < 500) {
                             Time.runTask(0.3f, this);
                     }}
+                    return;
                 }
             });
         });
