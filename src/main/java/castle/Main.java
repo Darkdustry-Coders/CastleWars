@@ -216,10 +216,8 @@ public class Main extends Plugin {
         Timer.schedule(() -> {
             if (isBreak())
                 return;
-
+            
             Groups.build.each(build -> {
-                netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                 try {
                     if (build.block != Blocks.sublimate && build instanceof ItemTurret.ItemTurretBuild turret) {
                         BulletType active = turret.peekAmmo();
@@ -230,6 +228,8 @@ public class Main extends Plugin {
                                 turret.ammo.get(i).amount = 1; 
                             }
                             turret.update();
+                            netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+                            netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                             SyncBlock(turret);
                         }
                                             
@@ -246,6 +246,8 @@ public class Main extends Plugin {
                         }
                         if (!hasLiq) return;
                         LiqTurret.liquids.clear();
+                        netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+                        netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                         SyncBlock(LiqTurret);
                     }
                     if (build.block != Blocks.sublimate) return;
@@ -262,6 +264,8 @@ public class Main extends Plugin {
                         }
                         if (!hasCyan) return;
                         subl.liquids.clear();
+                        netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+                        netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                         SyncBlock(subl);
                     }
                 } catch (Exception ohno) {
