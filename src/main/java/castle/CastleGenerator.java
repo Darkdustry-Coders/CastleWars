@@ -14,6 +14,8 @@ import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.distribution.Sorter.SorterBuild;
 import mindustry.world.blocks.environment.SpawnBlock;
 import mindustry.world.blocks.storage.CoreBlock;
+import mindustry.world.blocks.logic.LogicBlock.LogicBuild;
+import arc.util.Time;
 import useful.Bundle;
 
 import static castle.CastleRooms.*;
@@ -93,6 +95,17 @@ public class CastleGenerator {
                 var drill = drill(c);
                 addRoom(x, y, drill.size,
                         () -> new MinerRoom(drill, sorter.config(), CastleCosts.items.get(sorter.config())));
+            }
+
+            if (tile.build instanceof LogicBuild LogicBlock) {
+                var tileEdit = world.tile(x, y);
+                var code = LogicBlock.code;
+                tileEdit.setNet(tile.block(), tile.build.team(), 0);
+                Time.run(1f, () -> {
+                    if (tileEdit.build instanceof LogicBuild newLogic) {
+                        newLogic.updateCode(code);
+                    }
+                });
             }
 
             if (tile.overlay() instanceof SpawnBlock)

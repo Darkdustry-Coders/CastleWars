@@ -25,6 +25,7 @@ import mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.ContinuousL
 import mindustry.world.blocks.defense.turrets.LiquidTurret.LiquidTurretBuild;
 import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
 import mindustry.world.blocks.production.Drill;
+import mindustry.gen.Building;
 import useful.Bundle;
 import mindustry.world.Tile;
 import arc.util.Time;
@@ -44,7 +45,28 @@ public class Main extends Plugin {
     public static final Seq<Room> rooms = new Seq<>();
     public static final Spawns spawns = new Spawns();
 
+    private ReusableByteOutStream netServerSyncStream;
+    private DataOutputStream netServerDataStream;
+
     public static int timer, halfHeight;
+
+    private void SyncBlock(Building block_Sync) {
+        Core.app.post(() -> {
+            try {
+                netServerSyncStream.reset();
+                netServerDataStream.writeInt(block_Sync.pos());
+                netServerDataStream.writeShort(block_Sync.block().id);
+                block_Sync.writeAll(Writes.get(netServerDataStream));
+                netServerDataStream.close();
+                Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
+                netServerSyncStream.reset();
+            } catch (IOException e) {
+                Log.err(e);
+            }});
+        return;
+    } 
+
+
 
     @Override
     public void init() {
@@ -206,20 +228,9 @@ public class Main extends Plugin {
                                 turret.ammo.get(i).amount = 1; 
                             }
                             turret.update();
-                            var netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                            var netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
-                            Core.app.post(() -> {
-                            try {
-                                netServerSyncStream.reset();
-                                netServerDataStream.writeInt(turret.pos());
-                                netServerDataStream.writeShort(turret.block().id);
-                                turret.writeAll(Writes.get(netServerDataStream));
-                                netServerDataStream.close();
-                                Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
-                                netServerSyncStream.reset();
-                            } catch (IOException e) {
-                                Log.err(e);
-                            }});
+                            netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+                            netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
+                            SyncBlock(turret);
                         }
                                             
                     }       
@@ -235,21 +246,9 @@ public class Main extends Plugin {
                         }
                         if (!hasLiq) return;
                         LiqTurret.liquids.clear();
-                        var netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                        var netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
-                        Core.app.post(() -> {
-                            try {
-                                netServerSyncStream.reset();
-                                netServerDataStream.writeInt(LiqTurret.pos());
-                                netServerDataStream.writeShort(LiqTurret.block().id);
-                                LiqTurret.writeAll(Writes.get(netServerDataStream));
-                                netServerDataStream.close();
-                                Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
-                                netServerSyncStream.reset();
-                            } catch (IOException e) {
-                                Log.err(e);
-                            }
-                        });
+                        netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+                        netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
+                        SyncBlock(LiqTurret);
                     }
                     if (build.block != Blocks.sublimate) return;
                     if (build instanceof ContinuousLiquidTurretBuild subl) {
@@ -265,21 +264,9 @@ public class Main extends Plugin {
                         }
                         if (!hasCyan) return;
                         subl.liquids.clear();
-                        var netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                        var netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
-                        Core.app.post(() -> {
-                            try {
-                                netServerSyncStream.reset();
-                                netServerDataStream.writeInt(subl.pos());
-                                netServerDataStream.writeShort(subl.block().id);
-                                subl.writeAll(Writes.get(netServerDataStream));
-                                netServerDataStream.close();
-                                Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
-                                netServerSyncStream.reset();
-                            } catch (IOException e) {
-                                Log.err(e);
-                            }
-                        });
+                        netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+                        netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
+                        SyncBlock(subl);
                     }
                 } catch (Exception ohno) {
                     throw new RuntimeException(ohno);
