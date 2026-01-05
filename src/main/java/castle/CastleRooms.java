@@ -255,12 +255,12 @@ public class CastleRooms {
         public boolean canBuy(PlayerData data) {
             if (!super.canBuy(data)) return false;
             if (attack){
-                if(data.team().getUnitCountAttack()>=Vars.state.rules.unitCap/2) {
+                if(data.team().getUnitCountAttack()>=AttackCap/2) {
                 Bundle.announce(data.player, "rooms.unit.limit");
                 return false;
                 }}
             else{
-                if(data.team().getUnitCountDefense()>=Vars.state.rules.unitCap/2){ 
+                if(data.team().getUnitCountDefense()>=DefenseCap/2){ 
                 Bundle.announce(data.player, "rooms.unit.limit");
                 return false;
                 }}

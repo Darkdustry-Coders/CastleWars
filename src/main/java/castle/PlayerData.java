@@ -32,9 +32,9 @@ public class PlayerData {
                 team().getUnitCount() > state.rules.unitCap ? "lightgray" : "scarlet",
                 team().getUnitCount(), state.rules.unitCap, UI.formatTime(timer * 60f),
                 team().getUnitCountAttack(),
-                team().getUnitCountAttack() < AttackCap/2 ? "lightgray" : "scarlet",
+                team().getUnitCountAttack() < AttackCap ? "lightgray" : "scarlet",
                 team().getUnitCountDefense(),
-                team().getUnitCountDefense() < DefenseCap/2 ? "lightgray" : "scarlet",
+                team().getUnitCountDefense() < DefenseCap ? "lightgray" : "scarlet",
             AttackCap,DefenseCap);
     }
 
