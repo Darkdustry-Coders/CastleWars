@@ -141,30 +141,30 @@ public class Main extends Plugin {
         });
 
         Events.on(TapEvent.class, event -> {
-            if (event.player.team().core() == null || event.player.unit() == null) return;
             var data = PlayerData.getData(event.player);
-            if (data == null) return;
+            if (event.player.team().core() == null || event.player.unit() == null || data == null) return;
             Tile tapped = event.tile;
             long[] start = { Time.millis() };
             rooms.each(room -> room.check(tapped) && room.canBuy(data), room -> room.buy(data));
             Time.runTask(0f, new Runnable() {
                 @Override
                 public void run() {
-                    int tx = (int) event.player.unit().aimX()/8;
-                    int ty = (int) event.player.unit().aimY()/8;
-                    if (tx < 0 || ty < 0 || tx >= Vars.world.width() || ty >= Vars.world.height()) return;
-                    Tile tile = Vars.world.tile(tx, ty);
-                    var dataPress = PlayerData.getData(event.player);
                     if (event.player.unit().isShooting) {
-                        if (Time.millis() - start[0] >= 500) {
-                            rooms.each(room -> room.check(tile) && room.canBuy(dataPress), room -> room.buy(dataPress));
-                        }
-                        Time.runTask(0.03f, this);
-                    } 
+                        int tx = (int) event.player.unit().aimX()/8;
+                        int ty = (int) event.player.unit().aimY()/8;
+                        if (tx < 0 || ty < 0 || tx >= Vars.world.width() || ty >= Vars.world.height()) return;
+                        Tile tile = Vars.world.tile(tx, ty);
+                        var dataPress = PlayerData.getData(event.player);
+                            if (Time.millis() - start[0] >= 500) {
+                                rooms.each(room -> room.check(tile) && room.canBuy(dataPress), room -> room.buy(dataPress));
+                            }
+                            Time.runTask(0.03f, this);
+                        } 
                     else {
                         long elapsed = Time.millis() - start[0];
                         if (elapsed < 500) {
-                            Time.runTask(0.3f, this);
+                            Time.runTask(0.5f, this);
+                        return;
                     }}
                     return;
                 }
@@ -218,6 +218,8 @@ public class Main extends Plugin {
                 return;
 
             Groups.build.each(build -> {
+                netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+                netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                 try {
                     if (build.block != Blocks.sublimate && build instanceof ItemTurret.ItemTurretBuild turret) {
                         BulletType active = turret.peekAmmo();
@@ -228,8 +230,6 @@ public class Main extends Plugin {
                                 turret.ammo.get(i).amount = 1; 
                             }
                             turret.update();
-                            netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                            netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                             SyncBlock(turret);
                         }
                                             
@@ -246,8 +246,6 @@ public class Main extends Plugin {
                         }
                         if (!hasLiq) return;
                         LiqTurret.liquids.clear();
-                        netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                        netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                         SyncBlock(LiqTurret);
                     }
                     if (build.block != Blocks.sublimate) return;
@@ -264,8 +262,6 @@ public class Main extends Plugin {
                         }
                         if (!hasCyan) return;
                         subl.liquids.clear();
-                        netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                        netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                         SyncBlock(subl);
                     }
                 } catch (Exception ohno) {

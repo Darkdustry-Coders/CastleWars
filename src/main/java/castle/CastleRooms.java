@@ -203,7 +203,6 @@ public class CastleRooms {
         }
 
         private void SpawnUnit(PlayerData data, float x, float y, UnitType type, boolean core_spawn) {
-            var prevLimit = Vars.state.rules.unitCap;
             Unit unit = null;
             var i = 0;
             var y_coordinate = 0.0;
@@ -226,7 +225,6 @@ public class CastleRooms {
                 data.player.team(),
                 x * 8 + 48f,Math.round(y_coordinate));
             Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", data.player.coloredName());
-            Vars.state.rules.unitCap = prevLimit;
         }
 
 
@@ -255,12 +253,12 @@ public class CastleRooms {
         public boolean canBuy(PlayerData data) {
             if (!super.canBuy(data)) return false;
             if (attack){
-                if(data.team().getUnitCountAttack()>=AttackCap/2) {
+                if(data.team().getUnitCountAttack()>=AttackCap) {
                 Bundle.announce(data.player, "rooms.unit.limit");
                 return false;
                 }}
             else{
-                if(data.team().getUnitCountDefense()>=DefenseCap/2){ 
+                if(data.team().getUnitCountDefense()>=DefenseCap){ 
                 Bundle.announce(data.player, "rooms.unit.limit");
                 return false;
                 }}
