@@ -218,22 +218,7 @@ public class Main extends Plugin {
                 return;
             
             Groups.build.each(build -> {
-                try {
-                    if (build.block != Blocks.sublimate && build instanceof ItemTurret.ItemTurretBuild turret) {
-                        BulletType active = turret.peekAmmo();
-                        for(int i = 0; i < turret.ammo.size; i++){
-                            if(i == 0){
-                                turret.ammo.get(i).amount = 0;
-                            } else {
-                                turret.ammo.get(i).amount = 1; 
-                            }
-                            turret.update();
-                            netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                            netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
-                            SyncBlock(turret);
-                        }
-                                            
-                    }       
+                try {   
                     if (build instanceof LiquidTurretBuild LiqTurret) {
                         var hasLiq = false;
                         a: for (var dx = -2; dx <= 2; dx++) for (var dy = -2; dy <= 2; dy++) {
