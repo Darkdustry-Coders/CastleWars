@@ -222,8 +222,8 @@ public class Main extends Plugin {
                     if (build.block != Blocks.sublimate && build instanceof ItemTurret.ItemTurretBuild turret) {
                         BulletType active = turret.peekAmmo();
                         for(int i = 0; i < turret.ammo.size; i++){
-                            if(i == 0){
-                                turret.ammo.get(i).amount = 0;
+                            if(i == 0 && turret.ammo.size > 1){
+                                turret.ammo.remove(i);
                             } else {
                                 turret.ammo.get(i).amount = 1; 
                             }
@@ -232,8 +232,7 @@ public class Main extends Plugin {
                             netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
                             netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                             SyncBlock(turret);
-                        }
-                                            
+                        }             
                     }  
                     if (build instanceof LiquidTurretBuild LiqTurret) {
                         var hasLiq = false;
