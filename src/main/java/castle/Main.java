@@ -225,7 +225,8 @@ public class Main extends Plugin {
                             if(i == 0 && turret.ammo.size > 1){
                                 turret.ammo.remove(i);
                             } else {
-                                turret.ammo.get(i).amount = 1; 
+                                turret.ammo.get(i).amount = 25; 
+                                turret.totalAmmo = 1;
                             }
                             turret.update();
                             turret.updateTile();
