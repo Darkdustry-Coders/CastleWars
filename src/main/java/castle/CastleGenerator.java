@@ -104,6 +104,7 @@ public class CastleGenerator {
                 Time.run(1f, () -> {
                     if (tileEdit.build instanceof LogicBuild newLogic) {
                         newLogic.updateCode(code);
+                        newLogic.updateTile();
                     }
                 });
             }
