@@ -197,8 +197,7 @@ public class CastleRooms {
             var tile = Vars.world.tile(x, y);
             if (tile == null ||
             (!type.flying && !tile.block().isAir()) ||
-            (type.naval && !tile.floor().isLiquid) ||
-            (!type.flying && !type.naval && tile.floor().isLiquid))
+            (type.naval && !tile.floor().isLiquid) )
                 return false;
             return true;
         }
