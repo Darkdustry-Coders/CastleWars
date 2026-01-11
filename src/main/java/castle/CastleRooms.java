@@ -17,7 +17,8 @@ import mindustry.type.UnitType;
 import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 import useful.Bundle; 
-import static mindustry.Vars.*;
+import mindustry.Vars;
+
 import static castle.CastleUtils.boatSpawnX;
 import static castle.CastleUtils.boatSpawnY;
 import static castle.CastleUtils.landSpawnX;
@@ -26,8 +27,8 @@ import static castle.CastleUtils.airSpawnX;
 import static castle.CastleUtils.airSpawnY;
 import static castle.CastleUtils.generatePlatforms;
 import static castle.CastleUtils.platformSource;
-import static castle.CastleUtils.DefenseCap;
-import static castle.CastleUtils.AttackCap;
+import static castle.CastleUtils.defenseCap;
+import static castle.CastleUtils.attackCap;
 import static castle.Main.*;
 
 public class CastleRooms {
@@ -193,7 +194,7 @@ public class CastleRooms {
 
         private boolean validFor(UnitType type, int x,int y) {
 
-            var tile = world.tile(x, y);
+            var tile = Vars.world.tile(x, y);
             if (tile == null ||
             (!type.flying && !tile.block().isAir()) ||
             (type.naval && !tile.floor().isLiquid) ||
@@ -202,7 +203,7 @@ public class CastleRooms {
             return true;
         }
 
-        private void SpawnUnit(PlayerData data, float x, float y, UnitType type, boolean core_spawn) {
+        private void spawnUnit(PlayerData data, float x, float y, UnitType type, boolean core_spawn) {
             Unit unit = null;
             var i = 0;
             var y_coordinate = 0.0;
@@ -235,17 +236,17 @@ public class CastleRooms {
 
             if (attack) spawns.spawn(data.player, data.player.team(), type);
             else if ((boatSpawnX > 0 && boatSpawnY > 0) && type.naval) {
-                SpawnUnit(data, boatSpawnX, boatSpawnY, type, true);
+                spawnUnit(data, boatSpawnX, boatSpawnY, type, true);
             }
             else if ((landSpawnX > 0 && landSpawnY > 0) && !type.naval && !type.flying) {
-                SpawnUnit(data, landSpawnX, landSpawnY, type, true);
+                spawnUnit(data, landSpawnX, landSpawnY, type, true);
             }
             else if ((airSpawnX > 0 && airSpawnY > 0) && type.flying) {
-                SpawnUnit(data, airSpawnX, airSpawnY, type, true);
+                spawnUnit(data, airSpawnX, airSpawnY, type, true);
             }
             else if (data.player.core() != null) {
                 var core = data.player.core();
-                SpawnUnit(data, core.x/8, core.y, type, false);
+                spawnUnit(data, core.x/8, core.y, type, false);
             };
         }
 
@@ -253,12 +254,12 @@ public class CastleRooms {
         public boolean canBuy(PlayerData data) {
             if (!super.canBuy(data)) return false;
             if (attack){
-                if(data.team().getUnitCountAttack()>=AttackCap) {
+                if(data.team().getUnitCountAttack()>=attackCap) {
                 Bundle.announce(data.player, "rooms.unit.limit");
                 return false;
                 }}
             else{
-                if(data.team().getUnitCountDefense()>=DefenseCap){ 
+                if(data.team().getUnitCountDefense()>=defenseCap){ 
                 Bundle.announce(data.player, "rooms.unit.limit");
                 return false;
                 }}

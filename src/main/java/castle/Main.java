@@ -140,36 +140,29 @@ public class Main extends Plugin {
             }
         });
 
-        Events.on(TapEvent.class, event -> {
-            var data = PlayerData.getData(event.player);
-            if (event.player.team().core() == null || event.player.unit() == null || data == null) return;
-            Tile tapped = event.tile;
-            long[] start = { Time.millis() };
-            rooms.each(room -> room.check(tapped) && room.canBuy(data), room -> room.buy(data));
-            Time.runTask(0f, new Runnable() {
-                @Override
-                public void run() {
-                    if (event.player.unit().isShooting) {
-                        int tx = (int) event.player.unit().aimX()/8;
-                        int ty = (int) event.player.unit().aimY()/8;
-                        if (tx < 0 || ty < 0 || tx >= Vars.world.width() || ty >= Vars.world.height()) return;
-                        Tile tile = Vars.world.tile(tx, ty);
-                        var dataPress = PlayerData.getData(event.player);
-                            if (Time.millis() - start[0] >= 500) {
-                                rooms.each(room -> room.check(tile) && room.canBuy(dataPress), room -> room.buy(dataPress));
-                            }
-                            Time.runTask(0.03f, this);
-                        } 
-                    else {
-                        long elapsed = Time.millis() - start[0];
-                        if (elapsed < 500) {
-                            Time.runTask(0.5f, this);
-                        return;
-                    }}
-                    return;
-                }
+        Timer.schedule(() -> {
+            Groups.player.each(p -> {
+                if (p == null || p.unit() == null || p.unit().isNull()) return;
+                if (!p.unit().isShooting) return;
+
+                var data = PlayerData.getData(p);
+                if (data == null) return;
+
+                int tx = (int)(p.unit().aimX / 8);
+                int ty = (int)(p.unit().aimY / 8);
+
+                if (tx < 0 || ty < 0 || tx >= Vars.world.width() || ty >= Vars.world.height()) return;
+
+                Tile tile = Vars.world.tile(tx, ty);
+                if (tile == null) return;
+
+                rooms.each(room -> 
+                    room.check(tile) && room.canBuy(data),
+                    room -> room.buy(data)
+                );
             });
-        });
+        }, 0.5f, 0.025f); 
+
 
         Events.on(UnitDestroyEvent.class, event -> {
             if (!units.containsKey(event.unit.type))

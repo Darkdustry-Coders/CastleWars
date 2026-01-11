@@ -39,8 +39,8 @@ public class CastleUtils {
     public static short landSpawnY = -1;
     public static short airSpawnX = -1;
     public static short airSpawnY = -1;
-    public static short DefenseCap = 150;
-    public static short AttackCap = 350;
+    public static short defenseCap = 150;
+    public static short attackCap = 350;
 
     public static boolean any(String[] array, String value) {
         for (var test : array)
@@ -126,22 +126,22 @@ public class CastleUtils {
                         airSpawnY = -1;
                     }
                 }
-                if (flag.flag.startsWith("DefenseCap")) {
+                if (flag.flag.startsWith("defenseCap ")) {
                     try {
                         String[] args = flag.flag.split(" ");
-                        DefenseCap = Short.valueOf(args[1]);
+                        defenseCap = Short.valueOf(args[1]);
                     } catch (Exception error) {
                         Log.warn("Failed to set Defense Cap!\n" + error);
-                        DefenseCap = 150;
+                        defenseCap = 150;
                     }
                 }
-                if (flag.flag.startsWith("AttackCap")) {
+                if (flag.flag.startsWith("attackCap ")) {
                     try {
                         String[] args = flag.flag.split(" ");
-                        AttackCap = Short.valueOf(args[1]);
+                        attackCap = Short.valueOf(args[1]);
                     } catch (Exception error) {
                         Log.warn("Failed to set Attack Cap!\n" + error);
-                        AttackCap = 350;
+                        attackCap = 350;
                     }
                 }
             }
