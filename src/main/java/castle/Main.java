@@ -29,7 +29,6 @@ import mindustry.gen.Building;
 import useful.Bundle;
 import mindustry.world.Tile;
 import arc.util.Time;
-import mindustry.gen.Unit;
 import mindustry.entities.bullet.BulletType;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.gen.Call;
@@ -49,7 +48,6 @@ public class Main extends Plugin {
     private DataOutputStream netServerDataStream;
 
     public static int timer, halfHeight;
-
     private void SyncBlock(Building block_Sync) {
         Core.app.post(() -> {
             try {
@@ -140,28 +138,37 @@ public class Main extends Plugin {
             }
         });
 
-        Timer.schedule(() -> {
-            Groups.player.each(p -> {
-                if (p == null || p.unit() == null || p.unit().isNull()) return;
-                if (!p.unit().isShooting) return;
-
-                var data = PlayerData.getData(p);
-                if (data == null) return;
-
-                int tx = (int)(p.unit().aimX / 8);
-                int ty = (int)(p.unit().aimY / 8);
-
-                if (tx < 0 || ty < 0 || tx >= Vars.world.width() || ty >= Vars.world.height()) return;
-
-                Tile tile = Vars.world.tile(tx, ty);
-                if (tile == null) return;
-
-                rooms.each(room -> 
-                    room.check(tile) && room.canBuy(data),
-                    room -> room.buy(data)
-                );
+        // unit cant buy anything while building cuz dont shoot
+        Events.on(TapEvent.class, event -> {
+            var data = PlayerData.getData(event.player);
+            if (event.player.team().core() == null || event.player.unit() == null || data == null) return;
+            Tile tapped = event.tile;
+            long[] start = { Time.millis() };
+            rooms.each(room -> room.check(tapped) && room.canBuy(data), room -> room.buy(data));
+            Time.runTask(0f, new Runnable() {
+                @Override
+                public void run() {
+                    if (event.player.unit().isShooting) {
+                        int tx = (int) event.player.unit().aimX()/8;
+                        int ty = (int) event.player.unit().aimY()/8;
+                        if (tx < 0 || ty < 0 || tx >= Vars.world.width() || ty >= Vars.world.height()) return;
+                        Tile tile = Vars.world.tile(tx, ty);
+                        var dataPress = PlayerData.getData(event.player);
+                            if (Time.millis() - start[0] >= 500) {
+                                rooms.each(room -> room.check(tile) && room.canBuy(dataPress), room -> room.buy(dataPress));
+                            }
+                            Time.runTask(0.03f, this);
+                        } 
+                    else {
+                        long elapsed = Time.millis() - start[0];
+                        if (elapsed < 500) {
+                            Time.runTask(0.5f, this);
+                        return;
+                    }}
+                    return;
+                }
             });
-        }, 0.5f, 0.025f); 
+        });
 
 
         Events.on(UnitDestroyEvent.class, event -> {
@@ -211,6 +218,12 @@ public class Main extends Plugin {
                 return;
             
             Groups.build.each(build -> {
+                try{
+                    // dont remove this shit is really necessary
+                    netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+                    netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
+                }
+                catch(Exception ohshit){throw new RuntimeException(ohshit);}
                 try {   
                     if (build.block != Blocks.sublimate && build instanceof ItemTurret.ItemTurretBuild turret) {
                         BulletType active = turret.peekAmmo();
@@ -226,8 +239,7 @@ public class Main extends Plugin {
                             }
                             turret.update();
                             turret.updateTile();
-                            netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                            netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
+                            
                             SyncBlock(turret);
                         }             
                     }  
@@ -243,8 +255,6 @@ public class Main extends Plugin {
                         }
                         if (!hasLiq) return;
                         LiqTurret.liquids.clear();
-                        netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                        netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                         SyncBlock(LiqTurret);
                     }
                     if (build.block != Blocks.sublimate) return;
@@ -261,8 +271,6 @@ public class Main extends Plugin {
                         }
                         if (!hasCyan) return;
                         subl.liquids.clear();
-                        netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                        netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
                         SyncBlock(subl);
                     }
                 } catch (Exception ohno) {
