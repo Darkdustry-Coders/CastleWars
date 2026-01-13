@@ -39,16 +39,16 @@ import static mindustry.Vars.*;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Main extends Plugin {
-
-    public static final Seq<Room> rooms = new Seq<>();
-    public static final Spawns spawns = new Spawns();
-
-    private ReusableByteOutStream netServerSyncStream;
-    private DataOutputStream netServerDataStream;
-
-    public static int timer, halfHeight;
-    private void SyncBlock(Building block_Sync) {
+class MindustryHotFixUtils {
+    static public ReusableByteOutStream netServerSyncStream;
+    static public DataOutputStream netServerDataStream;
+    static public void SyncBlock(Building block_Sync) {
+        try{
+            // dont remove this shit is really necessary
+            netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
+            netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
+        }
+            catch(Exception ohshit){throw new RuntimeException(ohshit);}
         Core.app.post(() -> {
             try {
                 netServerSyncStream.reset();
@@ -58,12 +58,23 @@ public class Main extends Plugin {
                 netServerDataStream.close();
                 Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
                 netServerSyncStream.reset();
-            } catch (IOException e) {
-                Log.err(e);
+            } catch (Exception ohshit) {
+                throw new RuntimeException(ohshit);
             }});
-        return;
     } 
+}
 
+public class Main extends Plugin {
+
+    public static final Seq<Room> rooms = new Seq<>();
+    public static final Spawns spawns = new Spawns();
+
+    public ReusableByteOutStream netServerSyncStream;
+    public DataOutputStream netServerDataStream;
+
+    private MindustryHotFixUtils mindSyncClassHotFix = new MindustryHotFixUtils();
+
+    public static int timer, halfHeight;
 
 
     @Override
@@ -74,6 +85,9 @@ public class Main extends Plugin {
         } catch (Exception failure) {
             throw new RuntimeException(failure);
         }
+        try{
+            mindSyncClassHotFix = new MindustryHotFixUtils();
+        }catch(Exception ohshit){throw new RuntimeException(ohshit);}
 
         content.statusEffects().each(effect -> effect.permanent = false);
 
@@ -218,12 +232,6 @@ public class Main extends Plugin {
                 return;
             
             Groups.build.each(build -> {
-                try{
-                    // dont remove this shit is really necessary
-                    netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                    netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
-                }
-                catch(Exception ohshit){throw new RuntimeException(ohshit);}
                 try {   
                     if (build.block != Blocks.sublimate && build instanceof ItemTurret.ItemTurretBuild turret) {
                         BulletType active = turret.peekAmmo();
@@ -239,8 +247,11 @@ public class Main extends Plugin {
                             }
                             turret.update();
                             turret.updateTile();
-                            
-                            SyncBlock(turret);
+                            try{
+                                mindSyncClassHotFix.SyncBlock(turret);
+                            }catch (Exception ohno) {
+                                Log.err(ohno);
+                            }
                         }             
                     }  
                     if (build instanceof LiquidTurretBuild LiqTurret) {
@@ -255,7 +266,11 @@ public class Main extends Plugin {
                         }
                         if (!hasLiq) return;
                         LiqTurret.liquids.clear();
-                        SyncBlock(LiqTurret);
+                        try{
+                            mindSyncClassHotFix.SyncBlock(LiqTurret);
+                        }catch (Exception ohno) {
+                            Log.err(ohno);
+                        }
                     }
                     if (build.block != Blocks.sublimate) return;
                     if (build instanceof ContinuousLiquidTurretBuild subl) {
@@ -271,7 +286,11 @@ public class Main extends Plugin {
                         }
                         if (!hasCyan) return;
                         subl.liquids.clear();
-                        SyncBlock(subl);
+                        try{
+                            mindSyncClassHotFix.SyncBlock(subl);
+                        }catch (Exception ohno) {
+                            Log.err(ohno);
+                        }
                     }
                 } catch (Exception ohno) {
                     throw new RuntimeException(ohno);
