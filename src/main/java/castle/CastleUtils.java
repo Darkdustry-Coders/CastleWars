@@ -1,5 +1,6 @@
 package castle;
 
+import arc.Core;
 import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
@@ -7,6 +8,7 @@ import mindustry.content.Planets;
 import mindustry.game.*;
 import mindustry.game.MapObjectives.FlagObjective;
 import mindustry.gen.Teamc;
+import mindustry.gen.Building;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
 import mindustry.type.unit.ErekirUnitType;
@@ -20,9 +22,13 @@ import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.Env;
+import mindustry.gen.Call;
+import arc.util.io.Writes;
 
 import static mindustry.Vars.*;
 
+import java.io.DataOutputStream;
+import arc.util.io.ReusableByteOutStream;
 import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Nullable;
@@ -152,6 +158,26 @@ public class CastleUtils {
             newSource.fill();
             newSource.eachTile(tile -> tile.setFloor(Blocks.metalFloor.asFloor()));
             platformSource.add(newSource);
+        }
+    }
+
+    public static void syncBlock(Building block_sync, ReusableByteOutStream syncStream, DataOutputStream dataStream){
+        try{
+            final Building block = block_sync; 
+            Core.app.post(() -> {
+                        try {
+                            syncStream.reset();
+                            dataStream.writeInt(block.pos());
+                            dataStream.writeShort(block.block().id);
+                            block.writeAll(Writes.get(dataStream));
+                            dataStream.close();
+                            Call.blockSnapshot((short) 1, syncStream.toByteArray());
+                            syncStream.reset();
+                        } catch (Exception ohshit) {
+                            throw new RuntimeException(ohshit);
+            }});
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 

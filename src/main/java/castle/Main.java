@@ -1,7 +1,6 @@
 package castle;
 
 
-import arc.Core;
 import arc.Events;
 import arc.struct.Seq;
 import arc.util.Log;
@@ -25,7 +24,6 @@ import mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.ContinuousL
 import mindustry.world.blocks.defense.turrets.LiquidTurret.LiquidTurretBuild;
 import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
 import mindustry.world.blocks.production.Drill;
-import mindustry.gen.Building;
 import useful.Bundle;
 import mindustry.world.Tile;
 import arc.util.Time;
@@ -35,6 +33,7 @@ import mindustry.gen.Call;
 import static castle.CastleCosts.*;
 import static castle.CastleUtils.*;
 import static mindustry.Vars.*;
+import static castle.CastleUtils.syncBlock;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -51,26 +50,6 @@ public class Main extends Plugin {
     public DataOutputStream netServerDataStream;
 
     public static int timer, halfHeight;
-
-    static public void syncBlock(Building block_sync){
-        try{
-            final Building block = block_sync; 
-            Core.app.post(() -> {
-                        try {
-                            syncStream.reset();
-                            dataStream.writeInt(block.pos());
-                            dataStream.writeShort(block.block().id);
-                            block.writeAll(Writes.get(dataStream));
-                            dataStream.close();
-                            Call.blockSnapshot((short) 1, syncStream.toByteArray());
-                            syncStream.reset();
-                        } catch (Exception ohshit) {
-                            throw new RuntimeException(ohshit);
-            }});
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void init() {
@@ -127,19 +106,11 @@ public class Main extends Plugin {
                 Groups.build.each(b -> {
                     if (b instanceof TurretBuild t) {
                         if (t.ammo.size > 1) {
-                            Core.app.post(() -> {
-                                try {
-                                    netServerSyncStream.reset();
-                                    netServerDataStream.writeInt(t.pos());
-                                    netServerDataStream.writeShort(t.block().id);
-                                    t.writeAll(Writes.get(netServerDataStream));
-                                    netServerDataStream.close();
-                                    Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
-                                    netServerSyncStream.reset();
-                                } catch (IOException e) {
-                                    Log.err(e);
-                                }
-                            });
+                            try {
+                                syncBlock(t, syncStream, dataStream);
+                            } catch (Exception e) {
+                                Log.err(e);
+                            }
                         }
                     }
                 });
@@ -244,7 +215,7 @@ public class Main extends Plugin {
                             turret.update();
                             turret.updateTile();
                             try{
-                                syncBlock(turret);
+                                syncBlock(turret,syncStream,dataStream);
                             }catch (Exception ohno) {
                                 Log.err(ohno);
                             }
@@ -263,7 +234,7 @@ public class Main extends Plugin {
                         if (!hasLiq) return;
                         LiqTurret.liquids.clear();
                         try{
-                            syncBlock(LiqTurret);
+                            syncBlock(LiqTurret,syncStream,dataStream);
                         }catch (Exception ohno) {
                             Log.err(ohno);
                         }
@@ -283,7 +254,7 @@ public class Main extends Plugin {
                         if (!hasCyan) return;
                         subl.liquids.clear();
                         try{
-                            syncBlock(subl);
+                            syncBlock(subl,syncStream,dataStream);
                         }catch (Exception ohno) {
                             Log.err(ohno);
                         }
