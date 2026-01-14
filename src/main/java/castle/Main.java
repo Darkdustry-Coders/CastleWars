@@ -126,8 +126,8 @@ public class Main extends Plugin {
 
         Events.on(PlayerConnectionConfirmed.class, event -> {
             try {
-                var netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                var netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
+                ReusableByteOutStream syncStream = new ReusableByteOutStream(512);
+                DataOutputStream dataStream = new DataOutputStream(syncStream);
                 Groups.build.each(b -> {
                     if (b instanceof TurretBuild t) {
                         if (t.ammo.size > 1) {
