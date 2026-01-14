@@ -40,28 +40,28 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 class MindustryHotFixUtils {
-    static public ReusableByteOutStream netServerSyncStream;
-    static public DataOutputStream netServerDataStream;
-    static public void SyncBlock(Building block_Sync) {
+
+    static public void SyncBlock(Building block_sync){
         try{
-            // dont remove this shit is really necessary
-            netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-            netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
-        }
-            catch(Exception ohshit){throw new RuntimeException(ohshit);}
-        Core.app.post(() -> {
-            try {
-                netServerSyncStream.reset();
-                netServerDataStream.writeInt(block_Sync.pos());
-                netServerDataStream.writeShort(block_Sync.block().id);
-                block_Sync.writeAll(Writes.get(netServerDataStream));
-                netServerDataStream.close();
-                Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
-                netServerSyncStream.reset();
-            } catch (Exception ohshit) {
-                throw new RuntimeException(ohshit);
+            ReusableByteOutStream syncStream = new ReusableByteOutStream(512);
+            DataOutputStream dataStream = new DataOutputStream(syncStream);
+            final Building block = block_sync; 
+            Core.app.post(() -> {
+                        try {
+                            syncStream.reset();
+                            dataStream.writeInt(block.pos());
+                            dataStream.writeShort(block.block().id);
+                            block.writeAll(Writes.get(dataStream));
+                            dataStream.close();
+                            Call.blockSnapshot((short) 1, syncStream.toByteArray());
+                            syncStream.reset();
+                        } catch (Exception ohshit) {
+                            throw new RuntimeException(ohshit);
             }});
-    } 
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 }
 
 public class Main extends Plugin {
