@@ -4,6 +4,7 @@ import arc.func.Prov;
 import arc.math.Mathf;
 import arc.math.geom.Point2;
 import arc.struct.Seq;
+import arc.util.Time;
 import mindustry.content.*;
 import mindustry.game.Team;
 import mindustry.gen.Call;
@@ -15,21 +16,22 @@ import mindustry.world.blocks.distribution.Sorter.SorterBuild;
 import mindustry.world.blocks.environment.SpawnBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.logic.LogicBlock.LogicBuild;
-import arc.util.Time;
+import mindustry.world.blocks.logic.LogicBlock.LogicLink;
+import static mindustry.Vars.*;
 import castle.CastleRooms.BlockRoom;
 import castle.CastleRooms.EffectRoom;
 import castle.CastleRooms.MinerRoom;
 import castle.CastleRooms.Room;
 import castle.CastleRooms.UnitRoom;
-import useful.Bundle;
-
 import static castle.CastleRooms.*;
 import static castle.CastleUtils.drill;
 import static castle.CastleUtils.refreshMeta;
 import static castle.CastleUtils.revealedUnits;
 import static castle.CastleUtils.shopFloor;
 import static castle.Main.*;
-import static mindustry.Vars.*;
+import useful.Bundle;
+
+
 
 public class CastleGenerator {
     public static final int unitLimitX = 5, unitLimitY = 3, effectLimitX = 4;
@@ -102,18 +104,36 @@ public class CastleGenerator {
                         () -> new MinerRoom(drill, sorter.config(), CastleCosts.items.get(sorter.config())));
             }
 
-            if (tile.build instanceof LogicBuild LogicBlock) {
+            if (tile.build instanceof LogicBuild logicBlock) {
+
+                var code = logicBlock.code;
+                var linksProcessor = logicBlock.links.copy();
                 var tileEdit = world.tile(x, y);
-                var code = LogicBlock.code;
-                var links_processor = LogicBlock.links.copy();;
+                var tileNew = world.tile(x, world.height() - y);
+
                 tileEdit.setNet(tile.block(), tile.build.team(), 0);
-                Time.run(1f, () -> {
-                    if (tileEdit.build instanceof LogicBuild newLogic) {
-                        newLogic.updateCode(code);
-                        newLogic.links.set(links_processor);
-                        newLogic.updateTile();
-                    }
-                });
+                tileNew.setNet(tile.block(), Team.blue, 180);
+
+                int yCoordinate = (int) tile.build.getY()/8;
+                Seq<LogicLink> mirroredLinks = new Seq<>();
+
+                for (LogicLink link : logicBlock.links) {
+                    int xLink = link.x;
+                    int yLink = world.height() - yCoordinate -(link.y - yCoordinate);
+                    LogicLink mirrored = new LogicLink(xLink, yLink, link.name, link.valid);
+                    mirroredLinks.add(mirrored);
+                }
+
+                if (tileEdit.build instanceof LogicBuild logicBlockEdit) {
+                    logicBlockEdit.updateCode(code);
+                    logicBlockEdit.links.set(linksProcessor);
+                    logicBlockEdit.updateTile();
+                }
+                if (tileNew.build instanceof LogicBuild newLogicBlock) {
+                    newLogicBlock.updateCode(code);
+                    newLogicBlock.links.set(mirroredLinks);
+                    newLogicBlock.updateTile();
+                }
             }
 
             if (tile.overlay() instanceof SpawnBlock)
