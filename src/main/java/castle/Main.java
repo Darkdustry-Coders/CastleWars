@@ -190,7 +190,14 @@ public class Main extends Plugin {
                 if (!world.tiles.in(unit.tileX(), unit.tileY()))
                     return true;
 
-                return unit.tileY() >= halfHeight && unit.tileY() <= world.height() - halfHeight - 1;
+                if (unit.tileY() >= halfHeight && unit.tileY() <= world.height() - halfHeight - 1 ){
+                    if(!onEnemySide(unit) && unit.type == UnitTypes.poly || unit.type == UnitTypes.mega){
+                        unit.set(unit.team().core().x, unit.team().core().y);
+                        return false;
+                    }
+                    return true;
+                }
+                return false;
             }, Call::unitEnvDeath);
         }, 0f, 0.1f);
 
@@ -201,7 +208,7 @@ public class Main extends Plugin {
             Groups.build.each(build -> {
                 try {   
                     if (build.block != Blocks.sublimate && build instanceof ItemTurret.ItemTurretBuild turret) {
-                        BulletType active = turret.peekAmmo();
+                        // BulletType active = turret.peekAmmo();
                         for(int i = 0; i < turret.ammo.size; i++){
                             if(i == 0 && turret.ammo.size > 1){
                                 turret.ammo.remove(i);
