@@ -254,14 +254,16 @@ public class CastleRooms {
             if (!super.canBuy(data)) return false;
             if (attack){
                 if(data.team().getUnitCountAttack()>=attackCap) {
-                Bundle.announce(data.player, "rooms.unit.limit");
-                return false;
-                }}
+                    Bundle.announce(data.player, "rooms.unit.limit");
+                    return false;
+                }
+            }
             else{
                 if(data.team().getUnitCountDefense()>=defenseCap){ 
-                Bundle.announce(data.player, "rooms.unit.limit");
-                return false;
-                }}
+                    Bundle.announce(data.player, "rooms.unit.limit");
+                    return false;
+                }
+            }
             return true;
         }
         @Override

@@ -43,26 +43,13 @@ public class Main extends Plugin {
     public static final Seq<Room> rooms = new Seq<>();
     public static final Spawns spawns = new Spawns();
 
-    private static ReusableByteOutStream syncStream;
-    private static DataOutputStream dataStream;
-
-    public ReusableByteOutStream netServerSyncStream;
-    public DataOutputStream netServerDataStream;
+    public ReusableByteOutStream syncStream = new ReusableByteOutStream(512);
+    public DataOutputStream dataStream = new DataOutputStream(syncStream);
 
     public static int timer, halfHeight;
 
     @Override
     public void init() {
-        try {
-            netServer.getClass().getDeclaredField("syncStream").setAccessible(true);
-            netServer.getClass().getDeclaredField("dataStream").setAccessible(true);
-        } catch (Exception failure) {
-            throw new RuntimeException(failure);
-        }
-        try{
-            syncStream = new ReusableByteOutStream(512);
-            dataStream = new DataOutputStream(syncStream);
-        }catch(Exception ohshit){throw new RuntimeException(ohshit);}
 
         content.statusEffects().each(effect -> effect.permanent = false);
 
