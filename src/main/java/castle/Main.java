@@ -1,6 +1,6 @@
 package castle;
 
-import arc.Core;
+
 import arc.Events;
 import arc.struct.Seq;
 import arc.util.Log;
@@ -21,13 +21,19 @@ import mindustry.mod.Plugin;
 import mindustry.net.Administration.ActionType;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.ContinuousLiquidTurretBuild;
+import mindustry.world.blocks.defense.turrets.LiquidTurret.LiquidTurretBuild;
 import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
 import mindustry.world.blocks.production.Drill;
 import useful.Bundle;
-
+import mindustry.world.Tile;
+import arc.util.Time;
+import mindustry.entities.bullet.BulletType;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.gen.Call;
 import static castle.CastleCosts.*;
 import static castle.CastleUtils.*;
 import static mindustry.Vars.*;
+import static castle.CastleUtils.syncBlock;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -37,16 +43,13 @@ public class Main extends Plugin {
     public static final Seq<Room> rooms = new Seq<>();
     public static final Spawns spawns = new Spawns();
 
+    public ReusableByteOutStream syncStream = new ReusableByteOutStream(512);
+    public DataOutputStream dataStream = new DataOutputStream(syncStream);
+
     public static int timer, halfHeight;
 
     @Override
     public void init() {
-        try {
-            netServer.getClass().getDeclaredField("syncStream").setAccessible(true);
-            netServer.getClass().getDeclaredField("dataStream").setAccessible(true);
-        } catch (Exception failure) {
-            throw new RuntimeException(failure);
-        }
 
         content.statusEffects().each(effect -> effect.permanent = false);
 
@@ -85,24 +88,16 @@ public class Main extends Plugin {
 
         Events.on(PlayerConnectionConfirmed.class, event -> {
             try {
-                var netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                var netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
+                ReusableByteOutStream syncStream = new ReusableByteOutStream(512);
+                DataOutputStream dataStream = new DataOutputStream(syncStream);
                 Groups.build.each(b -> {
                     if (b instanceof TurretBuild t) {
                         if (t.ammo.size > 1) {
-                            Core.app.post(() -> {
-                                try {
-                                    netServerSyncStream.reset();
-                                    netServerDataStream.writeInt(t.pos());
-                                    netServerDataStream.writeShort(t.block().id);
-                                    t.writeAll(Writes.get(netServerDataStream));
-                                    netServerDataStream.close();
-                                    Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
-                                    netServerSyncStream.reset();
-                                } catch (IOException e) {
-                                    Log.err(e);
-                                }
-                            });
+                            try {
+                                syncBlock(t, syncStream, dataStream);
+                            } catch (Exception e) {
+                                Log.err(e);
+                            }
                         }
                     }
                 });
@@ -111,15 +106,38 @@ public class Main extends Plugin {
             }
         });
 
+        // unit cant buy anything while building cuz dont shoot
         Events.on(TapEvent.class, event -> {
-            if (event.player.team().core() == null)
-                return;
             var data = PlayerData.getData(event.player);
-            if (data == null)
-                return; // Why
-
-            rooms.each(room -> room.check(event.tile) && room.canBuy(data), room -> room.buy(data));
+            if (event.player.team().core() == null || event.player.unit() == null || data == null) return;
+            Tile tapped = event.tile;
+            long[] start = { Time.millis() };
+            rooms.each(room -> room.check(tapped) && room.canBuy(data), room -> room.buy(data));
+            Time.runTask(0f, new Runnable() {
+                @Override
+                public void run() {
+                    if (event.player.unit().isShooting) {
+                        int tx = (int) event.player.unit().aimX()/8;
+                        int ty = (int) event.player.unit().aimY()/8;
+                        if (tx < 0 || ty < 0 || tx >= Vars.world.width() || ty >= Vars.world.height()) return;
+                        Tile tile = Vars.world.tile(tx, ty);
+                        var dataPress = PlayerData.getData(event.player);
+                            if (Time.millis() - start[0] >= 500) {
+                                rooms.each(room -> room.check(tile) && room.canBuy(dataPress), room -> room.buy(dataPress));
+                            }
+                            Time.runTask(0.03f, this);
+                        } 
+                    else {
+                        long elapsed = Time.millis() - start[0];
+                        if (elapsed < 500) {
+                            Time.runTask(0.5f, this);
+                        return;
+                    }}
+                    return;
+                }
+            });
         });
+
 
         Events.on(UnitDestroyEvent.class, event -> {
             if (!units.containsKey(event.unit.type))
@@ -159,16 +177,62 @@ public class Main extends Plugin {
                 if (!world.tiles.in(unit.tileX(), unit.tileY()))
                     return true;
 
-                return unit.tileY() >= halfHeight && unit.tileY() <= world.height() - halfHeight - 1;
+                if (unit.tileY() >= halfHeight && unit.tileY() <= world.height() - halfHeight - 1 ){
+                    if(!onEnemySide(unit) && unit.type == UnitTypes.poly || unit.type == UnitTypes.mega){
+                        unit.set(unit.team().core().x, unit.team().core().y);
+                        return false;
+                    }
+                    return true;
+                }
+                return false;
             }, Call::unitEnvDeath);
         }, 0f, 0.1f);
 
         Timer.schedule(() -> {
             if (isBreak())
                 return;
-
+            
             Groups.build.each(build -> {
-                try {
+                try {   
+                    if (build.block != Blocks.sublimate && build instanceof ItemTurret.ItemTurretBuild turret) {
+                        // BulletType active = turret.peekAmmo();
+                        for(int i = 0; i < turret.ammo.size; i++){
+                            if(i == 0 && turret.ammo.size > 1){
+                                turret.ammo.remove(i);
+                            } else {
+                                if (turret.ammo.get(i).amount >=10)
+                                {
+                                    turret.ammo.get(i).amount = 25; 
+                                }
+                                turret.totalAmmo = 1;
+                            }
+                            turret.update();
+                            turret.updateTile();
+                            try{
+                                syncBlock(turret,syncStream,dataStream);
+                            }catch (Exception ohno) {
+                                Log.err(ohno);
+                            }
+                        }             
+                    }  
+                    if (build instanceof LiquidTurretBuild LiqTurret) {
+                        var hasLiq = false;
+                        a: for (var dx = -2; dx <= 2; dx++) for (var dy = -2; dy <= 2; dy++) {
+                            var build2 = Vars.world.build(LiqTurret.tileX() + dx, LiqTurret.tileY() + dy);
+                            if (build2 == null) continue;
+                            if (!build2.block().hasLiquids) continue;
+                            if (build2.liquids().current() == LiqTurret.liquids().current()) continue;
+                            hasLiq = true;
+                            break a;
+                        }
+                        if (!hasLiq) return;
+                        LiqTurret.liquids.clear();
+                        try{
+                            syncBlock(LiqTurret,syncStream,dataStream);
+                        }catch (Exception ohno) {
+                            Log.err(ohno);
+                        }
+                    }
                     if (build.block != Blocks.sublimate) return;
                     if (build instanceof ContinuousLiquidTurretBuild subl) {
                         if (subl.liquids().current() != Liquids.ozone) return;
@@ -183,21 +247,11 @@ public class Main extends Plugin {
                         }
                         if (!hasCyan) return;
                         subl.liquids.clear();
-                        var netServerSyncStream = (ReusableByteOutStream) (netServer.getClass().getDeclaredField("syncStream").get(netServer));
-                        var netServerDataStream = (DataOutputStream) (netServer.getClass().getDeclaredField("dataStream").get(netServer));
-                        Core.app.post(() -> {
-                            try {
-                                netServerSyncStream.reset();
-                                netServerDataStream.writeInt(subl.pos());
-                                netServerDataStream.writeShort(subl.block().id);
-                                subl.writeAll(Writes.get(netServerDataStream));
-                                netServerDataStream.close();
-                                Call.blockSnapshot((short) 1, netServerSyncStream.toByteArray());
-                                netServerSyncStream.reset();
-                            } catch (IOException e) {
-                                Log.err(e);
-                            }
-                        });
+                        try{
+                            syncBlock(subl,syncStream,dataStream);
+                        }catch (Exception ohno) {
+                            Log.err(ohno);
+                        }
                     }
                 } catch (Exception ohno) {
                     throw new RuntimeException(ohno);

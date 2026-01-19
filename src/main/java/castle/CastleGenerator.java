@@ -4,6 +4,7 @@ import arc.func.Prov;
 import arc.math.Mathf;
 import arc.math.geom.Point2;
 import arc.struct.Seq;
+import arc.util.Time;
 import mindustry.content.*;
 import mindustry.game.Team;
 import mindustry.gen.Call;
@@ -14,15 +15,23 @@ import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.distribution.Sorter.SorterBuild;
 import mindustry.world.blocks.environment.SpawnBlock;
 import mindustry.world.blocks.storage.CoreBlock;
-import useful.Bundle;
-
+import mindustry.world.blocks.logic.LogicBlock.LogicBuild;
+import mindustry.world.blocks.logic.LogicBlock.LogicLink;
+import static mindustry.Vars.*;
+import castle.CastleRooms.BlockRoom;
+import castle.CastleRooms.EffectRoom;
+import castle.CastleRooms.MinerRoom;
+import castle.CastleRooms.Room;
+import castle.CastleRooms.UnitRoom;
 import static castle.CastleRooms.*;
 import static castle.CastleUtils.drill;
 import static castle.CastleUtils.refreshMeta;
 import static castle.CastleUtils.revealedUnits;
 import static castle.CastleUtils.shopFloor;
 import static castle.Main.*;
-import static mindustry.Vars.*;
+import useful.Bundle;
+
+
 
 public class CastleGenerator {
     public static final int unitLimitX = 5, unitLimitY = 3, effectLimitX = 4;
@@ -93,6 +102,38 @@ public class CastleGenerator {
                 var drill = drill(c);
                 addRoom(x, y, drill.size,
                         () -> new MinerRoom(drill, sorter.config(), CastleCosts.items.get(sorter.config())));
+            }
+
+            if (tile.build instanceof LogicBuild logicBlock) {
+
+                var code = logicBlock.code;
+                var linksProcessor = logicBlock.links.copy();
+                var tileEdit = world.tile(x, y);
+                var tileNew = world.tile(x, world.height() - y);
+
+                tileEdit.setNet(tile.block(), tile.build.team(), 0);
+                tileNew.setNet(tile.block(), Team.blue, 180);
+
+                int yCoordinate = (int) tile.build.getY()/8;
+                Seq<LogicLink> mirroredLinks = new Seq<>();
+
+                for (LogicLink link : logicBlock.links) {
+                    int xLink = link.x;
+                    int yLink = world.height() - yCoordinate -(link.y - yCoordinate);
+                    LogicLink mirrored = new LogicLink(xLink, yLink, link.name, link.valid);
+                    mirroredLinks.add(mirrored);
+                }
+
+                if (tileEdit.build instanceof LogicBuild logicBlockEdit) {
+                    logicBlockEdit.updateCode(code);
+                    logicBlockEdit.links.set(linksProcessor);
+                    logicBlockEdit.updateTile();
+                }
+                if (tileNew.build instanceof LogicBuild newLogicBlock) {
+                    newLogicBlock.updateCode(code);
+                    newLogicBlock.links.set(mirroredLinks);
+                    newLogicBlock.updateTile();
+                }
             }
 
             if (tile.overlay() instanceof SpawnBlock)
@@ -210,7 +251,7 @@ public class CastleGenerator {
                 spawn = get(team).cpy().add(Mathf.range(tilesize), Mathf.range(tilesize));
             } while (!validFor(type, spawn));
             var prevLimit = state.rules.unitCap;
-            state.rules.unitCap = Integer.MAX_VALUE;
+            state.rules.unitCap = 500;
             var unit = type.spawn(team, spawn.x * tilesize, spawn.y * tilesize);
             state.rules.unitCap = prevLimit;
             Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", summonner.coloredName());

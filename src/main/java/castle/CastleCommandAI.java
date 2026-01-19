@@ -16,7 +16,10 @@ public class CastleCommandAI extends CommandAI {
         if (!hasCommand() && onEnemySide(unit)) {
              target = attackTarget = unit.closestEnemyCore();
 
-            if (unit.type.flying) moveTo(target, unit.type.range * 0.8f);
+            if (unit.type.flying){
+                if (unit.health>unit.type.health*0.5) moveTo(target, unit.type.range * 0.8f);
+                else moveTo(target, 0f);
+            }
             else pathfind(Pathfinder.fieldCore);
 
             if (!invalid(target) && unit.type.circleTarget)
