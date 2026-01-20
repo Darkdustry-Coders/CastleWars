@@ -27,8 +27,8 @@ public class PlayerData {
 
     public void update() {
         if (player.con.isConnected()) Bundle.setHud(player, "ui.hud",
-                money >= 0 ? "lime" : "scarlet", money,
-                income >= 0 ? "lime" : "scarlet", income, 
+                "lightgray", money,
+                "scarlet", income, 
                 team().getUnitCountAttack(), team().getUnitCountAttack() < attackCap ? "lightgray" : "#be2537ff",
                 team().getUnitCountDefense(),
                 team().getUnitCountDefense() < defenseCap ? "lightgray" : "#1659a7ff",
