@@ -244,8 +244,8 @@ public class CastleRooms {
                 spawnUnit(data, airSpawnX, airSpawnY, type, true);
             }
             else if (data.player.core() != null) {
-                var core = data.player.core();
-                spawnUnit(data, core.x/8, core.y, type, false);
+                // idk but somehow fixed other shit
+                spawnUnit(data, data.player.core().x/8, data.player.core().y, type, false);
             };
         }
 
