@@ -202,16 +202,11 @@ public class Main extends Plugin {
                             } else {
                                 if (turret.ammo.get(i).amount >=10)
                                 {
-                                    turret.ammo.get(i).amount = 25; 
+                                    turret.update();
+                                    turret.updateTile();
+                                    syncBlock(turret,syncStream,dataStream);
                                 }
                                 turret.totalAmmo = 1;
-                            }
-                            turret.update();
-                            turret.updateTile();
-                            try{
-                                syncBlock(turret,syncStream,dataStream);
-                            }catch (Exception ohno) {
-                                Log.err(ohno);
                             }
                         }             
                     }  

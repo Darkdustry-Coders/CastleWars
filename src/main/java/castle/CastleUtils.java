@@ -68,6 +68,15 @@ public class CastleUtils {
         platformSource.clear();
         shopFloor = Blocks.space.asFloor();
 
+        boatSpawnX = -1;
+        boatSpawnY = -1;
+        landSpawnX = -1;
+        landSpawnY = -1;
+        airSpawnX = -1;
+        airSpawnY = -1;
+        defenseCap = 150;
+        attackCap = 350;
+
         for (var objective : state.rules.objectives.all) {
             if (objective instanceof FlagObjective flag) {
                 if (any((flag.details + "\n" + flag.text + "\n" + flag.flag).split("\n"), "noplatform"))
