@@ -159,13 +159,6 @@ public class Main extends Plugin {
             TeamData.datas.clear();
 
             timer = 45 * 60;
-
-            boatSpawnX = -1;
-            boatSpawnY = -1;
-            landSpawnX = -1;
-            landSpawnY = -1;
-            airSpawnX = -1;
-            airSpawnY = -1;
         });
 
         Events.on(WorldLoadEndEvent.class, event -> CastleGenerator.generate());
