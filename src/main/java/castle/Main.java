@@ -43,8 +43,8 @@ public class Main extends Plugin {
     public static final Seq<Room> rooms = new Seq<>();
     public static final Spawns spawns = new Spawns();
 
-    public ReusableByteOutStream syncStream = new ReusableByteOutStream(512);
-    public DataOutputStream dataStream = new DataOutputStream(syncStream);
+    public static ReusableByteOutStream syncStream = new ReusableByteOutStream(512);
+    public static DataOutputStream dataStream = new DataOutputStream(syncStream);
 
     public static int timer, halfHeight;
 
@@ -122,14 +122,14 @@ public class Main extends Plugin {
                         if (tx < 0 || ty < 0 || tx >= Vars.world.width() || ty >= Vars.world.height()) return;
                         Tile tile = Vars.world.tile(tx, ty);
                         var dataPress = PlayerData.getData(event.player);
-                            if (Time.millis() - start[0] >= 500) {
+                            if (Time.millis() - start[0] >= 1500) {
                                 rooms.each(room -> room.check(tile) && room.canBuy(dataPress), room -> room.buy(dataPress));
                             }
                             Time.runTask(0.03f, this);
                         } 
                     else {
                         long elapsed = Time.millis() - start[0];
-                        if (elapsed < 500) {
+                        if (elapsed < 1500) {
                             Time.runTask(0.5f, this);
                         return;
                     }}
