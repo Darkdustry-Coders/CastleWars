@@ -94,7 +94,7 @@ public class Main extends Plugin {
                     if (b instanceof TurretBuild t) {
                         if (t.ammo.size > 1) {
                             try {
-                                syncBlock(t, syncStream, dataStream);
+                                syncBlock(t);
                             } catch (Exception e) {
                                 Log.err(e);
                             }
@@ -204,7 +204,7 @@ public class Main extends Plugin {
                                 {
                                     turret.update();
                                     turret.updateTile();
-                                    syncBlock(turret,syncStream,dataStream);
+                                    syncBlock(turret);
                                 }
                                 turret.totalAmmo = 1;
                             }
@@ -223,7 +223,7 @@ public class Main extends Plugin {
                         if (!hasLiq) return;
                         LiqTurret.liquids.clear();
                         try{
-                            syncBlock(LiqTurret,syncStream,dataStream);
+                            syncBlock(LiqTurret);
                         }catch (Exception ohno) {
                             Log.err(ohno);
                         }
@@ -243,7 +243,7 @@ public class Main extends Plugin {
                         if (!hasCyan) return;
                         subl.liquids.clear();
                         try{
-                            syncBlock(subl,syncStream,dataStream);
+                            syncBlock(subl);
                         }catch (Exception ohno) {
                             Log.err(ohno);
                         }

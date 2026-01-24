@@ -129,12 +129,13 @@ public class CastleGenerator {
                     logicBlockEdit.updateCode(code);
                     logicBlockEdit.links.set(linksProcessor);
                     logicBlockEdit.updateTile();
-                    syncBlock(tileEdit.build, syncStream, dataStream);
+                    syncBlock(tileEdit.build);
                 }
                 if (tileNew.build instanceof LogicBuild newLogicBlock) {
                     newLogicBlock.updateCode(code);
                     newLogicBlock.links.set(mirroredLinks);
                     newLogicBlock.updateTile();
+                    syncBlock(tileNew.build);
                 }
             }
 
