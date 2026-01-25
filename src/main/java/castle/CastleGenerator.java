@@ -29,9 +29,8 @@ import static castle.CastleUtils.refreshMeta;
 import static castle.CastleUtils.revealedUnits;
 import static castle.CastleUtils.shopFloor;
 import static castle.Main.*;
+import static castle.CastleUtils.syncBlock;
 import useful.Bundle;
-
-
 
 public class CastleGenerator {
     public static final int unitLimitX = 5, unitLimitY = 3, effectLimitX = 4;
@@ -128,11 +127,13 @@ public class CastleGenerator {
                     logicBlockEdit.updateCode(code);
                     logicBlockEdit.links.set(linksProcessor);
                     logicBlockEdit.updateTile();
+                    syncBlock(tileEdit.build);
                 }
                 if (tileNew.build instanceof LogicBuild newLogicBlock) {
                     newLogicBlock.updateCode(code);
                     newLogicBlock.links.set(mirroredLinks);
                     newLogicBlock.updateTile();
+                    syncBlock(tileNew.build);
                 }
             }
 
