@@ -29,8 +29,6 @@ import static castle.CastleUtils.refreshMeta;
 import static castle.CastleUtils.revealedUnits;
 import static castle.CastleUtils.shopFloor;
 import static castle.Main.*;
-import static castle.Main.syncStream;
-import static castle.Main.dataStream;
 import static castle.CastleUtils.syncBlock;
 import useful.Bundle;
 
