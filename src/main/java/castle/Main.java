@@ -43,8 +43,8 @@ public class Main extends Plugin {
     public static final Seq<Room> rooms = new Seq<>();
     public static final Spawns spawns = new Spawns();
 
-    public ReusableByteOutStream syncStream = new ReusableByteOutStream(512);
-    public DataOutputStream dataStream = new DataOutputStream(syncStream);
+    public static ReusableByteOutStream syncStream = new ReusableByteOutStream(512);
+    public static DataOutputStream dataStream = new DataOutputStream(syncStream);
 
     public static int timer, halfHeight;
 
@@ -94,7 +94,7 @@ public class Main extends Plugin {
                     if (b instanceof TurretBuild t) {
                         if (t.ammo.size > 1) {
                             try {
-                                syncBlock(t, syncStream, dataStream);
+                                syncBlock(t);
                             } catch (Exception e) {
                                 Log.err(e);
                             }
@@ -122,14 +122,14 @@ public class Main extends Plugin {
                         if (tx < 0 || ty < 0 || tx >= Vars.world.width() || ty >= Vars.world.height()) return;
                         Tile tile = Vars.world.tile(tx, ty);
                         var dataPress = PlayerData.getData(event.player);
-                            if (Time.millis() - start[0] >= 500) {
+                            if (Time.millis() - start[0] >= 1500) {
                                 rooms.each(room -> room.check(tile) && room.canBuy(dataPress), room -> room.buy(dataPress));
                             }
                             Time.runTask(0.03f, this);
                         } 
                     else {
                         long elapsed = Time.millis() - start[0];
-                        if (elapsed < 500) {
+                        if (elapsed < 1500) {
                             Time.runTask(0.5f, this);
                         return;
                     }}
@@ -204,7 +204,7 @@ public class Main extends Plugin {
                                 {
                                     turret.update();
                                     turret.updateTile();
-                                    syncBlock(turret,syncStream,dataStream);
+                                    syncBlock(turret);
                                 }
                                 turret.totalAmmo = 1;
                             }
@@ -223,7 +223,7 @@ public class Main extends Plugin {
                         if (!hasLiq) return;
                         LiqTurret.liquids.clear();
                         try{
-                            syncBlock(LiqTurret,syncStream,dataStream);
+                            syncBlock(LiqTurret);
                         }catch (Exception ohno) {
                             Log.err(ohno);
                         }
@@ -243,7 +243,7 @@ public class Main extends Plugin {
                         if (!hasCyan) return;
                         subl.liquids.clear();
                         try{
-                            syncBlock(subl,syncStream,dataStream);
+                            syncBlock(subl);
                         }catch (Exception ohno) {
                             Log.err(ohno);
                         }

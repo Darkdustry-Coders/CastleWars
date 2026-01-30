@@ -33,6 +33,8 @@ import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Nullable;
 
+import static castle.Main.syncStream;
+import static castle.Main.dataStream;
 public class CastleUtils {
     public static Seq<UnitType> revealedUnits = new Seq<>();
     public static boolean generatePlatforms = true;
@@ -170,7 +172,7 @@ public class CastleUtils {
         }
     }
 
-    public static void syncBlock(Building block_sync, ReusableByteOutStream syncStream, DataOutputStream dataStream){
+    public static void syncBlock(Building block_sync){
         try{
             final Building block = block_sync; 
             Core.app.post(() -> {
