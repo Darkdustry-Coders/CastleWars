@@ -2,9 +2,9 @@ package castle;
 
 import arc.struct.Seq;
 import arc.util.Timer;
+
 import mindustry.game.Team;
 import mindustry.Vars;
-import mindustry.game.Team;
 public class TeamData {
     public static final Seq<TeamData> datas = new Seq<>();
 

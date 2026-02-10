@@ -6,10 +6,10 @@ import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Timer;
 import arc.util.io.ReusableByteOutStream;
-import arc.util.io.Writes;
-import castle.CastleGenerator.Spawns;
-import castle.CastleRooms.Room;
+import arc.util.Time;
+
 import mindustry.Vars;
+import mindustry.world.Tile;
 import mindustry.ai.ControlPathfinder;
 import mindustry.content.Blocks;
 import mindustry.content.Liquids;
@@ -22,21 +22,21 @@ import mindustry.net.Administration.ActionType;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.ContinuousLiquidTurretBuild;
 import mindustry.world.blocks.defense.turrets.LiquidTurret.LiquidTurretBuild;
-import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
 import mindustry.world.blocks.production.Drill;
-import useful.Bundle;
-import mindustry.world.Tile;
-import arc.util.Time;
-import mindustry.entities.bullet.BulletType;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.gen.Call;
+import static mindustry.Vars.*;
+
 import static castle.CastleCosts.*;
 import static castle.CastleUtils.*;
-import static mindustry.Vars.*;
 import static castle.CastleUtils.syncBlock;
+import static castle.CastleUtils.withinPointDef;
+import castle.CastleGenerator.Spawns;
+import castle.CastleRooms.Room;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
+
+import useful.Bundle;
 
 public class Main extends Plugin {
 
@@ -67,10 +67,12 @@ public class Main extends Plugin {
         CastleCosts.load();
 
         netServer.admins.addActionFilter(action -> {
-            if (action.tile == null)
-                return true;
-            if (spawns.within(action.tile))
+            if (action.tile == null) return true;
+            if(spawns.within(action.tile) ||
+                withinPointDef(action.tile,boatSpawn,16) ||
+                withinPointDef(action.tile,landSpawn,16))
                 return false;
+
 
             return !((action.tile.block() instanceof Turret && action.type != ActionType.depositItem)
                     || action.tile.block() instanceof Drill);
@@ -88,17 +90,9 @@ public class Main extends Plugin {
 
         Events.on(PlayerConnectionConfirmed.class, event -> {
             try {
-                ReusableByteOutStream syncStream = new ReusableByteOutStream(512);
-                DataOutputStream dataStream = new DataOutputStream(syncStream);
                 Groups.build.each(b -> {
-                    if (b instanceof TurretBuild t) {
-                        if (t.ammo.size > 1) {
-                            try {
-                                syncBlock(t);
-                            } catch (Exception e) {
-                                Log.err(e);
-                            }
-                        }
+                    if(b instanceof Building){
+                        syncBlock(b);
                     }
                 });
             } catch (Exception ohno) {

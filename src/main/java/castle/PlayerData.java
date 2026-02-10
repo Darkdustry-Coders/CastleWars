@@ -3,11 +3,12 @@ package castle;
 import arc.struct.Seq;
 import mindustry.core.UI;
 import mindustry.gen.Player;
-import useful.Bundle;
+
 import static castle.CastleUtils.defenseCap;
 import static castle.CastleUtils.attackCap;
 import static castle.Main.*;
-import static mindustry.Vars.*;
+
+import useful.Bundle;
 
 public class PlayerData {
 
