@@ -29,13 +29,13 @@ public class PlayerData {
 
     public void update() {
         if (!player.con.isConnected() && player.team() == null) return;
-        String HudText = "";
+        String hudText = "";
         String economyText = Bundle.format("ui.hudPart.economy",player,
                 money >= 0 ? "lime" : "scarlet", money,
                 income >= 0 ? "lime" : "scarlet", income);
         String timeText= Bundle.format("ui.hudPart.time",player,
                 UI.formatTime(timer * 60f));
-        HudText += economyText;
+        hudText += economyText;
         String unitCapText = Bundle.format("ui.hudPart.unitCap", player,
                 team().getUnitCount() < state.rules.unitCap ? "lightgray" : "scarlet",
                 team().getUnitCount(), state.rules.unitCap
@@ -48,12 +48,12 @@ public class PlayerData {
                 team().getUnitCountDefense() < defenseCap ? "lightgray" : "#1659a7ff",
                 team().getUnitCountDefense(), defenseCap
         );
-        if(isDivideCap==0) HudText += unitCapText;
-        if(unitCapType==1) HudText +=  unitCapText + unitCapDefense;
-        if(unitCapType==2) HudText +=  unitCapText + unitCapAttack;
-        if(unitCapType==3) HudText += unitCapDefense + unitCapAttack;
-        HudText += timeText;
-        Call.setHudText(player.con, HudText);
+        if(isDivideCap==0) hudText += unitCapText;
+        if(unitCapType==1) hudText +=  unitCapText + unitCapDefense;
+        if(unitCapType==2) hudText +=  unitCapText + unitCapAttack;
+        if(unitCapType==3) hudText += unitCapDefense + unitCapAttack;
+        hudText += timeText;
+        Call.setHudText(player.con, hudText);
     }
 
     public void updateMoney() {

@@ -75,8 +75,9 @@ public class CastleUtils {
         airSpawn = new Point2(-1, -1);
 
         unitCapType = 0;
-        defenseCap = 0;
+        defenseCap = 100;
         attackCap = 0;
+        isDivideCap =1;
 
         for (var objective : state.rules.objectives.all) {
             if (objective instanceof FlagObjective flag) {
