@@ -19,13 +19,13 @@ import mindustry.world.blocks.logic.LogicBlock.LogicBuild;
 import mindustry.world.blocks.logic.LogicBlock.LogicLink;
 import static mindustry.Vars.*;
 
-import static castle.CastleUtils.*;
 import castle.CastleRooms.BlockRoom;
 import castle.CastleRooms.EffectRoom;
 import castle.CastleRooms.MinerRoom;
 import castle.CastleRooms.Room;
 import castle.CastleRooms.UnitRoom;
 import static castle.Main.*;
+import static castle.CastleUtils.*;
 
 import useful.Bundle;
 

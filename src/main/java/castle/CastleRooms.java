@@ -183,7 +183,7 @@ public class CastleRooms {
         }
 
         private void spawnUnit(PlayerData data, int x, int y, UnitType type) {
-            int yPosition = -1;
+            int yPosition = -10;
             int iterations = 0;
             if(x<0) {
                 x = (int) data.player.core().x + 48;
@@ -194,8 +194,8 @@ public class CastleRooms {
                 y = (data.team().team == Team.blue ? Vars.world.height() - y : y) * 8;
             }
             Point2 coordinate = new Point2(x, yPosition);
-            while(!validForSpawn(type,coordinate) && iterations < 10){
-                yPosition = y + Mathf.range(48);
+            while(!validForSpawn(type,coordinate) && iterations < 48){
+                yPosition = y + iterations - 24;
                 coordinate = new Point2(x, yPosition);
                 iterations++;
             }
@@ -225,14 +225,16 @@ public class CastleRooms {
         @Override
         public boolean canBuy(PlayerData data) {
             if (!super.canBuy(data)) return false;
+            if(defenseCap == 0) defenseCap = (short) Vars.state.rules.unitCap;
+            if(attackCap == 0) attackCap = (short) Vars.state.rules.unitCap;
             if (attack){
-                if(data.team().getUnitCountAttack()>=attackCap) {
+                if(data.team().getUnitCountAttack()>=attackCap && data.team().getUnitCountAttack()>=Vars.state.rules.unitCap) {
                     Bundle.announce(data.player, "rooms.unit.limit");
                     return false;
                 }
             }
             else{
-                if(data.team().getUnitCountDefense()>=defenseCap){ 
+                if(data.team().getUnitCountDefense()>=defenseCap && data.team().getUnitCountAttack()>=Vars.state.rules.unitCap){
                     Bundle.announce(data.player, "rooms.unit.limit");
                     return false;
                 }

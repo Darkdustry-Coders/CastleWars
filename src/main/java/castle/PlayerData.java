@@ -2,10 +2,11 @@ package castle;
 
 import arc.struct.Seq;
 import mindustry.core.UI;
+import mindustry.gen.Call;
 import mindustry.gen.Player;
+import static mindustry.Vars.*;
 
-import static castle.CastleUtils.defenseCap;
-import static castle.CastleUtils.attackCap;
+import static castle.CastleUtils.*;
 import static castle.Main.*;
 
 import useful.Bundle;
@@ -27,13 +28,32 @@ public class PlayerData {
     }
 
     public void update() {
-        if (player.con.isConnected()) Bundle.setHud(player, "ui.hud",
+        if (!player.con.isConnected() && player.team() == null) return;
+        String HudText = "";
+        String economyText = Bundle.format("ui.hudPart.economy",player,
                 money >= 0 ? "lime" : "scarlet", money,
-                income >= 0 ? "lime" : "scarlet", income, 
-                team().getUnitCountAttack(), team().getUnitCountAttack() < attackCap ? "lightgray" : "#be2537ff",
-                team().getUnitCountDefense(),
+                income >= 0 ? "lime" : "scarlet", income);
+        String timeText= Bundle.format("ui.hudPart.time",player,
+                UI.formatTime(timer * 60f));
+        HudText += economyText;
+        String unitCapText = Bundle.format("ui.hudPart.unitCap", player,
+                team().getUnitCount() < state.rules.unitCap ? "lightgray" : "scarlet",
+                team().getUnitCount(), state.rules.unitCap
+        );
+        String unitCapAttack = Bundle.format("ui.hudPart.unitCapAttack", player,
+                team().getUnitCountAttack() < attackCap ? "lightgray" : "#be2537ff",
+                team().getUnitCountAttack(), attackCap
+        );
+        String unitCapDefense = Bundle.format("ui.hudPart.unitCapDefense", player,
                 team().getUnitCountDefense() < defenseCap ? "lightgray" : "#1659a7ff",
-            attackCap,defenseCap, UI.formatTime(timer * 60f));
+                team().getUnitCountDefense(), defenseCap
+        );
+        if(isDivideCap==0) HudText += unitCapText;
+        if(unitCapType==1) HudText +=  unitCapText + unitCapDefense;
+        if(unitCapType==2) HudText +=  unitCapText + unitCapAttack;
+        if(unitCapType==3) HudText += unitCapDefense + unitCapAttack;
+        HudText += timeText;
+        Call.setHudText(player.con, HudText);
     }
 
     public void updateMoney() {

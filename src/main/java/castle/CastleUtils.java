@@ -44,8 +44,11 @@ public class CastleUtils {
     public static Point2 landSpawn = new Point2(-1, -1);
     public static Point2 airSpawn = new Point2(-1, -1);
 
-    public static short defenseCap = 150;
-    public static short attackCap = 350;
+    public static int isDivideCap = 1;
+    public static int unitCapType = 0;
+
+    public static short defenseCap = 0;
+    public static short attackCap = 0;
 
     public static boolean any(String[] array, String value) {
         for (var test : array)
@@ -70,8 +73,10 @@ public class CastleUtils {
         boatSpawn = new Point2(-1, -1);
         landSpawn = new Point2(-1, -1);
         airSpawn = new Point2(-1, -1);
-        defenseCap = 150;
-        attackCap = 350;
+
+        unitCapType = 0;
+        defenseCap = 0;
+        attackCap = 0;
 
         for (var objective : state.rules.objectives.all) {
             if (objective instanceof FlagObjective flag) {
@@ -147,6 +152,32 @@ public class CastleUtils {
                         attackCap = 350;
                     }
                 }
+                if (flagName.startsWith("isdividecap ")) {
+                    try {
+                        String[] args = flagName.split(" ");
+                        isDivideCap = Integer.parseInt(args[1]);
+                    } catch (Exception error) {
+                        Log.warn("Failed to set is divided Cap!\n" + error);
+                        isDivideCap = 1;
+                    }
+                }
+            }
+        }
+        if(isDivideCap == 0) unitCapType = 0;
+        else{
+            if (attackCap > 0 && defenseCap > 0) {
+                unitCapType = 3;
+            }
+            else if (attackCap > 0) {
+                unitCapType = 2;
+            }
+            else if (defenseCap > 0) {
+                unitCapType = 1;
+            }
+            else{
+                attackCap = 400;
+                defenseCap = 100;
+                unitCapType = 3;
             }
         }
 
@@ -162,16 +193,16 @@ public class CastleUtils {
         try{
             final Building block = block_sync; 
             Core.app.post(() -> {
-                        try {
-                            syncStream.reset();
-                            dataStream.writeInt(block.pos());
-                            dataStream.writeShort(block.block().id);
-                            block.writeAll(Writes.get(dataStream));
-                            dataStream.close();
-                            Call.blockSnapshot((short) 1, syncStream.toByteArray());
-                            syncStream.reset();
-                        } catch (Exception ohshit) {
-                            throw new RuntimeException(ohshit);
+                try {
+                    syncStream.reset();
+                    dataStream.writeInt(block.pos());
+                    dataStream.writeShort(block.block().id);
+                    block.writeAll(Writes.get(dataStream));
+                    dataStream.close();
+                    Call.blockSnapshot((short) 1, syncStream.toByteArray());
+                    syncStream.reset();
+                } catch (Exception ohshit) {
+                    throw new RuntimeException(ohshit);
             }});
         }catch(Exception e){
             e.printStackTrace();
@@ -179,7 +210,7 @@ public class CastleUtils {
     }
 
     public static boolean validForSpawn(UnitType type, Point2 pos) {
-        var tile = world.tile(pos.x, pos.y);
+        var tile = world.tile(pos.x/8, pos.y/8);
         // TODO: Check if tile is in death zone.
         return tile != null &&
                 (type.flying || tile.block().isAir()) &&

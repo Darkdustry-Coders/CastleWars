@@ -105,29 +105,19 @@ public class Main extends Plugin {
             var data = PlayerData.getData(event.player);
             if (event.player.team().core() == null || event.player.unit() == null || data == null) return;
             Tile tapped = event.tile;
-            long[] start = { Time.millis() };
             rooms.each(room -> room.check(tapped) && room.canBuy(data), room -> room.buy(data));
-            Time.runTask(0f, new Runnable() {
+            Time.runTask(120, new Runnable() {
                 @Override
                 public void run() {
                     if (event.player.unit().isShooting) {
-                        int tx = (int) event.player.unit().aimX()/8;
-                        int ty = (int) event.player.unit().aimY()/8;
-                        if (tx < 0 || ty < 0 || tx >= Vars.world.width() || ty >= Vars.world.height()) return;
-                        Tile tile = Vars.world.tile(tx, ty);
-                        var dataPress = PlayerData.getData(event.player);
-                            if (Time.millis() - start[0] >= 1500) {
-                                rooms.each(room -> room.check(tile) && room.canBuy(dataPress), room -> room.buy(dataPress));
-                            }
-                            Time.runTask(0.03f, this);
-                        } 
-                    else {
-                        long elapsed = Time.millis() - start[0];
-                        if (elapsed < 1500) {
-                            Time.runTask(0.5f, this);
-                        return;
-                    }}
-                    return;
+                        int shootX = (int) event.player.unit().aimX()/8;
+                        int shootY = (int) event.player.unit().aimY()/8;
+                        var data = PlayerData.getData(event.player);
+                        if (shootX < 0 || shootY < 0 || shootX >= Vars.world.width() || shootY >= Vars.world.height()) return;
+                        Tile tile = Vars.world.tile(shootX, shootY);
+                        rooms.each(room -> room.check(tile) && room.canBuy(data), room -> room.buy(data));
+                        Time.runTask(0.03f, this);
+                    }
                 }
             });
         });
@@ -193,11 +183,12 @@ public class Main extends Plugin {
                         for(int i = 0; i < turret.ammo.size; i++){
                             if(i == 0 && turret.ammo.size > 1){
                                 turret.ammo.remove(i);
-                            } else {
-                                if (turret.ammo.get(i).amount >=10)
-                                {
+                            }
+                            else {
+                                if (turret.ammo.get(i).amount >=10) {
                                     turret.update();
                                     turret.updateTile();
+                                    turret.ammo.get(i).amount = 10;
                                     syncBlock(turret);
                                 }
                                 turret.totalAmmo = 1;
