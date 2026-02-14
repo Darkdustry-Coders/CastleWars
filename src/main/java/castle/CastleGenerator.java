@@ -105,7 +105,7 @@ public class CastleGenerator {
                 var code = logicBlock.code;
                 var linksProcessor = logicBlock.links.copy();
                 var tileEdit = world.tile(x, y);
-                var tileNew = world.tile(x, world.height() - y);
+                var tileNew = world.tile(x, world.height() - y-1);
 
                 tileEdit.setNet(tile.block(), tile.build.team(), 0);
                 tileNew.setNet(tile.block(), Team.blue, 180);
