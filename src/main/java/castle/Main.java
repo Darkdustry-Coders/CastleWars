@@ -185,10 +185,10 @@ public class Main extends Plugin {
                                 turret.ammo.remove(i);
                             }
                             else {
-                                if (turret.ammo.get(i).amount >=10) {
+                                if (turret.ammo.get(i).amount >25) {
                                     turret.update();
                                     turret.updateTile();
-                                    turret.ammo.get(i).amount = 10;
+                                    turret.ammo.get(i).amount = 25;
                                     syncBlock(turret);
                                 }
                                 turret.totalAmmo = 1;
