@@ -197,10 +197,16 @@ public class Main extends Plugin {
                     }  
                     if (build instanceof LiquidTurretBuild LiqTurret) {
                         var hasLiq = false;
-                        a: for (var dx = -2; dx <= 2; dx++) for (var dy = -2; dy <= 2; dy++) {
+                        int minX = -2;
+                        int minY = -2;
+                        if(LiqTurret.hitSize() == 16){
+                            minX = -1;
+                            minY = -1;
+                        }
+                        a: for (var dx = minX; dx <= 2; dx++) for (var dy = minY; dy <= 2; dy++) {
                             var build2 = Vars.world.build(LiqTurret.tileX() + dx, LiqTurret.tileY() + dy);
                             if (build2 == null) continue;
-                            if (!build2.block().hasLiquids && build2.liquids().current() != null) continue;
+                            if (!build2.block().hasLiquids || !build2.block().outputsLiquid) continue;
                             if (build2.liquids().current() == LiqTurret.liquids().current()) continue;
                             hasLiq = true;
                             break a;
