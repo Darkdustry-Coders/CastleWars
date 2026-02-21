@@ -228,13 +228,17 @@ public class CastleRooms {
             if(defenseCap == 0) defenseCap = (short) Vars.state.rules.unitCap;
             if(attackCap == 0) attackCap = (short) Vars.state.rules.unitCap;
             if (attack){
-                if(data.team().getUnitCountAttack()>=attackCap || data.team().getUnitCountAttack()>=Vars.state.rules.unitCap) {
+                if(data.team().getUnitCountAttack()>=attackCap ||
+                        data.team().getUnitCountAttack()>=Vars.state.rules.unitCap ||
+                        data.team().getUnitCount()>=Vars.state.rules.unitCap) {
                     Bundle.announce(data.player, "rooms.unit.limit");
                     return false;
                 }
             }
             else{
-                if(data.team().getUnitCountDefense()>=defenseCap || data.team().getUnitCountAttack()>=Vars.state.rules.unitCap){
+                if(data.team().getUnitCountDefense()>=defenseCap ||
+                        data.team().getUnitCountDefense()>=Vars.state.rules.unitCap ||
+                        data.team().getUnitCount()>=Vars.state.rules.unitCap){
                     Bundle.announce(data.player, "rooms.unit.limit");
                     return false;
                 }
