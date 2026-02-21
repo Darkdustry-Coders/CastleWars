@@ -200,7 +200,7 @@ public class Main extends Plugin {
                         a: for (var dx = -2; dx <= 2; dx++) for (var dy = -2; dy <= 2; dy++) {
                             var build2 = Vars.world.build(LiqTurret.tileX() + dx, LiqTurret.tileY() + dy);
                             if (build2 == null) continue;
-                            if (!build2.block().hasLiquids) continue;
+                            if (!build2.block().hasLiquids && build2.liquids().current() != null) continue;
                             if (build2.liquids().current() == LiqTurret.liquids().current()) continue;
                             hasLiq = true;
                             break a;
