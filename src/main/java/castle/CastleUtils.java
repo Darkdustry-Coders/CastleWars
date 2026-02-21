@@ -1,6 +1,12 @@
 package castle;
 
 import arc.Core;
+import arc.util.io.Writes;
+import arc.struct.Seq;
+import arc.util.Log;
+import arc.util.Nullable;
+import arc.math.geom.Point2;
+
 import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
@@ -14,6 +20,7 @@ import mindustry.type.UnitType;
 import mindustry.type.unit.ErekirUnitType;
 import mindustry.type.unit.NeoplasmUnitType;
 import mindustry.world.Block;
+import mindustry.world.Tile;
 import mindustry.world.Tiles;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.environment.Floor;
@@ -23,15 +30,7 @@ import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.Env;
 import mindustry.gen.Call;
-import arc.util.io.Writes;
-
 import static mindustry.Vars.*;
-
-import java.io.DataOutputStream;
-import arc.util.io.ReusableByteOutStream;
-import arc.struct.Seq;
-import arc.util.Log;
-import arc.util.Nullable;
 
 import static castle.Main.syncStream;
 import static castle.Main.dataStream;
@@ -41,20 +40,44 @@ public class CastleUtils {
     public static Seq<Tiles> platformSource = new Seq<>();
     public static Floor shopFloor = Blocks.space.asFloor();
 
-    public static short boatSpawnX = -1;
-    public static short boatSpawnY = -1;
-    public static short landSpawnX = -1;
-    public static short landSpawnY = -1;
-    public static short airSpawnX = -1;
-    public static short airSpawnY = -1;
-    public static short defenseCap = 150;
-    public static short attackCap = 350;
+    public static Point2 boatSpawn = new Point2(-1, -1);
+    public static Point2 landSpawn = new Point2(-1, -1);
+    public static Point2 airSpawn = new Point2(-1, -1);
+
+    public enum unitCapType {
+        NONE,
+        ATTACK_ONLY,
+        DEFENSE_ONLY,
+        BOTH
+    }
+
+    public static int isDivideCap = 1;
+    public static unitCapType capType = unitCapType.DEFENSE_ONLY;
+    public static short defenseCap = 0;
+    public static short attackCap = 0;
 
     public static boolean any(String[] array, String value) {
         for (var test : array)
             if (test.equals(value))
                 return true;
         return false;
+    }
+
+    private static unitCapType getCapType() {
+        if (isDivideCap == 0) {
+            return unitCapType.NONE;
+        }
+        boolean hasAttack = attackCap > 0;
+        boolean hasDefense = defenseCap > 0;
+        if (hasAttack && hasDefense) {
+            return unitCapType.BOTH;
+        } else if (hasAttack) {
+            return unitCapType.ATTACK_ONLY;
+        } else if (hasDefense) {
+            return unitCapType.DEFENSE_ONLY;
+        } else {
+            return unitCapType.NONE;
+        }
     }
 
     public static void refreshMeta() {
@@ -70,22 +93,22 @@ public class CastleUtils {
         platformSource.clear();
         shopFloor = Blocks.space.asFloor();
 
-        boatSpawnX = -1;
-        boatSpawnY = -1;
-        landSpawnX = -1;
-        landSpawnY = -1;
-        airSpawnX = -1;
-        airSpawnY = -1;
-        defenseCap = 150;
-        attackCap = 350;
+        boatSpawn = new Point2(-1, -1);
+        landSpawn = new Point2(-1, -1);
+        airSpawn = new Point2(-1, -1);
+
+        defenseCap = 100;
+        attackCap = 0;
+        isDivideCap =1;
 
         for (var objective : state.rules.objectives.all) {
             if (objective instanceof FlagObjective flag) {
-                if (any((flag.details + "\n" + flag.text + "\n" + flag.flag).split("\n"), "noplatform"))
+                String flagName = flag.flag.toLowerCase();
+                if (any((flag.details + "\n" + flag.text + "\n" + flagName).split("\n"), "noplatform"))
                     generatePlatforms = false;
-                if (flag.flag.startsWith("platformsource ")) {
+                if (flagName.startsWith("platformsource ")) {
                     try {
-                        String[] args = flag.flag.split(" ");
+                        String[] args = flagName.split(" ");
                         var x = Integer.valueOf(args[1]);
                         var y = Integer.valueOf(args[2]);
                         var replace = args.length < 4 ? null : content.block(args[3]).asFloor();
@@ -102,67 +125,68 @@ public class CastleUtils {
                         Log.warn("Failed to load custom platform!\n" + error);
                     }
                 }
-                if (flag.flag.startsWith("shopfloor ")) {
+                if (flagName.startsWith("shopfloor ")) {
                     try {
-                        String[] args = flag.flag.split(" ");
+                        String[] args = flagName.split(" ");
                         shopFloor = content.block(args[1]).asFloor();
                     } catch (Exception error) {
                         Log.warn("Failed to set custom shop floor!\n" + error);
                     }
                 }
-                if (flag.flag.startsWith("boatspawn ")) {
+                if (flagName.startsWith("boatspawn ")) {
                     try {
-                        String[] args = flag.flag.split(" ");
-                        boatSpawnX = Short.valueOf(args[1]);
-                        boatSpawnY = Short.valueOf(args[2]);
+                        String[] args = flagName.split(" ");
+                        boatSpawn = new Point2(Short.parseShort(args[1]), Short.parseShort(args[2]));
                     } catch (Exception error) {
                         Log.warn("Failed to set boat spawn!\n" + error);
-                        boatSpawnX = -1;
-                        boatSpawnY = -1;
                     }
                 }
-                if (flag.flag.startsWith("landspawn ")) {
+                if (flagName.startsWith("landspawn ")) {
                     try {
-                        String[] args = flag.flag.split(" ");
-                        landSpawnX = Short.valueOf(args[1]);
-                        landSpawnY = Short.valueOf(args[2]);
+                        String[] args = flagName.split(" ");
+                        landSpawn = new Point2(Short.parseShort(args[1]), Short.parseShort(args[2]));
                     } catch (Exception error) {
                         Log.warn("Failed to set land spawn!\n" + error);
-                        landSpawnX = -1;
-                        landSpawnY = -1;
                     }
                 }
-                if (flag.flag.startsWith("airspawn ")) {
+                if (flagName.startsWith("airspawn ")) {
                     try {
-                        String[] args = flag.flag.split(" ");
-                        airSpawnX = Short.valueOf(args[1]);
-                        airSpawnY = Short.valueOf(args[2]);
+                        String[] args = flagName.split(" ");
+                        airSpawn = new Point2(Short.parseShort(args[1]), Short.parseShort(args[2]));
                     } catch (Exception error) {
                         Log.warn("Failed to set air spawn!\n" + error);
-                        airSpawnX = -1;
-                        airSpawnY = -1;
                     }
                 }
-                if (flag.flag.startsWith("defenseCap ")) {
+                if (flagName.startsWith("defensecap ")) {
                     try {
-                        String[] args = flag.flag.split(" ");
+                        String[] args = flagName.split(" ");
                         defenseCap = Short.valueOf(args[1]);
                     } catch (Exception error) {
                         Log.warn("Failed to set Defense Cap!\n" + error);
                         defenseCap = 150;
                     }
                 }
-                if (flag.flag.startsWith("attackCap ")) {
+                if (flagName.startsWith("attackcap ")) {
                     try {
-                        String[] args = flag.flag.split(" ");
+                        String[] args = flagName.split(" ");
                         attackCap = Short.valueOf(args[1]);
                     } catch (Exception error) {
                         Log.warn("Failed to set Attack Cap!\n" + error);
                         attackCap = 350;
                     }
                 }
+                if (flagName.startsWith("isdividecap ")) {
+                    try {
+                        String[] args = flagName.split(" ");
+                        isDivideCap = Integer.parseInt(args[1]);
+                    } catch (Exception error) {
+                        Log.warn("Failed to set is divided Cap!\n" + error);
+                        isDivideCap = 1;
+                    }
+                }
             }
         }
+        capType = getCapType();
 
         if (platformSource.isEmpty()) {
             var newSource = new Tiles(6, 6);
@@ -176,20 +200,34 @@ public class CastleUtils {
         try{
             final Building block = block_sync; 
             Core.app.post(() -> {
-                        try {
-                            syncStream.reset();
-                            dataStream.writeInt(block.pos());
-                            dataStream.writeShort(block.block().id);
-                            block.writeAll(Writes.get(dataStream));
-                            dataStream.close();
-                            Call.blockSnapshot((short) 1, syncStream.toByteArray());
-                            syncStream.reset();
-                        } catch (Exception ohshit) {
-                            throw new RuntimeException(ohshit);
+                try {
+                    syncStream.reset();
+                    dataStream.writeInt(block.pos());
+                    dataStream.writeShort(block.block().id);
+                    block.writeAll(Writes.get(dataStream));
+                    dataStream.close();
+                    Call.blockSnapshot((short) 1, syncStream.toByteArray());
+                    syncStream.reset();
+                } catch (Exception ohshit) {
+                    throw new RuntimeException(ohshit);
             }});
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static boolean validForSpawn(UnitType type, Point2 pos) {
+        var tile = world.tile(pos.x/8, pos.y/8);
+        // TODO: Check if tile is in death zone.
+        return tile != null &&
+                (type.flying || tile.block().isAir()) &&
+                (!type.naval || tile.floor().isLiquid) &&
+                ((!type.naval && !type.flying) && tile.floor().drownTime == 0);
+    }
+
+    public static boolean withinPointDef(Tile tile, Point2 point, int distance) {
+        int ySecondPos = (Vars.world.height() - point.y);
+        return (tile.within(point.x * tilesize, point.y * tilesize, distance) || tile.within(point.x * tilesize, ySecondPos * tilesize, distance));
     }
 
     public static void applyRules(Rules rules) {

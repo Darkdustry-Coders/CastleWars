@@ -6,10 +6,10 @@ import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Timer;
 import arc.util.io.ReusableByteOutStream;
-import arc.util.io.Writes;
-import castle.CastleGenerator.Spawns;
-import castle.CastleRooms.Room;
+import arc.util.Time;
+
 import mindustry.Vars;
+import mindustry.world.Tile;
 import mindustry.ai.ControlPathfinder;
 import mindustry.content.Blocks;
 import mindustry.content.Liquids;
@@ -22,21 +22,21 @@ import mindustry.net.Administration.ActionType;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.ContinuousLiquidTurretBuild;
 import mindustry.world.blocks.defense.turrets.LiquidTurret.LiquidTurretBuild;
-import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
 import mindustry.world.blocks.production.Drill;
-import useful.Bundle;
-import mindustry.world.Tile;
-import arc.util.Time;
-import mindustry.entities.bullet.BulletType;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.gen.Call;
+import static mindustry.Vars.*;
+
 import static castle.CastleCosts.*;
 import static castle.CastleUtils.*;
-import static mindustry.Vars.*;
 import static castle.CastleUtils.syncBlock;
+import static castle.CastleUtils.withinPointDef;
+import castle.CastleGenerator.Spawns;
+import castle.CastleRooms.Room;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
+
+import useful.Bundle;
 
 public class Main extends Plugin {
 
@@ -67,10 +67,12 @@ public class Main extends Plugin {
         CastleCosts.load();
 
         netServer.admins.addActionFilter(action -> {
-            if (action.tile == null)
-                return true;
-            if (spawns.within(action.tile))
+            if (action.tile == null) return true;
+            if(spawns.within(action.tile) ||
+                withinPointDef(action.tile,boatSpawn,16) ||
+                withinPointDef(action.tile,landSpawn,16))
                 return false;
+
 
             return !((action.tile.block() instanceof Turret && action.type != ActionType.depositItem)
                     || action.tile.block() instanceof Drill);
@@ -88,17 +90,9 @@ public class Main extends Plugin {
 
         Events.on(PlayerConnectionConfirmed.class, event -> {
             try {
-                ReusableByteOutStream syncStream = new ReusableByteOutStream(512);
-                DataOutputStream dataStream = new DataOutputStream(syncStream);
                 Groups.build.each(b -> {
-                    if (b instanceof TurretBuild t) {
-                        if (t.ammo.size > 1) {
-                            try {
-                                syncBlock(t);
-                            } catch (Exception e) {
-                                Log.err(e);
-                            }
-                        }
+                    if(b instanceof Building){
+                        syncBlock(b);
                     }
                 });
             } catch (Exception ohno) {
@@ -111,29 +105,19 @@ public class Main extends Plugin {
             var data = PlayerData.getData(event.player);
             if (event.player.team().core() == null || event.player.unit() == null || data == null) return;
             Tile tapped = event.tile;
-            long[] start = { Time.millis() };
             rooms.each(room -> room.check(tapped) && room.canBuy(data), room -> room.buy(data));
-            Time.runTask(0f, new Runnable() {
+            Time.runTask(120, new Runnable() {
                 @Override
                 public void run() {
                     if (event.player.unit().isShooting) {
-                        int tx = (int) event.player.unit().aimX()/8;
-                        int ty = (int) event.player.unit().aimY()/8;
-                        if (tx < 0 || ty < 0 || tx >= Vars.world.width() || ty >= Vars.world.height()) return;
-                        Tile tile = Vars.world.tile(tx, ty);
-                        var dataPress = PlayerData.getData(event.player);
-                            if (Time.millis() - start[0] >= 1500) {
-                                rooms.each(room -> room.check(tile) && room.canBuy(dataPress), room -> room.buy(dataPress));
-                            }
-                            Time.runTask(0.03f, this);
-                        } 
-                    else {
-                        long elapsed = Time.millis() - start[0];
-                        if (elapsed < 1500) {
-                            Time.runTask(0.5f, this);
-                        return;
-                    }}
-                    return;
+                        int shootX = (int) event.player.unit().aimX()/8;
+                        int shootY = (int) event.player.unit().aimY()/8;
+                        var data = PlayerData.getData(event.player);
+                        if (shootX < 0 || shootY < 0 || shootX >= Vars.world.width() || shootY >= Vars.world.height()) return;
+                        Tile tile = Vars.world.tile(shootX, shootY);
+                        rooms.each(room -> room.check(tile) && room.canBuy(data), room -> room.buy(data));
+                        Time.runTask(0.03f, this);
+                    }
                 }
             });
         });
@@ -199,11 +183,12 @@ public class Main extends Plugin {
                         for(int i = 0; i < turret.ammo.size; i++){
                             if(i == 0 && turret.ammo.size > 1){
                                 turret.ammo.remove(i);
-                            } else {
-                                if (turret.ammo.get(i).amount >=10)
-                                {
+                            }
+                            else {
+                                if (turret.ammo.get(i).amount >25) {
                                     turret.update();
                                     turret.updateTile();
+                                    turret.ammo.get(i).amount = 25;
                                     syncBlock(turret);
                                 }
                                 turret.totalAmmo = 1;
@@ -212,10 +197,16 @@ public class Main extends Plugin {
                     }  
                     if (build instanceof LiquidTurretBuild LiqTurret) {
                         var hasLiq = false;
-                        a: for (var dx = -2; dx <= 2; dx++) for (var dy = -2; dy <= 2; dy++) {
+                        int minX = -2;
+                        int minY = -2;
+                        if(LiqTurret.hitSize() == 16){
+                            minX = -1;
+                            minY = -1;
+                        }
+                        a: for (var dx = minX; dx <= 2; dx++) for (var dy = minY; dy <= 2; dy++) {
                             var build2 = Vars.world.build(LiqTurret.tileX() + dx, LiqTurret.tileY() + dy);
                             if (build2 == null) continue;
-                            if (!build2.block().hasLiquids) continue;
+                            if (!build2.block().hasLiquids || !build2.block().outputsLiquid) continue;
                             if (build2.liquids().current() == LiqTurret.liquids().current()) continue;
                             hasLiq = true;
                             break a;

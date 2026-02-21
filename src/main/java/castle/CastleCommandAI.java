@@ -18,7 +18,7 @@ public class CastleCommandAI extends CommandAI {
 
             if (unit.type.flying){
                 if (unit.health>unit.type.health*0.5) moveTo(target, unit.type.range * 0.8f);
-                else moveTo(target, 0f);
+                else moveTo(target, 4f);
             }
             else pathfind(Pathfinder.fieldCore);
 

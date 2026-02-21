@@ -1,10 +1,9 @@
 package castle;
 
-import arc.math.geom.Point2;
-import arc.struct.Seq;
 import arc.math.Mathf;
+import arc.math.geom.Point2;
 import arc.util.*;
-import castle.CastleCosts.*;
+
 import mindustry.Vars;
 import mindustry.content.*;
 import mindustry.world.*;
@@ -12,24 +11,15 @@ import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.gen.Player;
 import mindustry.type.UnitType;
 import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.storage.CoreBlock;
-import useful.Bundle; 
-import mindustry.Vars;
 
-import static castle.CastleUtils.boatSpawnX;
-import static castle.CastleUtils.boatSpawnY;
-import static castle.CastleUtils.landSpawnX;
-import static castle.CastleUtils.landSpawnY;
-import static castle.CastleUtils.airSpawnX;
-import static castle.CastleUtils.airSpawnY;
-import static castle.CastleUtils.generatePlatforms;
-import static castle.CastleUtils.platformSource;
-import static castle.CastleUtils.defenseCap;
-import static castle.CastleUtils.attackCap;
+import castle.CastleCosts.*;
+import static castle.CastleUtils.*;
 import static castle.Main.*;
+
+import useful.Bundle;
 
 public class CastleRooms {
     public static class Room {
@@ -192,38 +182,26 @@ public class CastleRooms {
             this.income = attack ? data.income() : -data.income();
         }
 
-        private boolean validFor(UnitType type, int x,int y) {
-
-            var tile = Vars.world.tile(x, y);
-            if (tile == null ||
-            (!type.flying && !tile.block().isAir()) ||
-            (type.naval && !tile.floor().isLiquid) )
-                return false;
-            return true;
-        }
-
-        private void spawnUnit(PlayerData data, float x, float y, UnitType type, boolean core_spawn) {
-            Unit unit = null;
-            var i = 0;
-            var y_coordinate = 0.0;
-            if (core_spawn == true){
-                y_coordinate = Math.round((data.team().team == Team.blue ? Vars.world.height() - y : y) * 8 + Mathf.range(48f));
+        private void spawnUnit(PlayerData data, int x, int y, UnitType type) {
+            int yPosition = -10;
+            int iterations = 0;
+            if(x<0) {
+                x = (int) data.player.core().x + 48;
+                y = (int) data.player.core().y;
             }
-            else{
-                y_coordinate = y + Mathf.range(48f);
+            else {
+                x = x*8;
+                y = (data.team().team == Team.blue ? Vars.world.height() - y : y) * 8;
             }
-            while(i < 10 && !validFor(type,Math.round((int)x),Math.round((int)y_coordinate/8))){
-                    if (core_spawn == true){ 
-                        y_coordinate = Math.round((data.team().team == Team.blue ? Vars.world.height() - y : y) * 8 + Mathf.range(48f));
-                    }
-                    else{
-                        y_coordinate = y + Mathf.range(48f);
-                    }
-                    i++;
+            Point2 coordinate = new Point2(x, yPosition);
+            while(!validForSpawn(type,coordinate) && iterations < 48){
+                yPosition = y + iterations - 24;
+                coordinate = new Point2(x, yPosition);
+                iterations++;
             }
-            unit = type.spawn(
+            Unit unit = type.spawn(
                 data.player.team(),
-                x * 8 + 48f,Math.round(y_coordinate));
+                x,coordinate.y);
             Bundle.label(1f, unit.getX(), unit.getY(), "rooms.unit.bought", data.player.coloredName());
         }
 
@@ -232,34 +210,33 @@ public class CastleRooms {
         public void buy(PlayerData data) {
             super.buy(data);
             data.income += income;
-
             if (attack) spawns.spawn(data.player, data.player.team(), type);
-            else if ((boatSpawnX > 0 && boatSpawnY > 0) && type.naval) {
-                spawnUnit(data, boatSpawnX, boatSpawnY, type, true);
+            else if (type.naval) {
+                spawnUnit(data, boatSpawn.x, boatSpawn.y, type);
             }
-            else if ((landSpawnX > 0 && landSpawnY > 0) && !type.naval && !type.flying) {
-                spawnUnit(data, landSpawnX, landSpawnY, type, true);
+            else if (!type.naval && !type.flying) {
+                spawnUnit(data, airSpawn.x, airSpawn.y, type);
             }
-            else if ((airSpawnX > 0 && airSpawnY > 0) && type.flying) {
-                spawnUnit(data, airSpawnX, airSpawnY, type, true);
+            else if (type.flying) {
+                spawnUnit(data, landSpawn.x, landSpawn.y, type);
             }
-            else if (data.player.core() != null) {
-                // idk but somehow fixed other shit
-                spawnUnit(data, data.player.core().x/8, data.player.core().y, type, false);
-            };
         }
 
         @Override
         public boolean canBuy(PlayerData data) {
             if (!super.canBuy(data)) return false;
+            if(defenseCap == 0) defenseCap = (short) Vars.state.rules.unitCap;
+            if(attackCap == 0) attackCap = (short) Vars.state.rules.unitCap;
             if (attack){
-                if(data.team().getUnitCountAttack()>=attackCap) {
+                if(data.team().getUnitCountAttack()>=attackCap ||
+                        data.team().getUnitCount()>=Vars.state.rules.unitCap) {
                     Bundle.announce(data.player, "rooms.unit.limit");
                     return false;
                 }
             }
             else{
-                if(data.team().getUnitCountDefense()>=defenseCap){ 
+                if(data.team().getUnitCountDefense()>=defenseCap ||
+                        data.team().getUnitCount()>=Vars.state.rules.unitCap){
                     Bundle.announce(data.player, "rooms.unit.limit");
                     return false;
                 }
