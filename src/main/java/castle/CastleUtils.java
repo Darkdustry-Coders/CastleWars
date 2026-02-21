@@ -44,9 +44,15 @@ public class CastleUtils {
     public static Point2 landSpawn = new Point2(-1, -1);
     public static Point2 airSpawn = new Point2(-1, -1);
 
-    public static int isDivideCap = 1;
-    public static int unitCapType = 0;
+    public enum unitCapType {
+        NONE,
+        ATTACK_ONLY,
+        DEFENSE_ONLY,
+        BOTH
+    }
 
+    public static int isDivideCap = 1;
+    public static unitCapType capType = unitCapType.DEFENSE_ONLY;
     public static short defenseCap = 0;
     public static short attackCap = 0;
 
@@ -55,6 +61,23 @@ public class CastleUtils {
             if (test.equals(value))
                 return true;
         return false;
+    }
+
+    private static unitCapType getCapType() {
+        if (isDivideCap == 0) {
+            return unitCapType.NONE;
+        }
+        boolean hasAttack = attackCap > 0;
+        boolean hasDefense = defenseCap > 0;
+        if (hasAttack && hasDefense) {
+            return unitCapType.BOTH;
+        } else if (hasAttack) {
+            return unitCapType.ATTACK_ONLY;
+        } else if (hasDefense) {
+            return unitCapType.DEFENSE_ONLY;
+        } else {
+            return unitCapType.NONE;
+        }
     }
 
     public static void refreshMeta() {
@@ -74,7 +97,6 @@ public class CastleUtils {
         landSpawn = new Point2(-1, -1);
         airSpawn = new Point2(-1, -1);
 
-        unitCapType = 0;
         defenseCap = 100;
         attackCap = 0;
         isDivideCap =1;
@@ -164,23 +186,7 @@ public class CastleUtils {
                 }
             }
         }
-        if(isDivideCap == 0) unitCapType = 0;
-        else{
-            if (attackCap > 0 && defenseCap > 0) {
-                unitCapType = 3;
-            }
-            else if (attackCap > 0) {
-                unitCapType = 2;
-            }
-            else if (defenseCap > 0) {
-                unitCapType = 1;
-            }
-            else{
-                attackCap = 400;
-                defenseCap = 100;
-                unitCapType = 3;
-            }
-        }
+        capType = getCapType();
 
         if (platformSource.isEmpty()) {
             var newSource = new Tiles(6, 6);
@@ -215,7 +221,8 @@ public class CastleUtils {
         // TODO: Check if tile is in death zone.
         return tile != null &&
                 (type.flying || tile.block().isAir()) &&
-                (!type.naval || tile.floor().isLiquid);
+                (!type.naval || tile.floor().isLiquid) &&
+                ((!type.naval && !type.flying) && tile.floor().drownTime == 0);
     }
 
     public static boolean withinPointDef(Tile tile, Point2 point, int distance) {
