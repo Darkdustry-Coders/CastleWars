@@ -235,7 +235,7 @@ public class CastleUtils {
         return tile != null &&
                 (type.flying || tile.block().isAir()) &&
                 (!type.naval || tile.floor().isLiquid) &&
-                ((!type.naval && !type.flying) && tile.floor().drownTime == 0 && betterGroundValid == 1);
+                ((type.naval || type.flying) || tile.floor().drownTime == 0.0 || betterGroundValid != 1);
     }
 
     public static boolean withinPointDef(Tile tile, Point2 point, int distance) {
