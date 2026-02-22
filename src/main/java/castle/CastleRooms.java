@@ -193,7 +193,7 @@ public class CastleRooms {
                 x = x*8;
                 y = (data.team().team == Team.blue ? Vars.world.height() - y : y) * 8;
             }
-            Point2 coordinate = new Point2(x, yPosition);
+            Point2 coordinate = new Point2(x/8, yPosition/8);
             while(!validForSpawn(type,coordinate) && iterations < 48){
                 yPosition = y + iterations - 24;
                 coordinate = new Point2(x, yPosition);

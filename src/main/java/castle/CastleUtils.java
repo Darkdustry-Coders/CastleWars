@@ -230,7 +230,7 @@ public class CastleUtils {
     }
 
     public static boolean validForSpawn(UnitType type, Point2 pos) {
-        var tile = world.tile(pos.x/8, pos.y/8);
+        var tile = world.tile(pos.x, pos.y);
         // TODO: Check if tile is in death zone.
         return tile != null &&
             (type.flying || tile.block().isAir()) &&
