@@ -35,6 +35,9 @@ import static mindustry.Vars.*;
 import static castle.Main.syncStream;
 import static castle.Main.dataStream;
 public class CastleUtils {
+
+    private static int betterGroundValid = 0;
+
     public static Seq<UnitType> revealedUnits = new Seq<>();
     public static boolean generatePlatforms = true;
     public static Seq<Tiles> platformSource = new Seq<>();
@@ -99,7 +102,8 @@ public class CastleUtils {
 
         defenseCap = 100;
         attackCap = 0;
-        isDivideCap =1;
+        isDivideCap = 1;
+        betterGroundValid = 0;
 
         for (var objective : state.rules.objectives.all) {
             if (objective instanceof FlagObjective flag) {
@@ -184,6 +188,15 @@ public class CastleUtils {
                         isDivideCap = 1;
                     }
                 }
+                if (flagName.startsWith("bettergroundvalid ")) {
+                    try {
+                        String[] args = flagName.split(" ");
+                        betterGroundValid = Integer.parseInt(args[1]);
+                    } catch (Exception error) {
+                        Log.warn("Failed to set is divided Cap!\n" + error);
+                        betterGroundValid = 0;
+                    }
+                }
             }
         }
         capType = getCapType();
@@ -221,8 +234,8 @@ public class CastleUtils {
         // TODO: Check if tile is in death zone.
         return tile != null &&
                 (type.flying || tile.block().isAir()) &&
-                (!type.naval || tile.floor().isLiquid);
-//                ((!type.naval && !type.flying) && tile.floor().drownTime == 0) not all maps ready to this
+                (!type.naval || tile.floor().isLiquid) &&
+                ((!type.naval && !type.flying) && tile.floor().drownTime == 0 && betterGroundValid == 1);
     }
 
     public static boolean withinPointDef(Tile tile, Point2 point, int distance) {
