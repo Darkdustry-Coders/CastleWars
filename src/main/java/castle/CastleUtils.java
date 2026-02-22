@@ -83,11 +83,11 @@ public class CastleUtils {
     public static void refreshMeta() {
         revealedUnits.clear();
         if (isSerpulo()) revealedUnits.addAll(content.units()
-            .select(unit -> !unit.internal
-                && !(unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
+                .select(unit -> !unit.internal
+                        && !(unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
         if (isErekir()) revealedUnits.addAll(content.units()
-            .select(unit -> !unit.internal
-                && (unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
+                .select(unit -> !unit.internal
+                        && (unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
 
         generatePlatforms = true;
         platformSource.clear();
@@ -198,7 +198,7 @@ public class CastleUtils {
 
     public static void syncBlock(Building block_sync){
         try{
-            final Building block = block_sync; 
+            final Building block = block_sync;
             Core.app.post(() -> {
                 try {
                     syncStream.reset();
@@ -210,7 +210,7 @@ public class CastleUtils {
                     syncStream.reset();
                 } catch (Exception ohshit) {
                     throw new RuntimeException(ohshit);
-            }});
+                }});
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -221,8 +221,8 @@ public class CastleUtils {
         // TODO: Check if tile is in death zone.
         return tile != null &&
                 (type.flying || tile.block().isAir()) &&
-                (!type.naval || tile.floor().isLiquid) &&
-                ((!type.naval && !type.flying) && tile.floor().drownTime == 0);
+                (!type.naval || tile.floor().isLiquid);
+//                ((!type.naval && !type.flying) && tile.floor().drownTime == 0) not all maps ready to this
     }
 
     public static boolean withinPointDef(Tile tile, Point2 point, int distance) {
@@ -252,25 +252,25 @@ public class CastleUtils {
 
     public static boolean isSerpulo() {
         return state.rules.planet == Planets.serpulo
-            || state.rules.planet == Planets.sun
-            || state.rules.hiddenBuildItems.isEmpty()
-            || !state.rules.hasEnv(Env.scorching);
+                || state.rules.planet == Planets.sun
+                || state.rules.hiddenBuildItems.isEmpty()
+                || !state.rules.hasEnv(Env.scorching);
     }
 
     public static boolean isErekir() {
         return state.rules.planet == Planets.erekir
-            || state.rules.planet == Planets.sun
-            || state.rules.hiddenBuildItems.isEmpty()
-            || state.rules.hasEnv(Env.scorching);
+                || state.rules.planet == Planets.sun
+                || state.rules.hiddenBuildItems.isEmpty()
+                || state.rules.hasEnv(Env.scorching);
     }
 
     public static Block drill(Item item) {
         if (item == Items.lead || item == Items.copper || item == Items.titanium
-            || item == Items.metaglass || item == Items.coal || item == Items.scrap || item == Items.plastanium
-            || item == Items.surgeAlloy || item == Items.pyratite || item == Items.blastCompound
-            || item == Items.sporePod) return Blocks.laserDrill;
+                || item == Items.metaglass || item == Items.coal || item == Items.scrap || item == Items.plastanium
+                || item == Items.surgeAlloy || item == Items.pyratite || item == Items.blastCompound
+                || item == Items.sporePod) return Blocks.laserDrill;
         if (item == Items.beryllium || item == Items.tungsten || item == Items.oxide
-            || item == Items.carbide || item == Items.fissileMatter || item == Items.dormantCyst) return Blocks.impactDrill;
+                || item == Items.carbide || item == Items.fissileMatter || item == Items.dormantCyst) return Blocks.impactDrill;
 
         return state.rules.hasEnv(Env.scorching) ? Blocks.impactDrill : Blocks.laserDrill;
     }
@@ -288,6 +288,6 @@ public class CastleUtils {
 
     public static boolean onEnemySide(Teamc teamc) {
         return (teamc.team() == Team.sharded && teamc.y() > world.unitHeight() / 2f)
-            || (teamc.team() == Team.blue && teamc.y() < world.unitHeight() / 2f);
+                || (teamc.team() == Team.blue && teamc.y() < world.unitHeight() / 2f);
     }
 }
