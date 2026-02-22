@@ -193,7 +193,7 @@ public class CastleUtils {
                         String[] args = flagName.split(" ");
                         betterGroundValid = Integer.parseInt(args[1]);
                     } catch (Exception error) {
-                        Log.warn("Failed to set is divided Cap!\n" + error);
+                        Log.warn("Failed to set state of valid to spawn check!\n" + error);
                         betterGroundValid = 0;
                     }
                 }
