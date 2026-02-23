@@ -167,7 +167,7 @@ public class Main extends Plugin {
                     return true;
 
                 if (unit.tileY() >= halfHeight && unit.tileY() <= world.height() - halfHeight - 1 ){
-                    if(!onEnemySide(unit) && unit.type == UnitTypes.poly || unit.type == UnitTypes.mega){
+                    if(!onEnemySide(unit) && (unit.type == UnitTypes.poly || unit.type == UnitTypes.mega)){
                         unit.set(unit.team().core().x, unit.team().core().y);
                         return false;
                     }
