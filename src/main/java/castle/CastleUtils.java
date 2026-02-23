@@ -58,6 +58,7 @@ public class CastleUtils {
     public static unitCapType capType = unitCapType.DEFENSE_ONLY;
     public static short defenseCap = 0;
     public static short attackCap = 0;
+    public static short unitCap = 500;
 
     public static boolean any(String[] array, String value) {
         for (var test : array)
@@ -102,6 +103,7 @@ public class CastleUtils {
 
         defenseCap = 100;
         attackCap = 0;
+        unitCap = 500;
         isDivideCap = 1;
         betterGroundValid = 0;
 
@@ -179,6 +181,16 @@ public class CastleUtils {
                         attackCap = 350;
                     }
                 }
+                if (flagName.startsWith("unitcap ")) {
+                    try {
+                        String[] args = flagName.split(" ");
+                        unitCap = Short.valueOf(args[1]);
+                        if(unitCap > 500) unitCap = 500;
+                    } catch (Exception error) {
+                        Log.warn("Failed to set Unit Cap!\n" + error);
+                        unitCap = 500;
+                    }
+                }
                 if (flagName.startsWith("isdividecap ")) {
                     try {
                         String[] args = flagName.split(" ");
@@ -247,7 +259,7 @@ public class CastleUtils {
         rules.waveTimer = rules.waves = rules.waveSending = false;
         rules.pvp = rules.attackMode = rules.polygonCoreProtection = true;
 
-        rules.unitCap = 500;
+        rules.unitCap = unitCap;
         rules.unitCapVariable = false;
 
         rules.dropZoneRadius = 48f;
