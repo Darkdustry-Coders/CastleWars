@@ -106,10 +106,15 @@ public class Main extends Plugin {
             if (event.player.team().core() == null || event.player.unit() == null || data == null) return;
             Tile tapped = event.tile;
             rooms.each(room -> room.check(tapped) && room.canBuy(data), room -> room.buy(data));
-            Time.runTask(120, new Runnable() {
+            long timeRunHold = Time.millis();
+            Time.runTask(30, new Runnable() {
                 @Override
                 public void run() {
                     if (event.player.unit().isShooting) {
+                        if(Time.millis()-timeRunHold<2500) {
+                            Time.runTask(5f, this);
+                            return;
+                        }
                         int shootX = (int) event.player.unit().aimX()/8;
                         int shootY = (int) event.player.unit().aimY()/8;
                         var data = PlayerData.getData(event.player);
@@ -162,7 +167,7 @@ public class Main extends Plugin {
                     return true;
 
                 if (unit.tileY() >= halfHeight && unit.tileY() <= world.height() - halfHeight - 1 ){
-                    if(!onEnemySide(unit) && unit.type == UnitTypes.poly || unit.type == UnitTypes.mega){
+                    if(!onEnemySide(unit) && (unit.type == UnitTypes.poly || unit.type == UnitTypes.mega)){
                         unit.set(unit.team().core().x, unit.team().core().y);
                         return false;
                     }

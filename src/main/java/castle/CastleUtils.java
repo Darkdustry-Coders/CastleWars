@@ -35,6 +35,9 @@ import static mindustry.Vars.*;
 import static castle.Main.syncStream;
 import static castle.Main.dataStream;
 public class CastleUtils {
+
+    private static int betterGroundValid = 0;
+
     public static Seq<UnitType> revealedUnits = new Seq<>();
     public static boolean generatePlatforms = true;
     public static Seq<Tiles> platformSource = new Seq<>();
@@ -55,6 +58,7 @@ public class CastleUtils {
     public static unitCapType capType = unitCapType.DEFENSE_ONLY;
     public static short defenseCap = 0;
     public static short attackCap = 0;
+    public static short unitCap = 500;
 
     public static boolean any(String[] array, String value) {
         for (var test : array)
@@ -84,10 +88,10 @@ public class CastleUtils {
         revealedUnits.clear();
         if (isSerpulo()) revealedUnits.addAll(content.units()
             .select(unit -> !unit.internal
-                && !(unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
+                    && !(unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
         if (isErekir()) revealedUnits.addAll(content.units()
             .select(unit -> !unit.internal
-                && (unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
+                    && (unit instanceof NeoplasmUnitType || unit instanceof ErekirUnitType)));
 
         generatePlatforms = true;
         platformSource.clear();
@@ -99,7 +103,9 @@ public class CastleUtils {
 
         defenseCap = 100;
         attackCap = 0;
-        isDivideCap =1;
+        unitCap = 500;
+        isDivideCap = 1;
+        betterGroundValid = 0;
 
         for (var objective : state.rules.objectives.all) {
             if (objective instanceof FlagObjective flag) {
@@ -175,6 +181,16 @@ public class CastleUtils {
                         attackCap = 350;
                     }
                 }
+                if (flagName.startsWith("unitcap ")) {
+                    try {
+                        String[] args = flagName.split(" ");
+                        unitCap = Short.valueOf(args[1]);
+                        if(unitCap > 500) unitCap = 500;
+                    } catch (Exception error) {
+                        Log.warn("Failed to set Unit Cap!\n" + error);
+                        unitCap = 500;
+                    }
+                }
                 if (flagName.startsWith("isdividecap ")) {
                     try {
                         String[] args = flagName.split(" ");
@@ -182,6 +198,15 @@ public class CastleUtils {
                     } catch (Exception error) {
                         Log.warn("Failed to set is divided Cap!\n" + error);
                         isDivideCap = 1;
+                    }
+                }
+                if (flagName.startsWith("bettergroundvalid ")) {
+                    try {
+                        String[] args = flagName.split(" ");
+                        betterGroundValid = Integer.parseInt(args[1]);
+                    } catch (Exception error) {
+                        Log.warn("Failed to set state of valid to spawn check!\n" + error);
+                        betterGroundValid = 0;
                     }
                 }
             }
@@ -198,7 +223,7 @@ public class CastleUtils {
 
     public static void syncBlock(Building block_sync){
         try{
-            final Building block = block_sync; 
+            final Building block = block_sync;
             Core.app.post(() -> {
                 try {
                     syncStream.reset();
@@ -217,12 +242,12 @@ public class CastleUtils {
     }
 
     public static boolean validForSpawn(UnitType type, Point2 pos) {
-        var tile = world.tile(pos.x/8, pos.y/8);
+        var tile = world.tile(pos.x, pos.y);
         // TODO: Check if tile is in death zone.
         return tile != null &&
-                (type.flying || tile.block().isAir()) &&
-                (!type.naval || tile.floor().isLiquid) &&
-                ((!type.naval && !type.flying) && tile.floor().drownTime == 0);
+            (type.flying || tile.block().isAir()) &&
+            (!type.naval || tile.floor().isLiquid) &&
+            ((type.naval || type.flying) || tile.floor().drownTime == 0.0 || betterGroundValid != 1);
     }
 
     public static boolean withinPointDef(Tile tile, Point2 point, int distance) {
@@ -234,7 +259,7 @@ public class CastleUtils {
         rules.waveTimer = rules.waves = rules.waveSending = false;
         rules.pvp = rules.attackMode = rules.polygonCoreProtection = true;
 
-        rules.unitCap = 500;
+        rules.unitCap = unitCap;
         rules.unitCapVariable = false;
 
         rules.dropZoneRadius = 48f;
