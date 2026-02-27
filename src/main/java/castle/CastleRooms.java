@@ -102,7 +102,6 @@ public class CastleRooms {
 
             final int[][] coreItems;
             var tile = Vars.world.tile(x, y);
-            tile.setNet(block, team, 0);
 
             if (!(block instanceof CoreBlock)) {
                 tile.build.health(Float.MAX_VALUE);
@@ -115,6 +114,8 @@ public class CastleRooms {
                     t[item.id] = count;
                 });
             }
+
+            tile.setNet(block, team, 0);
 
             Bundle.label(1f, drawX(), drawY(), "rooms.block.bought", data.player.coloredName());
 

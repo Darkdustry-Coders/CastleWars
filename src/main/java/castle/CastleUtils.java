@@ -245,7 +245,7 @@ public class CastleUtils {
         var tile = world.tile(pos.x, pos.y);
         // TODO: Check if tile is in death zone.
         return tile != null &&
-            (type.flying || tile.block().isAir()) &&
+            ((type.flying && !type.canBoost) || tile.block().isAir()) &&
             (!type.naval || tile.floor().isLiquid) &&
             ((type.naval || type.flying) || tile.floor().drownTime == 0.0 || betterGroundValid != 1);
     }
