@@ -163,8 +163,6 @@ public class Main extends Plugin {
                 if (unit.spawnedByCore)
                     return false;
 
-                if (!world.tiles.in(unit.tileX(), unit.tileY()))
-                    return true;
 
                 if (unit.tileY() >= halfHeight && unit.tileY() <= world.height() - halfHeight - 1 ){
                     if(!onEnemySide(unit) && (unit.type == UnitTypes.poly || unit.type == UnitTypes.mega)){
@@ -184,7 +182,6 @@ public class Main extends Plugin {
             Groups.build.each(build -> {
                 try {   
                     if (build.block != Blocks.sublimate && build instanceof ItemTurret.ItemTurretBuild turret) {
-                        // BulletType active = turret.peekAmmo();
                         for(int i = 0; i < turret.ammo.size; i++){
                             if(i == 0 && turret.ammo.size > 1){
                                 turret.ammo.remove(i);
@@ -205,8 +202,7 @@ public class Main extends Plugin {
                         int minX = -2;
                         int minY = -2;
                         if(LiqTurret.hitSize() == 16){
-                            minX = -1;
-                            minY = -1;
+                            minY = minX = -1;
                         }
                         a: for (var dx = minX; dx <= 2; dx++) for (var dy = minY; dy <= 2; dy++) {
                             var build2 = Vars.world.build(LiqTurret.tileX() + dx, LiqTurret.tileY() + dy);

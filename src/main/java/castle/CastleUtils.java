@@ -30,6 +30,9 @@ import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.Env;
 import mindustry.gen.Call;
+
+import java.util.List;
+
 import static mindustry.Vars.*;
 
 import static castle.Main.syncStream;
@@ -84,6 +87,101 @@ public class CastleUtils {
         }
     }
 
+    private static void valuesUpdate(){
+        for (var objective : state.rules.objectives.all) {
+            if (objective instanceof FlagObjective flag) {
+                String flagName = flag.flag.toLowerCase();
+                String[] args = flagName.split(" ");
+                if (any((flag.details + "\n" + flag.text + "\n" + flagName).split("\n"), "noplatform"))
+                    generatePlatforms = false;
+                if (flagName.startsWith("platformsource ")) {
+                    try {
+                        var x = Integer.valueOf(args[1]);
+                        var y = Integer.valueOf(args[2]);
+                        var replace = args.length < 4 ? null : content.block(args[3]).asFloor();
+
+                        var newSource = new Tiles(6, 6);
+                        newSource.fill();
+                        newSource.eachTile(tile -> {
+                            tile.setFloor(world.tile(tile.x + x, tile.y + y).floor());
+                            if (replace != null)
+                                world.tile(tile.x + x, tile.y + y).setFloor(replace);
+                        });
+                        platformSource.add(newSource);
+                    } catch (Exception error) {
+                        Log.warn("Failed to load custom platform!\n" + error);
+                    }
+                }
+                if (flagName.startsWith("shopfloor ")) {
+                    try {
+                        shopFloor = content.block(args[1]).asFloor();
+                    } catch (Exception error) {
+                        Log.warn("Failed to set custom shop floor!\n" + error);
+                    }
+                }
+                if (flagName.startsWith("boatspawn ")) {
+                    try {
+                        boatSpawn = new Point2(Short.parseShort(args[1]), Short.parseShort(args[2]));
+                    } catch (Exception error) {
+                        Log.warn("Failed to set boat spawn!\n" + error);
+                    }
+                }
+                if (flagName.startsWith("landspawn ")) {
+                    try {
+                        landSpawn = new Point2(Short.parseShort(args[1]), Short.parseShort(args[2]));
+                    } catch (Exception error) {
+                        Log.warn("Failed to set land spawn!\n" + error);
+                    }
+                }
+                if (flagName.startsWith("airspawn ")) {
+                    try {
+                        airSpawn = new Point2(Short.parseShort(args[1]), Short.parseShort(args[2]));
+                    } catch (Exception error) {
+                        Log.warn("Failed to set air spawn!\n" + error);
+                    }
+                }
+                if (flagName.startsWith("defensecap ")) {
+                    try {
+                        defenseCap = Short.parseShort(args[1]);
+                    } catch (Exception error) {
+                        Log.warn("Failed to set Defense Cap!\n" + error);
+                    }
+                }
+                if (flagName.startsWith("attackcap ")) {
+                    try {
+                        attackCap = Short.parseShort(args[1]);
+                    } catch (Exception error) {
+                        Log.warn("Failed to set Attack Cap!\n" + error);
+                    }
+                }
+                if (flagName.startsWith("unitcap ")) {
+                    try {
+                        unitCap = Short.parseShort(args[1]);
+                        if(unitCap > 500) unitCap = 500;
+                    } catch (Exception error) {
+                        Log.warn("Failed to set Unit Cap!\n" + error);
+                    }
+                }
+                if (flagName.startsWith("isdividecap ")) {
+                    try {
+                        isDivideCap = Integer.parseInt(args[1]);
+                    } catch (Exception error) {
+                        Log.warn("Failed to set is divided Cap!\n" + error);
+                        isDivideCap = 1;
+                    }
+                }
+                if (flagName.startsWith("bettergroundvalid ")) {
+                    try {
+                        betterGroundValid = Integer.parseInt(args[1]);
+                    } catch (Exception error) {
+                        Log.warn("Failed to set state of valid to spawn check!\n" + error);
+                        betterGroundValid = 0;
+                    }
+                }
+            }
+        }
+    }
+
     public static void refreshMeta() {
         revealedUnits.clear();
         if (isSerpulo()) revealedUnits.addAll(content.units()
@@ -107,110 +205,7 @@ public class CastleUtils {
         isDivideCap = 1;
         betterGroundValid = 0;
 
-        for (var objective : state.rules.objectives.all) {
-            if (objective instanceof FlagObjective flag) {
-                String flagName = flag.flag.toLowerCase();
-                if (any((flag.details + "\n" + flag.text + "\n" + flagName).split("\n"), "noplatform"))
-                    generatePlatforms = false;
-                if (flagName.startsWith("platformsource ")) {
-                    try {
-                        String[] args = flagName.split(" ");
-                        var x = Integer.valueOf(args[1]);
-                        var y = Integer.valueOf(args[2]);
-                        var replace = args.length < 4 ? null : content.block(args[3]).asFloor();
-
-                        var newSource = new Tiles(6, 6);
-                        newSource.fill();
-                        newSource.eachTile(tile -> {
-                            tile.setFloor(world.tile(tile.x + x, tile.y + y).floor());
-                            if (replace != null)
-                                world.tile(tile.x + x, tile.y + y).setFloor(replace);
-                        });
-                        platformSource.add(newSource);
-                    } catch (Exception error) {
-                        Log.warn("Failed to load custom platform!\n" + error);
-                    }
-                }
-                if (flagName.startsWith("shopfloor ")) {
-                    try {
-                        String[] args = flagName.split(" ");
-                        shopFloor = content.block(args[1]).asFloor();
-                    } catch (Exception error) {
-                        Log.warn("Failed to set custom shop floor!\n" + error);
-                    }
-                }
-                if (flagName.startsWith("boatspawn ")) {
-                    try {
-                        String[] args = flagName.split(" ");
-                        boatSpawn = new Point2(Short.parseShort(args[1]), Short.parseShort(args[2]));
-                    } catch (Exception error) {
-                        Log.warn("Failed to set boat spawn!\n" + error);
-                    }
-                }
-                if (flagName.startsWith("landspawn ")) {
-                    try {
-                        String[] args = flagName.split(" ");
-                        landSpawn = new Point2(Short.parseShort(args[1]), Short.parseShort(args[2]));
-                    } catch (Exception error) {
-                        Log.warn("Failed to set land spawn!\n" + error);
-                    }
-                }
-                if (flagName.startsWith("airspawn ")) {
-                    try {
-                        String[] args = flagName.split(" ");
-                        airSpawn = new Point2(Short.parseShort(args[1]), Short.parseShort(args[2]));
-                    } catch (Exception error) {
-                        Log.warn("Failed to set air spawn!\n" + error);
-                    }
-                }
-                if (flagName.startsWith("defensecap ")) {
-                    try {
-                        String[] args = flagName.split(" ");
-                        defenseCap = Short.valueOf(args[1]);
-                    } catch (Exception error) {
-                        Log.warn("Failed to set Defense Cap!\n" + error);
-                        defenseCap = 150;
-                    }
-                }
-                if (flagName.startsWith("attackcap ")) {
-                    try {
-                        String[] args = flagName.split(" ");
-                        attackCap = Short.valueOf(args[1]);
-                    } catch (Exception error) {
-                        Log.warn("Failed to set Attack Cap!\n" + error);
-                        attackCap = 350;
-                    }
-                }
-                if (flagName.startsWith("unitcap ")) {
-                    try {
-                        String[] args = flagName.split(" ");
-                        unitCap = Short.valueOf(args[1]);
-                        if(unitCap > 500) unitCap = 500;
-                    } catch (Exception error) {
-                        Log.warn("Failed to set Unit Cap!\n" + error);
-                        unitCap = 500;
-                    }
-                }
-                if (flagName.startsWith("isdividecap ")) {
-                    try {
-                        String[] args = flagName.split(" ");
-                        isDivideCap = Integer.parseInt(args[1]);
-                    } catch (Exception error) {
-                        Log.warn("Failed to set is divided Cap!\n" + error);
-                        isDivideCap = 1;
-                    }
-                }
-                if (flagName.startsWith("bettergroundvalid ")) {
-                    try {
-                        String[] args = flagName.split(" ");
-                        betterGroundValid = Integer.parseInt(args[1]);
-                    } catch (Exception error) {
-                        Log.warn("Failed to set state of valid to spawn check!\n" + error);
-                        betterGroundValid = 0;
-                    }
-                }
-            }
-        }
+        valuesUpdate();
         capType = getCapType();
 
         if (platformSource.isEmpty()) {
