@@ -1,33 +1,43 @@
 import groovy.json.JsonSlurper
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
-
 plugins {
     id "java"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.ksp)
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
+def mod = new JsonSlurper().parse("$rootDir/src/main/resources/plugin.json" as File)
+def workspacePath = gradle.ext.workspacePath
+
+group = "mindurka"
+version = "${mod['version']}"
+
+compileJava.options.encoding = "UTF-8"
 
 repositories {
+    maven { url "$workspacePath/.cache/maven" }
     mavenCentral()
-    maven { url = "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
-    maven { url = "https://jitpack.io" }
 }
 
-def json = (new JsonSlurper()).parse("src/main/resources/plugin.json" as File)
-def mindustryVersion = json["minGameVersion"]
-def usefulHash = "2f1d9eb899"
-project.version = json["version"]
+apply from: "$workspacePath/.cache/tools/buildscript/shared.repos.gradle"
 
 dependencies {
-    compileOnly "com.github.Anuken.Arc:arc-core:v$mindustryVersion" 
-    compileOnly "com.github.Anuken.Mindustry:core:v$mindustryVersion" 
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
 
-    implementation "com.github.xzxADIxzx.useful-stuffs:bundle:$usefulHash" 
+    def serverJar = file("$workspacePath/.bin/server-release.jar")
+    if (serverJar.exists()) {
+        compileOnly files(serverJar)
+        testImplementation files(serverJar)
+    } else {
+        compileOnly libs.bundles.mindustry, { changing = true }
+        testImplementation libs.bundles.mindustry
+    }
+    compileOnly libs.kotlin.coro
+    compileOnly libs.kotlin.reflect
+    compileOnly "mindurka:CorePlugin:latest-SNAPSHOT"
+    compileOnly "mindurka.coreplugin:annotations:latest-SNAPSHOT"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    ksp "mindurka.coreplugin:processor:latest-SNAPSHOT"
 }
 
 tasks.jar {
@@ -35,47 +45,11 @@ tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+tasks.register("copyJar", Copy) {
+    dependsOn jar
+    from jar.archiveFile
+    into file("$workspacePath/.bin")
+    rename { "CastleWars.jar" }
 }
 
-tasks.register("runServer") {
-    dependsOn build
-
-    doLast {
-        def path = rootProject.rootDir.toPath().resolve("run")
-        Files.createDirectories(path.resolve("config/mods"))
-        Files.createDirectories(path.resolve("config/maps"))
-
-        if (!Files.exists(path.resolve("server.jar"))) {
-            println "Downloading Mindustry server..."
-            Files.copy(
-                    new URI("https://github.com/5GameMaker/MindustryHotfixv7/releases/download/v146.7/server-release.jar").toURL().openStream(),
-                    path.resolve("server.jar"))
-            Files.copy(
-                    rootDir.toPath().resolve("assets/Prophit.msav"),
-                    path.resolve("config/maps/Prophit.msav"))
-            Files.copy(
-                    rootDir.toPath().resolve("assets/settings.bin"),
-                    path.resolve("config/settings.bin"))
-        }
-
-        Files.copy(
-                jar.archiveFile.get().asFile.toPath(),
-                path.resolve("config/mods/Debug.jar"),
-                StandardCopyOption.REPLACE_EXISTING)
-
-        javaexec {
-            classpath = files(path.resolve("server.jar"))
-            workingDir = path.toFile()
-            standardInput = System.in
-
-            debugOptions {
-                enabled = true
-                port = 7857
-                server = true
-                suspend = false
-            }
-        }
-    }
-}
+build.dependsOn copyJar

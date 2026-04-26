@@ -1,0 +1,25 @@
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.nio.file.Paths
+import java.lang.IllegalStateException
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+}
+
+def workspacePath = null
+if (System.env["MINDURKA_WORKSPACE"] == null) {
+    def path = Paths.get("${rootProject.projectDir}").parent.resolve("workspace.meta")
+    if (Files.exists(path)) {
+        workspacePath = path.parent
+    } else {
+        throw new IllegalStateException("could not find workspace. Make sure 'MINDURKA_WORKSPACE' environment variable is set.")
+    }
+} else {
+    workspacePath = Paths.get(System.env["MINDURKA_WORKSPACE"])
+}
+gradle.ext.workspacePath = workspacePath
+
+apply from: "$workspacePath/buildscript/assets/shared.settings.gradle"
+
+rootProject.name = 'Castle'
