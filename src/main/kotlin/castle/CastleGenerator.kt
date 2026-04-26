@@ -311,7 +311,7 @@ object CastleGenerator {
         }
 
         fun add(x: Int, y: Int) {
-            sharded.add(Point2(x, Vars.world.height() - y - 1))
+            sharded.add(if (mirrored) Point2(x, Vars.world.height() - y - 1) else Point2(x,y + Vars.world.tiles.height - Main.halfHeight))
             blue.add(Point2(x, y))
         }
 
