@@ -321,16 +321,16 @@ class CastleRooms {
 
             // Visual things
             for (rotation in 0..35) Time.run(
-                rotation.toFloat(),
-                 {
-                    Call.effect(
-                        Fx.coreLandDust,
-                        data.player.x,
-                        data.player.y,
-                        Mathf.random(360f),
-                        effect?.color
-                    )
-                })
+                rotation.toFloat()
+            ) {
+                Call.effect(
+                    Fx.coreLandDust,
+                    data.player.x,
+                    data.player.y,
+                    Mathf.random(360f),
+                    effect?.color
+                )
+            }
             worldLabel("rooms.effect.bought", drawX(), drawY(),1f,Pair("player",data.player.coloredName()))
         }
 

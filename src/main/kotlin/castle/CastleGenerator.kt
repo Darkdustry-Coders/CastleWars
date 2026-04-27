@@ -28,6 +28,7 @@ import castle.CastleCosts.EffectData
 import castle.CastleRooms.*
 import castle.CastleUtils.castleBlocks
 import castle.CastleUtils.castleMiners
+import castle.CastleUtils.mirrorY
 import castle.CastleUtils.mirrored
 import castle.CastleUtils.worldLabel
 import mindustry.Vars.state
@@ -83,7 +84,7 @@ object CastleGenerator {
             addTile(x, y, floor, block, overlay, tile.data)
             addTile(
                 x,
-                if (mirrored) Vars.world.tiles.height - y - 1 else Main.halfHeight + y + Vars.world.tiles.height - saved.height * 2,
+                mirrorY(y),
                 floor,
                 block,
                 overlay,
@@ -92,7 +93,7 @@ object CastleGenerator {
             Vars.world.tile(x, y).packedData = packetData
             Vars.world.tile(
                 x,
-                if (mirrored) Vars.world.tiles.height - y - 1 else Main.halfHeight + y + Vars.world.tiles.height - saved.height * 2
+                mirrorY(y)
             ).packedData = packetData
         }
 
@@ -127,7 +128,7 @@ object CastleGenerator {
                     val code: String? = build.code
                     val linksProcessor: Seq<LogicLink?>? = build.links.copy()
                     val tileEdit = Vars.world.tile(x, y)
-                    val tileNew = Vars.world.tile(x, if (mirrored) Vars.world.tiles.height - y - 1 else Vars.world.tiles.height + y)
+                    val tileNew = Vars.world.tile(x, mirrorY(y))
 
                     tileEdit.setNet(tile.block(), tile.build.team(), 0)
                     tileNew.setNet(tile.block(), Team.blue, 180)
@@ -137,7 +138,7 @@ object CastleGenerator {
 
                     for (link in build.links) {
                         val xLink: Int = link.x
-                        val yLink: Int = if (mirrored) Vars.world.height() - yCoordinate - (link.y - yCoordinate) else Main.halfHeight +link.y
+                        val yLink: Int = if (mirrored) Vars.world.height() - yCoordinate - (link.y - yCoordinate) else Main.halfHeight + link.y
                         val mirrored = LogicLink(xLink, yLink, link.name, link.valid)
                         mirroredLinks.add(mirrored)
                     }
@@ -291,7 +292,7 @@ object CastleGenerator {
         sharded.spawn()
 
         val blue = create.get()
-        blue.set(x, if (mirrored) Vars.world.height() - y - 2 + size % 2 else y + Vars.world.tiles.height - Main.halfHeight, size + 2, Team.blue)
+        blue.set(x, mirrorY(y),size+2,Team.blue)
         blue.spawn()
     }
 
@@ -311,7 +312,7 @@ object CastleGenerator {
         }
 
         fun add(x: Int, y: Int) {
-            sharded.add(if (mirrored) Point2(x, Vars.world.height() - y - 1) else Point2(x,y + Vars.world.tiles.height - Main.halfHeight))
+            sharded.add(Point2(x,mirrorY(y)))
             blue.add(Point2(x, y))
         }
 

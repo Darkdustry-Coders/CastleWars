@@ -568,6 +568,20 @@ object CastleUtils {
             || (teamc.team() === Team.blue && teamc.y() < Vars.world.unitHeight() / 2f)
     }
 
+    fun mirrorY(y: Int): Int {
+        when {
+            y <= halfHeight -> {
+                return if (mirrored) Vars.world.height() - y - 1
+                else y+Vars.world.tiles.height-halfHeight
+            }
+            y > halfHeight -> {
+                return if (mirrored) y-Vars.world.height() - halfHeight*2
+                else halfHeight-(y-Vars.world.height()+halfHeight)
+            }
+        }
+        return 0 //how
+    }
+
     enum class unitCapType {
         NONE,
         ATTACK_ONLY,
