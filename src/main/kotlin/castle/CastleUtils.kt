@@ -72,18 +72,18 @@ object CastleUtils {
     var airSpawns: Seq<Point2> = Seq<Point2>()
 
     var isDivideCap: Int = 1
-    val capType: unitCapType
+    val capType: UnitCapType
         get() {
             if (isDivideCap == 0) {
-                return unitCapType.NONE
+                return UnitCapType.NONE
             }
             val hasAttack = attackCap > 0
             val hasDefense = defenseCap > 0
             return when {
-                hasAttack && hasDefense -> unitCapType.BOTH
-                hasAttack -> unitCapType.ATTACK_ONLY
-                hasDefense -> unitCapType.DEFENSE_ONLY
-                else -> unitCapType.NONE
+                hasAttack && hasDefense -> UnitCapType.BOTH
+                hasAttack -> UnitCapType.ATTACK_ONLY
+                hasDefense -> UnitCapType.DEFENSE_ONLY
+                else -> UnitCapType.NONE
             }
         }
     var defenseCap: Short = 0
@@ -582,7 +582,7 @@ object CastleUtils {
         return 0 //how
     }
 
-    enum class unitCapType {
+    enum class UnitCapType {
         NONE,
         ATTACK_ONLY,
         DEFENSE_ONLY,

@@ -23,7 +23,7 @@ apply from: "$workspacePath/.cache/tools/buildscript/shared.repos.gradle"
 dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
 
-    def serverJar = file("$workspacePath/.bin/server-release.jar")
+    def serverJar = file("$workspacePath/.cache/tools/buildscript/server-release.jar")
     if (serverJar.exists()) {
         compileOnly files(serverJar)
         testImplementation files(serverJar)
@@ -36,20 +36,17 @@ dependencies {
     compileOnly "mindurka:CorePlugin:latest-SNAPSHOT"
     compileOnly "mindurka.coreplugin:annotations:latest-SNAPSHOT"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     ksp "mindurka.coreplugin:processor:latest-SNAPSHOT"
 }
 
 tasks.jar {
     from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    doLast {
+        copy {
+            from archiveFile
+            into file("$workspacePath/.bin")
+            rename { "CastleWars.jar" }
+        }
+    }
 }
-
-tasks.register("copyJar", Copy) {
-    dependsOn jar
-    from jar.archiveFile
-    into file("$workspacePath/.bin")
-    rename { "CastleWars.jar" }
-}
-
-build.dependsOn copyJar

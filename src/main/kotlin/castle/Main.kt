@@ -34,6 +34,7 @@ import castle.CastleUtils.unitOnBorderKill
 
 import mindurka.util.ModifyWorld.syncBuild
 import mindurka.api.Gamemode
+import mindurka.util.prefixed
 
 
 class Main : Plugin() {
@@ -44,7 +45,7 @@ class Main : Plugin() {
         Gamemode.restoreTeams = true
         Gamemode.unlockSpecialBlocks = false
         Gamemode.hasStats = true
-        Gamemode.init(javaClass)
+        Gamemode.init(javaClass.classLoader.prefixed("castle"))
 
         Vars.content.statusEffects().each(Cons { effect: StatusEffect? -> effect!!.permanent = false })
 
