@@ -21,12 +21,12 @@ class HoldTask(val player: mindustry.gen.Player, val timeStart: Long) : Runnable
         }
         val shootX = player.mouseX.toInt() / tilesize
         val shootY = player.mouseY.toInt() / tilesize
-        val data = PlayerData.getData(player)
+        val data = PlayerData.of(player)
         if (shootX < 0 || shootY < 0 || shootX >= Vars.world.width() || shootY >= Vars.world.height()) return
         val tile = Vars.world.tile(shootX, shootY)
-        rooms.each<CastleRooms.Room?>(
-            Boolf { room -> room!!.check(tile) && room.canBuy(data) }
-        ) { room -> room?.buy(data) }
+        rooms.each(
+            { room -> room.check(tile) && room.canBuy(data) }
+        ) { room: CastleRooms.Room -> room.buy(data) }
         Time.runTask(0.03f, this)
     }
 }

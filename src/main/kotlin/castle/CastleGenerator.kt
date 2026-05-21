@@ -272,8 +272,9 @@ object CastleGenerator {
         offsetXAlly = unitEndX
         offsetXEnemy = unitEndX
 
-        CastleCosts.effects!!.each { effect: StatusEffect?, data: EffectData? ->
-            offsetY = if (data!!.ally) 0 else 1
+        CastleCosts.effects.each { effect: StatusEffect, data: EffectData ->
+            if (data.duration <= 1 || data.cost <= 1) return@each
+            offsetY = if (data.ally) 0 else 1
             offsetX = if (data.ally) offsetXAlly else offsetXEnemy
             addShopRoom(shopX + offsetX * 9, shopY + unitEndY * 18 + offsetY * 9, EffectRoom(effect, data))
             if (data.ally) offsetXAlly += 1 else offsetXEnemy += 1

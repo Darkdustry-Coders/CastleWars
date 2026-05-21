@@ -12,17 +12,15 @@ import mindustry.type.UnitType
 import mindustry.world.blocks.defense.turrets.Turret
 import mindustry.world.Block
 import castle.CastleUtils.drill
+import mindurka.util.UnsafeNull
+import mindurka.util.nodecl
 
 object CastleCosts {
-    @JvmField
-    var units: OrderedMap<UnitType, UnitData>? = null
-    @JvmField
-    var effects: OrderedMap<StatusEffect, EffectData>? = null
+    lateinit var units: OrderedMap<UnitType, UnitData>
+    lateinit var effects: OrderedMap<StatusEffect, EffectData>
 
-    @JvmField
-    var turrets: OrderedMap<Turret, Int>? = null
-    @JvmField
-    var items: OrderedMap<Item, ItemData>? = null
+    lateinit var turrets: OrderedMap<Turret, Int>
+    lateinit var items: OrderedMap<Item, ItemData>
 
     fun load() {
         units = OrderedMap.of(

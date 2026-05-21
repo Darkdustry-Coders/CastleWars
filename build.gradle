@@ -1,52 +1,56 @@
 import groovy.json.JsonSlurper
+
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+
 plugins {
-    id "java"
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
-def mod = new JsonSlurper().parse("$rootDir/src/main/resources/plugin.json" as File)
-def workspacePath = gradle.ext.workspacePath
+def json = new JsonSlurper()
+def mod = json.parse("$rootDir/src/main/resources/plugin.json" as File)
 
 group = "mindurka"
 version = "${mod['version']}"
 
-compileJava.options.encoding = "UTF-8"
+def workspacePath = gradle.ext.workspacePath
 
 repositories {
     maven { url "$workspacePath/.cache/maven" }
     mavenCentral()
 }
 
-apply from: "$workspacePath/.cache/tools/buildscript/shared.repos.gradle"
+compileJava.options.encoding = "UTF-8"
 
 dependencies {
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
+    compileOnly files("$workspacePath/.cache/tools/buildscript/server-release.jar")
 
-    def serverJar = file("$workspacePath/.cache/tools/buildscript/server-release.jar")
-    if (serverJar.exists()) {
-        compileOnly files(serverJar)
-        testImplementation files(serverJar)
-    } else {
-        compileOnly libs.bundles.mindustry, { changing = true }
-        testImplementation libs.bundles.mindustry
-    }
+    compileOnly 'mindurka:CorePlugin:latest-SNAPSHOT'
+    compileOnly 'mindurka.coreplugin:annotations:latest-SNAPSHOT'
+    compileOnly 'mindurka.coreplugin:buildExtras:latest-SNAPSHOT'
+
     compileOnly libs.kotlin.coro
-    compileOnly libs.kotlin.reflect
-    compileOnly "mindurka:CorePlugin:latest-SNAPSHOT"
-    compileOnly "mindurka.coreplugin:annotations:latest-SNAPSHOT"
-
-    ksp "mindurka.coreplugin:processor:latest-SNAPSHOT"
+    compileOnly libs.bundles.kotlin.serialization
 }
 
-tasks.jar {
-    from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+jar {
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named("build") {
+    def jarPath = Paths.get("${jar.archivePath}")
     doLast {
-        copy {
-            from archiveFile
-            into file("$workspacePath/.bin")
-            rename { "CastleWars.jar" }
-        }
+        Files.createDirectories(workspacePath.resolve(".bin"))
+        Files.copy(
+            jarPath,
+            workspacePath.resolve(".bin/CastleWars.jar"),
+            StandardCopyOption.REPLACE_EXISTING)
+        println "Copied CastleWars plugin to '$workspacePath/.bin/CastleWars.jar'"
     }
 }
