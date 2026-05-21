@@ -510,17 +510,12 @@ object CastleUtils {
     }
 
     fun applyRules(rules: Rules) {
-        rules.waveSending = false
-        rules.waves = rules.waveSending
-        rules.waveTimer = rules.waves
         rules.polygonCoreProtection = true
         rules.pvp = true
+        rules.attackMode = true
 
         rules.unitCap = unitCap.toInt()
         rules.unitCapVariable = false
-
-        rules.dropZoneRadius = 6f*tilesize
-        rules.buildSpeedMultiplier = 0.5f
 
         rules.modeName = "Castle Wars"
 
