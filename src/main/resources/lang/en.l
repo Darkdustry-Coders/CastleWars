@@ -2,8 +2,8 @@
 economy = [accent]Money: [{colorMoney}]{money}
         = [accent]Income: [{colorIncome}]{income}
 unitCap = [accent]Units amount: [{color}]{unitCount}/{unitCap}
-unitCapAttack = [red]Units Attack: [{color}]{unitCount}/{unitCap}
-unitCapDefense = [blue]Units Defense: [{color}]{unitCount}/{unitCap}
+unitCapAttack = [red]Units on attack: [{color}]{unitCount}/{unitCap}
+unitCapDefense = [blue]Units on defense: [{color}]{unitCount}/{unitCap}
 time = [accent]Time left: [lightgray]{time}
 
 [rooms.effect]
