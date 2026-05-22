@@ -513,6 +513,7 @@ object CastleUtils {
         rules.polygonCoreProtection = true
         rules.pvp = true
         rules.attackMode = true
+        rules.waves = false
 
         rules.unitCap = unitCap.toInt()
         rules.unitCapVariable = false
