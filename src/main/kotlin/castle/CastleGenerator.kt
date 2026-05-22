@@ -160,16 +160,20 @@ object CastleGenerator {
         })
 
         for (block in castleBlocks) {
+            val x = if(block.block.size % 2 == 0) block.x-1 else block.x
+            val y = if(block.block.size % 2 == 0) block.y-1 else block.y
             addRoom(
-                block.x,
-                block.y,
+                x,
+                y,
                 block.block.size
             ) { BlockRoom(block.block, block.cost, block.invincible, null) }
 
         }
         for (miner in castleMiners) {
+            val x = if(miner.block.size % 2 == 0) miner.x-1 else miner.x
+            val y = if(miner.block.size % 2 == 0) miner.y-1 else miner.y
             addRoom(
-                    miner.x, miner.y, miner.block.size
+                    x, y, miner.block.size
             ) { MinerRoom(miner.block, miner.item, miner.cost, miner.amount, miner.interval.toFloat()) }
         }
 
