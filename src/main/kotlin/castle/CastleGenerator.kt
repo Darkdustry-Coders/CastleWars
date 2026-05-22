@@ -224,7 +224,9 @@ object CastleGenerator {
 
 
         CastleCosts.units!!.keys().toSeq().forEach { type ->
-            if (type !in visited && type !in allUpgraded) {
+            val isRoot = type !in allUpgraded ||
+                upgradeMap.entries.none { it.value == type && CastleCosts.units!!.containsKey(it.key) }
+            if (type !in visited && isRoot) {
                 val branch = mutableListOf<UnitType>()
                 var current: UnitType? = type
                 while (current != null && CastleCosts.units!!.containsKey(current)) {
