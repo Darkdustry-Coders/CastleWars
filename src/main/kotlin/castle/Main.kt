@@ -1,5 +1,6 @@
 package castle
 
+import arc.Core
 import arc.func.Boolf
 import arc.func.Cons
 import arc.struct.OrderedMap
@@ -122,6 +123,10 @@ class Main : Plugin() {
             CastleUtils.applyRules(Vars.state.rules)
 
             timer = 45 * 60
+
+            Core.app.post {
+                for (player in Groups.player) PlayerData.of(player)
+            }
 
             interval(1f, 1f, lifetime = Lifetime.Round) schedule@{
                 if (isBreak) return@schedule
