@@ -160,16 +160,20 @@ object CastleGenerator {
         })
 
         for (block in castleBlocks) {
+            val x = if(block.block.size % 2 == 0) block.x-1 else block.x
+            val y = block.y
             addRoom(
-                block.x,
-                block.y,
+                x,
+                y,
                 block.block.size
             ) { BlockRoom(block.block, block.cost, block.invincible, null) }
 
         }
         for (miner in castleMiners) {
+            val x = if(miner.block.size % 2 == 0) miner.x-1 else miner.x
+            val y = miner.y
             addRoom(
-                    miner.x, miner.y, miner.block.size
+                    x, y, miner.block.size
             ) { MinerRoom(miner.block, miner.item, miner.cost, miner.amount, miner.interval.toFloat()) }
         }
 
@@ -220,7 +224,9 @@ object CastleGenerator {
 
 
         CastleCosts.units!!.keys().toSeq().forEach { type ->
-            if (type !in visited && type !in allUpgraded) {
+            val isRoot = type !in allUpgraded ||
+                upgradeMap.entries.none { it.value == type && CastleCosts.units!!.containsKey(it.key) }
+            if (type !in visited && isRoot) {
                 val branch = mutableListOf<UnitType>()
                 var current: UnitType? = type
                 while (current != null && CastleCosts.units!!.containsKey(current)) {
