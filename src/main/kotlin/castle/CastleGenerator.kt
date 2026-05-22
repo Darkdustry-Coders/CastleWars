@@ -299,7 +299,7 @@ object CastleGenerator {
         sharded.spawn()
 
         val blue = create.get()
-        blue.set(x, mirrorY(y)-create.get().size%2-1,size+2,Team.blue)
+        blue.set(x, mirrorY(y)-if(size%2==0)1 else 0,size+2,Team.blue)
         blue.spawn()
     }
 
