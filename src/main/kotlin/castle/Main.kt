@@ -124,10 +124,6 @@ class Main : Plugin() {
 
             timer = 45 * 60
 
-            Core.app.post {
-                for (player in Groups.player) PlayerData.of(player)
-            }
-
             interval(1f, 1f, lifetime = Lifetime.Round) schedule@{
                 if (isBreak) return@schedule
                 PlayerData.datas.each { obj: PlayerData -> obj.updateMoney() }

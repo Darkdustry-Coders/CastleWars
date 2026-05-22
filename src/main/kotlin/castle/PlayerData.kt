@@ -9,6 +9,7 @@ import buj.tl.Tl
 import mindurka.api.on
 import mindurka.util.newSeq
 import mindustry.game.EventType
+import mindustry.gen.Groups
 
 class PlayerData(var player: Player) {
     var money: Int = 0
@@ -85,7 +86,10 @@ class PlayerData(var player: Player) {
         }
 
         init {
-            on<EventType.PlayEvent> { datas.clear() }
+            on<EventType.PlayEvent> {
+                datas.clear()
+                for (player in Groups.player) of(player)
+            }
         }
     }
 }
