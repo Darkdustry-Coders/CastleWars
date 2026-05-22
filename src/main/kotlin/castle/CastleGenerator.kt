@@ -6,7 +6,6 @@ import arc.func.Prov
 import arc.math.Mathf
 import arc.math.geom.Point2
 import arc.struct.Seq
-import arc.util.Log
 
 import mindustry.Vars
 import mindustry.content.Blocks
