@@ -1,5 +1,6 @@
 package castle
 
+import arc.Core
 import mindustry.Vars
 import mindustry.core.UI
 import mindustry.gen.Call
@@ -86,10 +87,10 @@ class PlayerData(var player: Player) {
         }
 
         init {
-            on<EventType.PlayEvent> {
-                datas.clear()
-                for (player in Groups.player) of(player)
-            }
+            on<EventType.PlayEvent> { Core.app.post { // You can never be sure with this codebase!
+                datas.retainAll { it.player.con.isConnected }
+                datas.each { it.reset() }
+            } }
         }
     }
 }
