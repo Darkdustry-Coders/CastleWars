@@ -363,7 +363,7 @@ object CastleUtils {
         Groups.build.each(Cons each@{ build: Building? ->
             try {
                 if (build!!.block !== Blocks.sublimate && build is ItemTurretBuild) {
-                    for (i in 0..<build.ammo.size) {
+                    for (i in 0..<build.ammo.size-1) {
                         if (i == 0 && build.ammo.size > 1) {
                             build.ammo.remove(i)
                         } else {
