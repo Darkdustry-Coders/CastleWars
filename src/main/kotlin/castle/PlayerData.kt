@@ -1,13 +1,14 @@
 package castle
 
-import arc.struct.Seq
-
 import mindustry.Vars
 import mindustry.core.UI
 import mindustry.gen.Call
 import mindustry.gen.Player
 
 import buj.tl.Tl
+import mindurka.api.on
+import mindurka.util.newSeq
+import mindustry.game.EventType
 
 class PlayerData(var player: Player) {
     var money: Int = 0
@@ -71,10 +72,20 @@ class PlayerData(var player: Player) {
     }
 
     companion object {
-        val datas: Seq<PlayerData?> = Seq<PlayerData?>()
+        val datas = newSeq<PlayerData>()
 
-        fun getData(player: Player): PlayerData? {
-            return datas.find { data: PlayerData? -> data!!.player.uuid() == player.uuid() }
+        fun of(player: Player): PlayerData {
+            val data = datas.find { data: PlayerData -> data.player.uuid() == player.uuid() }
+            if (data == null) {
+                val d2 = PlayerData(player)
+                datas.add(d2)
+                return d2
+            }
+            return data
+        }
+
+        init {
+            on<EventType.PlayEvent> { datas.clear() }
         }
     }
 }

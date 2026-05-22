@@ -556,7 +556,7 @@ object CastleUtils {
     }
 
     val isBreak: Boolean
-        get() = Vars.state.gameOver || Vars.state.isPaused() || Vars.world.isGenerating()
+        get() = Vars.state.gameOver || Vars.state.isPaused || Vars.world.isGenerating
 
     fun onEnemySide(teamc: Teamc): Boolean {
         return (teamc.team() === Team.sharded && teamc.y() > Vars.world.unitHeight() / 2f)
