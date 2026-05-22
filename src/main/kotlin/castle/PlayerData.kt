@@ -85,7 +85,10 @@ class PlayerData(var player: Player) {
         }
 
         init {
-            on<EventType.PlayEvent> { datas.clear() }
+            on<EventType.PlayEvent> {
+                datas.retainAll { it.player.con.isConnected }
+                datas.each { it.reset() }
+            }
         }
     }
 }
