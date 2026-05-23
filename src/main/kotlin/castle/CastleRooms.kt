@@ -6,7 +6,6 @@ import arc.math.Mathf
 import arc.math.geom.Point2
 import arc.struct.Seq
 import arc.util.Interval
-import arc.util.Log
 import arc.util.Nullable
 import arc.util.Structs
 import arc.util.Time
@@ -230,7 +229,6 @@ class CastleRooms {
                 x *= tilesize
                 startY = if(data.player.team() == Team.blue)  mirrorY(y)*tilesize else y*tilesize
             }
-            Log.info("@ @",startY,y)
             startY -= 6*tilesize
             for (y in startY..<startY+12*tilesize) {
                 coordinate = Point2(x/tilesize, y/tilesize)
