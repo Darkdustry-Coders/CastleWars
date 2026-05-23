@@ -246,7 +246,7 @@ object CastleUtils {
                 key.startsWith("unit.") && !key.endsWith("unit.") -> {
                     val parts = key.split(".")
                     val unit = Vars.content.unit(parts[1]) ?: return@Cons2
-                    if (!units!!.containsKey(unit)) units!!.put(unit, UnitData(-1, -1, -1))
+                    if (!units!!.containsKey(unit)) units!!.put(unit, UnitData(0, 0, 0))
                     val data = units!!.get(unit)
                     when {
                         key.endsWith("cost") -> data.cost = value!!.toInt()
