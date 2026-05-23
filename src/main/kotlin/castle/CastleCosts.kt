@@ -26,7 +26,7 @@ object CastleCosts {
         units = OrderedMap.of(
             UnitTypes.dagger, UnitData(60, 0, 15),
             UnitTypes.mace, UnitData(170, 1, 50),
-            UnitTypes.fortress, UnitData(520, 4, 190),
+            UnitTypes.fortress, UnitData(520, 3, 190),
             UnitTypes.scepter, UnitData(3600, 22, 900),
             UnitTypes.reign, UnitData(10000, 60, 1500),
 
