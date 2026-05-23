@@ -34,6 +34,7 @@ import castle.CastleUtils.attackCap
 import castle.CastleUtils.worldLabel
 
 import buj.tl.Tl
+import castle.CastleUtils.mirrorY
 import castle.CastleUtils.mirrored
 import mindustry.world.blocks.defense.turrets.Turret
 import mindustry.world.blocks.production.Drill
@@ -226,10 +227,11 @@ class CastleRooms {
                 startY = data.player.core().y.toInt()
             } else {
                 x *= tilesize
-                startY = if (mirrored) (if (data.team().team === Team.blue) Vars.world.height() - startY else startY) * tilesize else (Main.halfHeight + startY + (Vars.world.height() - Main.halfHeight * 2)) * tilesize
+                startY = if(data.player.team() == Team.blue)  mirrorY(y)*tilesize else y*tilesize
             }
             startY -= 6*tilesize
             for (y in startY..<startY+12*tilesize) {
+                coordinate = Point2(x/tilesize, y/tilesize)
                 coordinate = Point2(x/tilesize, y/tilesize)
                 if(CastleUtils.validForSpawn(type, coordinate)) break
             }
