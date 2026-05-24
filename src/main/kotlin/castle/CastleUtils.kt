@@ -364,8 +364,8 @@ object CastleUtils {
             try {
                 if (build!!.block !== Blocks.sublimate && build is ItemTurretBuild) {
                     for (i in 0..<build.ammo.size-1) {
-                        if (i == 0 && build.ammo.size > 1) {
-                            build.ammo.remove(i)
+                        if (build.ammo.size > 1) {
+                            if (build.ammo.get(i).amount >= 25) build.ammo.remove(i)
                         } else {
                             if (build.ammo.get(i).amount > 25) {
                                 build.update()
