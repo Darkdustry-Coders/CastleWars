@@ -63,6 +63,7 @@ object CastleGenerator {
             val packetData = tile.packedData
             var data = tile.data
 
+            addTile(x, y, floor, block, overlay, tile.data)
 
             if (block === Blocks.cliff) {
                 for (i in 0..2) {
@@ -81,7 +82,6 @@ object CastleGenerator {
                     data = ((data.toInt() and remMask.inv().toInt()) or addMask.toInt()).toByte()
                 }
             }
-            addTile(x, y, floor, block, overlay, tile.data)
             addTile(
                 x,
                 mirrorY(y),
@@ -173,7 +173,7 @@ object CastleGenerator {
             val x = if(miner.block.size % 2 == 0) miner.x-1 else miner.x
             val y = if(miner.block.size % 2 == 0) miner.y-1 else miner.y
             addRoom(
-                    x, y, miner.block.size
+                x, y, miner.block.size
             ) { MinerRoom(miner.block, miner.item, miner.cost, miner.amount, miner.interval.toFloat()) }
         }
 
