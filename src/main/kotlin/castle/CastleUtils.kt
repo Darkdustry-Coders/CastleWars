@@ -141,7 +141,7 @@ object CastleUtils {
                 }
         )
 
-        generatePlatforms = true
+        generatePlatforms = false
         platformSource.clear()
         shopFloor = Blocks.space.asFloor()
 
@@ -168,7 +168,7 @@ object CastleUtils {
             if (key.startsWith("utils")) {
                 key = key.replace("utils.", "")
                 when {
-                    key.startsWith("noPlatform") -> generatePlatforms = false
+                    key.startsWith("noPlatform") -> generatePlatforms = value.toBoolean()
 
                     key.startsWith("mirrored") -> mirrored = value.toBoolean()
 
