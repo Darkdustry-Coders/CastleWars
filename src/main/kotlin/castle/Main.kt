@@ -1,5 +1,6 @@
 package castle
 
+import arc.Core
 import arc.func.Boolf
 import arc.func.Cons
 import arc.struct.OrderedMap

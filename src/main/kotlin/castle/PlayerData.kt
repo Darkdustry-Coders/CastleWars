@@ -1,5 +1,6 @@
 package castle
 
+import arc.Core
 import mindustry.Vars
 import mindustry.core.UI
 import mindustry.gen.Call
@@ -9,6 +10,7 @@ import buj.tl.Tl
 import mindurka.api.on
 import mindurka.util.newSeq
 import mindustry.game.EventType
+import mindustry.gen.Groups
 
 class PlayerData(var player: Player) {
     var money: Int = 0
@@ -85,10 +87,10 @@ class PlayerData(var player: Player) {
         }
 
         init {
-            on<EventType.PlayEvent> {
+            on<EventType.PlayEvent> { Core.app.post { // You can never be sure with this codebase!
                 datas.retainAll { it.player.con.isConnected }
                 datas.each { it.reset() }
-            }
+            } }
         }
     }
 }

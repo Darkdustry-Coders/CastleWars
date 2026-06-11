@@ -141,7 +141,7 @@ object CastleUtils {
                 }
         )
 
-        generatePlatforms = true
+        generatePlatforms = false
         platformSource.clear()
         shopFloor = Blocks.space.asFloor()
 
@@ -168,7 +168,7 @@ object CastleUtils {
             if (key.startsWith("utils")) {
                 key = key.replace("utils.", "")
                 when {
-                    key.startsWith("noPlatform") -> generatePlatforms = false
+                    key.startsWith("noPlatform") -> generatePlatforms = value.toBoolean()
 
                     key.startsWith("mirrored") -> mirrored = value.toBoolean()
 
@@ -246,7 +246,7 @@ object CastleUtils {
                 key.startsWith("unit.") && !key.endsWith("unit.") -> {
                     val parts = key.split(".")
                     val unit = Vars.content.unit(parts[1]) ?: return@Cons2
-                    if (!units!!.containsKey(unit)) units!!.put(unit, UnitData(-1, -1, -1))
+                    if (!units!!.containsKey(unit)) units!!.put(unit, UnitData(0, 0, 0))
                     val data = units!!.get(unit)
                     when {
                         key.endsWith("cost") -> data.cost = value!!.toInt()
@@ -513,6 +513,7 @@ object CastleUtils {
         rules.polygonCoreProtection = true
         rules.pvp = true
         rules.attackMode = true
+        rules.waves = false
 
         rules.unitCap = unitCap.toInt()
         rules.unitCapVariable = false
