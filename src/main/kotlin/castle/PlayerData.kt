@@ -52,7 +52,7 @@ class PlayerData(var player: Player) {
             CastleUtils.UnitCapType.NONE         -> capText()
             CastleUtils.UnitCapType.DEFENSE_ONLY -> capText() + defenseText()
             CastleUtils.UnitCapType.ATTACK_ONLY  -> capText() + attackText()
-            CastleUtils.UnitCapType.BOTH         -> defenseText() + attackText()
+            CastleUtils.UnitCapType.BOTH         -> capText() + defenseText() + attackText()
         }
 
         Call.setHudText(player.con, economyText + capPart + timeText)

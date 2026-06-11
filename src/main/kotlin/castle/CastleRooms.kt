@@ -245,6 +245,7 @@ class CastleRooms {
         override fun buy(data: PlayerData?) {
             super.buy(data)
             data!!.income += income
+            if (!canBuy(data)) return
             val prevLimit = Vars.state.rules.unitCap
             Vars.state.rules.unitCap = Integer.MAX_VALUE
             if (attack) Main.spawns.spawn(data.player, data.player.team(), type)
