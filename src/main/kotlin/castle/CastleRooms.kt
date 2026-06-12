@@ -149,7 +149,7 @@ class CastleRooms {
 
             if (block !is CoreBlock) {
                 tile.setNet(block, team, 0)
-                if(invincible || block is Turret || block is Drill) tile.build.health(Float.MAX_VALUE)
+                if(invincible) tile.build.health(Float.MAX_VALUE)
                 coreItems = null
             } else {
                 coreItems = arrayOf<IntArray?>(IntArray(Vars.content.items().size)) as Array<IntArray>?
