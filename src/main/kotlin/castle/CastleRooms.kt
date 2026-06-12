@@ -35,7 +35,7 @@ import castle.CastleUtils.worldLabel
 
 import buj.tl.Tl
 import castle.CastleUtils.mirrorY
-import castle.CastleUtils.mirrored
+import castle.Main.Companion.undestroyableBlocks
 import mindustry.world.blocks.defense.turrets.Turret
 import mindustry.world.blocks.production.Drill
 
@@ -159,6 +159,7 @@ class CastleRooms {
                 }
                 tile.setNet(block, team, 0)
             }
+            if(tile.build !=null && invincible) undestroyableBlocks.add(tile.build)
 
             worldLabel("rooms.block.bought",drawX(), drawY(),1f,Pair("player",data!!.player.coloredName()))
 

@@ -69,8 +69,7 @@ class Main : Plugin() {
                 CastleUtils.withinAnyPointDef(action.tile, CastleUtils.landSpawns, 16) ||
                 CastleUtils.withinAnyPointDef(action.tile, CastleUtils.airSpawns, 16)
             ) return@ActionFilter false
-            !((action.tile.block() is Turret && action.type != ActionType.depositItem)
-                    || action.tile.block() is Drill)
+            !(undestroyableBlocks.contains(action.tile.build))
         })
 
         on { event: PlayerJoin ->
@@ -124,6 +123,8 @@ class Main : Plugin() {
 
             timer = 45 * 60
 
+            undestroyableBlocks.clear()
+
             interval(1f, 1f, lifetime = Lifetime.Round) schedule@{
                 if (isBreak) return@schedule
                 PlayerData.datas.each { obj: PlayerData -> obj.updateMoney() }
@@ -163,5 +164,7 @@ class Main : Plugin() {
         var halfHeight = 0
 
         val playerTasks = OrderedMap<String, HoldTask>()
+
+        val undestroyableBlocks = Seq<Building>()
     }
 }
