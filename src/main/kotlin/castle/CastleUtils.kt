@@ -149,7 +149,7 @@ object CastleUtils {
         landSpawns.clear()
         airSpawns.clear()
 
-        defenseCap = 100
+        defenseCap = 75
         attackCap = 0
         unitCap = 500
         isDivideCap = 1
