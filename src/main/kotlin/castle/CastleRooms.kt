@@ -149,7 +149,10 @@ class CastleRooms {
 
             if (block !is CoreBlock) {
                 tile.setNet(block, team, 0)
-                if(invincible) tile.build.health(Float.POSITIVE_INFINITY)
+                if(invincible) {
+                    tile.build.health(Float.POSITIVE_INFINITY)
+                    undestroyableBlocks.add(tile.build)
+                }
                 coreItems = null
             } else {
                 coreItems = arrayOf<IntArray?>(IntArray(Vars.content.items().size)) as Array<IntArray>?
@@ -159,7 +162,6 @@ class CastleRooms {
                 }
                 tile.setNet(block, team, 0)
             }
-            if(tile.build !=null && invincible) undestroyableBlocks.add(tile.build)
 
             worldLabel("rooms.block.bought",drawX(), drawY(),1f,Pair("player",data!!.player.coloredName()))
 
