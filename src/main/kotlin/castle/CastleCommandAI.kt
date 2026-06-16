@@ -41,7 +41,7 @@ class CastleCommandAI : CommandAI() {
             x,
             y,
             range,
-            Boolf { unit: Unit? -> unit!!.checkTarget(air, ground) },
-            Boolf { build: Building? -> ground && !(build!!.block is Turret || build.block is Drill) })
+            Boolf { unit: Unit -> unit.checkTarget(air, ground) },
+            Boolf { build: Building -> ground && !build.health.isInfinite() })
     }
 }
