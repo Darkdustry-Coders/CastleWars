@@ -1,9 +1,8 @@
 package castle
 
-import arc.Core
-import arc.func.Boolf
 import arc.func.Cons
 import arc.struct.OrderedMap
+import arc.struct.ObjectSet
 import arc.struct.Seq
 import arc.util.Log
 import arc.util.Time
@@ -21,8 +20,6 @@ import mindustry.mod.Plugin
 import mindustry.net.Administration.*
 import mindustry.type.StatusEffect
 import mindustry.type.UnitType
-import mindustry.world.blocks.defense.turrets.Turret
-import mindustry.world.blocks.production.Drill
 
 import castle.CastleGenerator.Spawns
 import castle.CastleUtils.isBreak
@@ -64,13 +61,15 @@ class Main : Plugin() {
 
         Vars.netServer.admins.addActionFilter(ActionFilter { action: PlayerAction? ->
             if (action?.tile == null) return@ActionFilter true
-            if (spawns.within(action.tile) ||
+            if (
+                (action.type == ActionType.placeBlock || action.type == ActionType.dropPayload) && (
+                (spawns.within(action.tile) && action.block?.solid == true) ||
                 CastleUtils.withinAnyPointDef(action.tile, CastleUtils.boatSpawns, 16) ||
                 CastleUtils.withinAnyPointDef(action.tile, CastleUtils.landSpawns, 16) ||
                 CastleUtils.withinAnyPointDef(action.tile, CastleUtils.airSpawns, 16)
-            ) return@ActionFilter false
-            !((action.tile.block() is Turret && action.type != ActionType.depositItem)
-                    || action.tile.block() is Drill)
+            )) return@ActionFilter false
+
+            (!(undestroyableBlocks.contains(action.tile.build)) || action.type == ActionType.depositItem)
         })
 
         on { event: PlayerJoin ->
@@ -119,10 +118,16 @@ class Main : Plugin() {
             }
         }
 
+        on { event: BlockDestroyEvent ->
+            if (undestroyableBlocks.contains(event.tile.build)) undestroyableBlocks.remove(event.tile.build)
+        }
+
         on { _: PlayEvent ->
             CastleUtils.applyRules(Vars.state.rules)
 
             timer = 45 * 60
+
+            undestroyableBlocks.clear()
 
             interval(1f, 1f, lifetime = Lifetime.Round) schedule@{
                 if (isBreak) return@schedule
@@ -163,5 +168,7 @@ class Main : Plugin() {
         var halfHeight = 0
 
         val playerTasks = OrderedMap<String, HoldTask>()
+
+        val undestroyableBlocks = ObjectSet<Building>()
     }
 }

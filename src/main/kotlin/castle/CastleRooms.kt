@@ -35,7 +35,7 @@ import castle.CastleUtils.worldLabel
 
 import buj.tl.Tl
 import castle.CastleUtils.mirrorY
-import castle.CastleUtils.mirrored
+import castle.Main.Companion.undestroyableBlocks
 import mindustry.world.blocks.defense.turrets.Turret
 import mindustry.world.blocks.production.Drill
 
@@ -149,7 +149,10 @@ class CastleRooms {
 
             if (block !is CoreBlock) {
                 tile.setNet(block, team, 0)
-                if(invincible || block is Turret || block is Drill) tile.build.health(Float.POSITIVE_INFINITY)
+                undestroyableBlocks.add(tile.build)
+                if(invincible) {
+                    tile.build.health(Float.POSITIVE_INFINITY)
+                }
                 coreItems = null
             } else {
                 coreItems = arrayOf<IntArray?>(IntArray(Vars.content.items().size)) as Array<IntArray>?
