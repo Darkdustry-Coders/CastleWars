@@ -69,7 +69,7 @@ class Main : Plugin() {
                 CastleUtils.withinAnyPointDef(action.tile, CastleUtils.airSpawns, 16)
             )) return@ActionFilter false
 
-            (!(undestroyableBlocks.contains(action.tile.build)) || action.type == ActionType.depositItem)
+            (action.tile.build == null || !undestroyableBlocks.contains(action.tile.build) || action.type == ActionType.depositItem)
         })
 
         on { event: PlayerJoin ->
