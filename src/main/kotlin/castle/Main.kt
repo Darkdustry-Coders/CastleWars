@@ -119,7 +119,8 @@ class Main : Plugin() {
         }
 
         on { event: BlockDestroyEvent ->
-            if (undestroyableBlocks.contains(event.tile.build)) undestroyableBlocks.remove(event.tile.build)
+            val build = event.tile.build ?: return@on
+            if (undestroyableBlocks.contains(build)) undestroyableBlocks.remove(build)
         }
 
         on { _: PlayEvent ->
