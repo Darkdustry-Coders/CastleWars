@@ -149,9 +149,9 @@ class CastleRooms {
 
             if (block !is CoreBlock) {
                 tile.setNet(block, team, 0)
+                undestroyableBlocks.add(tile.build)
                 if(invincible) {
                     tile.build.health(Float.POSITIVE_INFINITY)
-                    undestroyableBlocks.add(tile.build)
                 }
                 coreItems = null
             } else {

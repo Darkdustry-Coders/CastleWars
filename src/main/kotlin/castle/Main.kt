@@ -118,6 +118,10 @@ class Main : Plugin() {
             }
         }
 
+        on { event: BlockDestroyEvent ->
+            if (undestroyableBlocks.contains(event.tile.build)) undestroyableBlocks.remove(event.tile.build)
+        }
+
         on { _: PlayEvent ->
             CastleUtils.applyRules(Vars.state.rules)
 
